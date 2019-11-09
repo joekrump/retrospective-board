@@ -1,0 +1,64 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+}
+
+header, main, footer {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+
+header {
+  height: 8%;
+  background: #2196f3;
+}
+
+main {
+  height: 88%;
+  grid-template-rows: 8% 1fr;
+}
+
+footer {
+  height: 4%;
+}
+
+#title-bar {
+  grid-row: 1 / span 1;
+  grid-column: 1 / span 12;
+  display: flex;
+}
+
+#board-title {
+  grid-row: 1 / span 1;
+  grid-column: 1 / span 2;
+}
+
+#board-description {
+  grid-row: 1 / span 1;
+  grid-column: 3 / span 8;
+}
+
+#board-description input {
+  width: 98%;
+}
+
+#board-controls {
+  grid-row: 1 / span 1;
+  grid-column: 11 / span 2;
+}
+
+#columns {
+  grid-row: 2 / span 1;
+  grid-column: 1 / span 12;
+  background: #f3f3f3;
+  display: flex;
+}
+
+.column {
+  flex-grow: 1;
+  margin: 20px;
+}
