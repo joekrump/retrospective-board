@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPencilAlt, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 
 import "./card.css";
 
@@ -13,6 +13,7 @@ interface CardProps {
 interface CardState {
   isEditing: boolean;
   text: string;
+  votes: number;
 }
 
 export class Card extends React.Component<CardProps, CardState> {
@@ -21,32 +22,52 @@ export class Card extends React.Component<CardProps, CardState> {
 
     this.state = {
       isEditing: true,
-      text: ""
+      text: "",
+      votes: 0,
     };
   }
 
-  flipEditable() {
-    this.setState({
+  flipEditable(event: React.MouseEvent) {
+    event.preventDefault();
+    let newState = {
       isEditing: !this.state.isEditing,
-    });
+    }
+
+    this.setState(newState);
+  }
+
+  voteUp(event: React.MouseEvent) {
+    event.preventDefault();
+
+    this.setState({
+      votes: this.state.votes + 1,
+    })
   }
 
   render() {
     let cardContents;
-    let buttonText;
+
     if (this.state.isEditing) {
-      cardContents = (<textarea defaultValue={this.state.text}></textarea>);
-      buttonText = "Add";
+      cardContents = (
+        <div>
+          <textarea onChange={event => this.setState({text: event.target.value})} value={this.state.text}></textarea>
+          <button onClick={event => this.flipEditable(event)}>Add</button>
+          <a href="" onClick={event => this.props.deleteCard(event, this.props.id)}><FontAwesomeIcon icon={faTrash} /></a>
+        </div>
+      );
     } else {
-      cardContents = (<>{this.state.text}</>);
-      buttonText = "Edit";
+      cardContents = (
+        <div>
+          <div>{this.state.text}</div>
+          <a href="" onClick={event => this.flipEditable(event)} className="edit-link"><FontAwesomeIcon icon={faPencilAlt} /></a>
+          <a href="" onClick={event => this.voteUp(event)} className="vote-link"><FontAwesomeIcon icon={faThumbsUp} /></a>
+          <span className="vote-count">{this.state.votes}</span>
+        </div>);
     }
 
     return (
       <div className="card-container">
         {cardContents}
-        <button onClick={() => this.flipEditable()}>{buttonText}</button>
-        <a href="" onClick={event => this.props.deleteCard(event, this.props.id)}><FontAwesomeIcon icon={faTrash} /></a>
       </div>
     );
   }
