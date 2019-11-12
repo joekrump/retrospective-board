@@ -6,32 +6,59 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as faIcons from "@fortawesome/free-solid-svg-icons";
 import { Column } from "../Column/Column";
 
+interface ColumnData {
+  key: string;
+}
+
 interface AppState {
-  columns: number;
+  columns: ColumnData[];
+  lastColumnIndex: number;
 }
 
 export class App extends React.Component<{}, AppState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      columns: 3,
+      columns: [
+        {key: "Column-1"},
+        {key: "Column-2"},
+        {key: "Column-3"}
+      ],
+      lastColumnIndex: 3,
     }
   }
 
   addColumn() {
-    this.setState({columns: this.state.columns + 1 });
+    let newColumns = this.state.columns.slice(0);
+    newColumns.push({key: `Column-${this.state.lastColumnIndex+1}`})
+    this.setState({columns: newColumns, lastColumnIndex: this.state.lastColumnIndex+1 });
   }
 
   renderColumns() {
     let markup: JSX.Element[] = [];
 
-    for (let i = 0; i < this.state.columns; i++) {
+    for (let i = 0; i < this.state.columns.length; i++) {
+      let name = this.state.columns[i].key.replace("-", " ");
       markup.push(
-        <Column index={i}></Column>
+        <Column
+          key={this.state.columns[i].key}
+          id={this.state.columns[i].key}
+          name={name}
+          deleteColumn={(event, key) =>this.deleteColumn(event, key)}>
+        </Column>
       );
     }
 
     return markup;
+  }
+
+  deleteColumn(event: React.MouseEvent, key: string) {
+    event.preventDefault();
+
+    let newColumns = this.state.columns.filter((column: ColumnData) => {
+      return column.key !== key;
+    });
+    this.setState({columns: newColumns});
   }
 
   render() {
