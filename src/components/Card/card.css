@@ -3,3 +3,8 @@
   border: 5px solid #000;
 }
 
+.card-container textarea {
+  resize: false;
+  height: 100%;
+  width: 100%;
+}
