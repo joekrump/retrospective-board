@@ -4,6 +4,7 @@ import "./app.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as faIcons from "@fortawesome/free-solid-svg-icons";
+import { Column } from "../Column/Column";
 
 interface AppState {
   columns: number;
@@ -26,15 +27,7 @@ export class App extends React.Component<{}, AppState> {
 
     for (let i = 0; i < this.state.columns; i++) {
       markup.push(
-        <div className="column">
-          <div className="header-row">
-            <h2><FontAwesomeIcon icon={faIcons.faSquare} /> Column {i+1}</h2>
-            <a href=""><FontAwesomeIcon icon={faIcons.faTrash} /></a>
-          </div>
-          <div className="body-row">
-            <button style={ {width:"100%"} }><FontAwesomeIcon icon={faIcons.faPlusCircle} /></button>
-          </div>
-        </div>
+        <Column index={i}></Column>
       );
     }
 
