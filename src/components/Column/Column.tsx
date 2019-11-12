@@ -35,6 +35,16 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
   }
 
+  deleteCard(event: React.MouseEvent, key: string) {
+    event.preventDefault();
+
+    let newCards = this.state.cards.filter((card: CardData) => {
+      return card.key !== key;
+    });
+
+    this.setState({cards: newCards});
+  }
+
   renderCards() {
     let markup: JSX.Element[] = [];
 
@@ -42,7 +52,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       markup.push(
         <Card
           key={this.state.cards[i].key}
-          id={this.state.cards[i].key}>
+          id={this.state.cards[i].key}
+          deleteCard={(event, key) => this.deleteCard(event, key)}>
         </Card>
       );
     }
