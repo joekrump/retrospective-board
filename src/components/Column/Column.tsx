@@ -2,6 +2,8 @@ import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquare, faTrash, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "../Card/Card";
+import * as uuid from "uuid";
+
 
 import "./column.css";
 
@@ -45,15 +47,16 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
 
   addCardFromSocket(card: CardData) {
     let newCards = this.state.cards.slice(0);
-    newCards.push({key: `card-${this.state.lastIndex + 1}`, text: card.text});
+    newCards.push(card);
     console.log("we settin' state:");
     console.log(newCards[newCards.length - 1]);
     this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
   }
 
   addCard() {
+    console.log("addCard called");
     let newCards = this.state.cards.slice(0);
-    newCards.push({key: `card-${this.state.lastIndex + 1}`});
+    newCards.push({key: `card-${uuid.v4()}`});
     this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
   }
 
@@ -85,21 +88,22 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             key={this.state.cards[i].key}
             id={this.state.cards[i].key}
             deleteCard={(event, key) => this.deleteCard(event, key)}
-            text="text"
+            text={this.state.cards[i].text}
             editable={false}
             onCardSaved={this.onCardSaved.bind(this)}>
           </Card>
-        );        
+        );
+      } else {
+        markup.push(
+          <Card
+            key={this.state.cards[i].key}
+            id={this.state.cards[i].key}
+            deleteCard={(event, key) => this.deleteCard(event, key)}
+            editable={true}
+            onCardSaved={this.onCardSaved.bind(this)}>
+          </Card>
+        );
       }
-      markup.push(
-        <Card
-          key={this.state.cards[i].key}
-          id={this.state.cards[i].key}
-          deleteCard={(event, key) => this.deleteCard(event, key)}
-          editable={true}
-          onCardSaved={this.onCardSaved.bind(this)}>
-        </Card>
-      );
     }
 
     return markup;

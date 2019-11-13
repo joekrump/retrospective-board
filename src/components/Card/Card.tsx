@@ -47,7 +47,7 @@ export class Card extends React.Component<CardProps, CardState> {
 
   save(event: React.MouseEvent) {
     this.flipEditable(event);
-    
+
     this.props.onCardSaved({
       id: this.props.id,
       text: this.state.text,
@@ -87,10 +87,17 @@ export class Card extends React.Component<CardProps, CardState> {
         );
       }
 
+      let editLink;
+      if (this.props.editable) {
+        editLink = (
+          <a href="" onClick={event => this.flipEditable(event)} className="edit-link"><FontAwesomeIcon icon={faPencilAlt} /></a>
+        );
+      }
+
       cardContents = (
         <div>
           <div>{this.state.text}</div>
-          <a href="" onClick={event => this.flipEditable(event)} className="edit-link"><FontAwesomeIcon icon={faPencilAlt} /></a>
+          {editLink}
           <a href="" onClick={event => this.voteUp(event)} className="vote-link"><FontAwesomeIcon icon={faThumbsUp} /></a>
           <span className="vote-count">{this.state.votes}</span>
           {downvote}
