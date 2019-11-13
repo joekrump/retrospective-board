@@ -8,3 +8,7 @@
   height: 100%;
   width: 100%;
 }
+
+.card-container .blur {
+  filter: blur(10px);
+}
