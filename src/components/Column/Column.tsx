@@ -9,7 +9,7 @@ import "./column.css";
 
 interface CardData {
   key: string;
-  text?: string;
+  editable: boolean;
 }
 
 interface ColumnProps {
@@ -33,52 +33,40 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       cards: [],
       lastIndex: 0,
     };
+  }
 
-    this.props.socket.on("card-created", (data: any) => {
-      if (data.column === this.props.id) {
-        if (!this.state.cards.some((card: CardData) => card.key === data.id)) {
-          console.log("adding from socket");
-          this.addCardFromSocket({key: data.id, text: data.text});
-        } else {
-          console.log("card exists!");
-          this.updateCardFromSocket({key: data.id, text: data.text});
-        }
-      }
+  componentWillMount() {
+    this.props.socket.on(`card:created:${this.props.id}`, (data: {id: string}) => {
+      this.addCard(data.id);
+    });
+
+    this.props.socket.on(`card:deleted:${this.props.id}`, (data: any) => {
+      let newCards = this.state.cards.filter((card: CardData) => {
+        return card.key !== data.id;
+      });
+      this.setState({cards: newCards});
     });
   }
 
-  updateCardFromSocket(updatedCard: CardData) {
-    let newCards = this.state.cards.map((card) => {
-      let cardCopy = Object.assign({}, card);
-      if (card.key === updatedCard.key) {
-        cardCopy.text = updatedCard.text;
-      }
-      return cardCopy;
-    });
-    console.log(newCards);
-    this.setState({cards: newCards});
-    this.forceUpdate();
+  componentWillUnmount() {
+    this.props.socket.removeListener(`card:created:${this.props.id}`);
   }
 
-  addCardFromSocket(card: CardData) {
+  addCard(key?: string) {
     let newCards = this.state.cards.slice(0);
-    newCards.push(card);
-    this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
-  }
+    if (key) {
+      newCards.push({key, editable: false});
+    } else {
+      let newCard = {key: `card-${uuid.v4()}`, editable: true }
+      newCards.push(newCard);
 
-  addCard() {
-    console.log("addCard called");
-    let newCards = this.state.cards.slice(0);
-    newCards.push({key: `card-${uuid.v4()}`});
-    this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
-  }
+      this.props.socket.emit(`card:created`, {
+        columnId: this.props.id,
+        id: newCard.key,
+      });
+    }
 
-  onCardSaved(data: any) {
-    this.props.socket.emit("cardCreated", {
-      id: data.id,
-      column: this.props.id,
-      text: data.text,
-    });
+    this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
   }
 
   deleteCard(event: React.MouseEvent, key: string) {
@@ -88,6 +76,11 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       return card.key !== key;
     });
 
+    this.props.socket.emit("card:deleted", {
+      columnId: this.props.id,
+      id: key
+    });
+
     this.setState({cards: newCards});
   }
 
@@ -95,28 +88,16 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     let markup: JSX.Element[] = [];
 
     for (let i = 0; i < this.state.cards.length; i++) {
-      if (this.state.cards[i].text) {
-        markup.push(
-          <Card
-            key={this.state.cards[i].key}
-            id={this.state.cards[i].key}
-            deleteCard={(event, key) => this.deleteCard(event, key)}
-            text={this.state.cards[i].text}
-            editable={false}
-            onCardSaved={this.onCardSaved.bind(this)}>
-          </Card>
-        );
-      } else {
-        markup.push(
-          <Card
-            key={this.state.cards[i].key}
-            id={this.state.cards[i].key}
-            deleteCard={(event, key) => this.deleteCard(event, key)}
-            editable={true}
-            onCardSaved={this.onCardSaved.bind(this)}>
-          </Card>
-        );
-      }
+      markup.push(
+        <Card
+          key={this.state.cards[i].key}
+          id={this.state.cards[i].key}
+          deleteCard={(event, key) => this.deleteCard(event, key)}
+          editable={this.state.cards[i].editable}
+          socket={this.props.socket}
+          columnId={this.props.id}>
+        </Card>
+      );
     }
 
     return markup;

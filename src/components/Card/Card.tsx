@@ -3,14 +3,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt, faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
 
 import "./card.css";
+import { Socket } from "net";
 
 interface CardProps {
   key: string;
   id: string;
   deleteCard: (event: React.MouseEvent, key: string) => void;
-  text?: string;
   editable: boolean;
-  onCardSaved: (data: any) => void;
+  socket: SocketIOClient.Socket;
+  columnId: string;
 }
 
 interface CardState {
@@ -29,11 +30,22 @@ export class Card extends React.Component<CardProps, CardState> {
       text: "",
     }
 
-    if (this.props.text) {
+    if (!this.props.editable) {
       stateToSet.isEditing = false;
-      stateToSet.text = this.props.text;
     }
     this.state = stateToSet;
+  }
+
+  componentWillMount() {
+    this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
+      this.setState({
+        text: data.text,
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.socket.removeListener(`card:updated:${this.props.id}`);
   }
 
   flipEditable(event: React.MouseEvent) {
@@ -48,7 +60,7 @@ export class Card extends React.Component<CardProps, CardState> {
   save(event: React.MouseEvent) {
     this.flipEditable(event);
 
-    this.props.onCardSaved({
+    this.props.socket.emit(`card:updated`, {
       id: this.props.id,
       text: this.state.text,
     });
