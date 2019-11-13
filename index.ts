@@ -43,4 +43,12 @@ io.on('connection', function (socket) {
       id: data.id
     });
   });
+
+  socket.on("card:voted", function (data) {
+    console.log("card vote");
+    console.log(data);
+    socket.broadcast.emit(`card:voted:${data.id}`, {
+      vote: data.vote
+    });
+  })
 });

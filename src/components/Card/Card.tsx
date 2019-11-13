@@ -42,6 +42,12 @@ export class Card extends React.Component<CardProps, CardState> {
         text: data.text,
       });
     });
+
+    this.props.socket.on(`card:voted:${this.props.id}`, (data: any) => {
+      this.setState({
+        votes: this.state.votes + data.vote,
+      });
+    });
   }
 
   componentWillUnmount() {
@@ -69,6 +75,11 @@ export class Card extends React.Component<CardProps, CardState> {
   voteUp(event: React.MouseEvent) {
     event.preventDefault();
 
+    this.props.socket.emit("card:voted", {
+      id: this.props.id,
+      vote: 1
+    });
+
     this.setState({
       votes: this.state.votes + 1,
     })
@@ -76,6 +87,11 @@ export class Card extends React.Component<CardProps, CardState> {
 
   voteDown(event: React.MouseEvent) {
     event.preventDefault();
+
+    this.props.socket.emit("card:voted", {
+      id: this.props.id,
+      vote: -1
+    });
 
     this.setState({votes: this.state.votes - 1});
   }
