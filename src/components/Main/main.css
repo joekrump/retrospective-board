@@ -4,3 +4,30 @@ main {
   height: 88%;
   grid-template-rows: 8% 1fr;
 }
+
+#board-title {
+  grid-row: 1 / span 1;
+  grid-column: 1 / span 2;
+}
+
+#board-description {
+  grid-row: 1 / span 1;
+  grid-column: 3 / span 8;
+}
+
+#board-description input {
+  width: 98%;
+  height: 100%;
+}
+
+#board-controls {
+  grid-row: 1 / span 1;
+  grid-column: 11 / span 2;
+}
+
+#columns {
+  grid-row: 2 / span 1;
+  grid-column: 1 / span 12;
+  background: #f3f3f3;
+  display: flex;
+}

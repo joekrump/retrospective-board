@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquare, faTrash, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "../Card/Card";
 
+import "./column.css";
+
 interface CardData {
   key: string;
 }
