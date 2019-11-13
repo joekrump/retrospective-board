@@ -8,6 +8,9 @@ interface CardProps {
   key: string;
   id: string;
   deleteCard: (event: React.MouseEvent, key: string) => void;
+  text?: string;
+  editable: boolean;
+  onCardSaved: (data: any) => void;
 }
 
 interface CardState {
@@ -20,11 +23,17 @@ export class Card extends React.Component<CardProps, CardState> {
   constructor(props: CardProps) {
     super(props);
 
-    this.state = {
+    let stateToSet = {
       isEditing: true,
-      text: "",
       votes: 0,
-    };
+      text: "",
+    }
+
+    if (this.props.text) {
+      stateToSet.isEditing = false;
+      stateToSet.text = this.props.text;
+    }
+    this.state = stateToSet;
   }
 
   flipEditable(event: React.MouseEvent) {
@@ -34,6 +43,15 @@ export class Card extends React.Component<CardProps, CardState> {
     }
 
     this.setState(newState);
+  }
+
+  save(event: React.MouseEvent) {
+    this.flipEditable(event);
+    
+    this.props.onCardSaved({
+      id: this.props.id,
+      text: this.state.text,
+    });
   }
 
   voteUp(event: React.MouseEvent) {
@@ -57,7 +75,7 @@ export class Card extends React.Component<CardProps, CardState> {
       cardContents = (
         <div>
           <textarea onChange={event => this.setState({text: event.target.value})} value={this.state.text}></textarea>
-          <button onClick={event => this.flipEditable(event)}>Add</button>
+          <button onClick={event => this.save(event)}>Add</button>
           <a href="" onClick={event => this.props.deleteCard(event, this.props.id)}><FontAwesomeIcon icon={faTrash} /></a>
         </div>
       );

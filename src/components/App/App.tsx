@@ -1,19 +1,31 @@
 import * as React from "react";
+import * as io from "socket.io-client";
 
 import "./app.css";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as faIcons from "@fortawesome/free-solid-svg-icons";
-import { Column } from "../Column/Column";
 import { Header } from "../Header/Header";
 import { Main } from "../Main/Main";
 
-export class App extends React.Component<{}, {}> {
+interface AppState {
+  socket: SocketIOClient.Socket,
+}
+
+export class App extends React.Component<{}, AppState> {
+  constructor(props: {}) {
+    super(props);
+
+    const socket = io.connect('http://localhost:8000');
+
+    this.state = {
+      socket,
+    };
+  }
+
   render() {
     return (
       <>
         <Header></Header>
-        <Main></Main>
+        <Main socket={this.state.socket}></Main>
         <footer></footer>
       </>
     );

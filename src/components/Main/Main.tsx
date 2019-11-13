@@ -9,12 +9,16 @@ interface ColumnData {
   key: string;
 }
 
+interface MainProps {
+  socket: SocketIOClient.Socket,
+}
+
 interface MainState {
   columns: ColumnData[];
   lastColumnIndex: number;
 }
 
-export class Main extends React.Component<{}, MainState> {
+export class Main extends React.Component<MainProps, MainState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -43,7 +47,8 @@ export class Main extends React.Component<{}, MainState> {
           key={this.state.columns[i].key}
           id={this.state.columns[i].key}
           name={name}
-          deleteColumn={(event, key) =>this.deleteColumn(event, key)}>
+          deleteColumn={(event, key) =>this.deleteColumn(event, key)}
+          socket={this.props.socket}>
         </Column>
       );
     }

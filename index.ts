@@ -14,8 +14,9 @@ app.get("/", function(req, res) {
 });
 
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
+  console.log("connected!");
+  socket.on('cardCreated', function (data) {
     console.log(data);
+    socket.broadcast.emit("card-created", data);
   });
 });

@@ -7,6 +7,7 @@ import "./column.css";
 
 interface CardData {
   key: string;
+  text?: string;
 }
 
 interface ColumnProps {
@@ -14,6 +15,7 @@ interface ColumnProps {
   id: string;
   name: string;
   deleteColumn: (event: React.MouseEvent, key: string) => void;
+  socket: SocketIOClient.Socket,
 }
 
 interface ColumnState {
@@ -29,12 +31,38 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       cards: [],
       lastIndex: 0,
     };
+
+    this.props.socket.on("card-created", (data: any) => {
+      if (data.column === this.props.id) {
+        console.log(data);
+        if (!this.state.cards.some((card: CardData) => card.key === data.id)) {
+          console.log("adding from socket");
+          this.addCardFromSocket({key: data.id, text: data.text});
+        }
+      }
+    });
+  }
+
+  addCardFromSocket(card: CardData) {
+    let newCards = this.state.cards.slice(0);
+    newCards.push({key: `card-${this.state.lastIndex + 1}`, text: card.text});
+    console.log("we settin' state:");
+    console.log(newCards[newCards.length - 1]);
+    this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
   }
 
   addCard() {
     let newCards = this.state.cards.slice(0);
     newCards.push({key: `card-${this.state.lastIndex + 1}`});
     this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
+  }
+
+  onCardSaved(data: any) {
+    this.props.socket.emit("cardCreated", {
+      id: data.id,
+      column: this.props.id,
+      text: data.text,
+    });
   }
 
   deleteCard(event: React.MouseEvent, key: string) {
@@ -51,11 +79,25 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     let markup: JSX.Element[] = [];
 
     for (let i = 0; i < this.state.cards.length; i++) {
+      if (this.state.cards[i].text) {
+        markup.push(
+          <Card
+            key={this.state.cards[i].key}
+            id={this.state.cards[i].key}
+            deleteCard={(event, key) => this.deleteCard(event, key)}
+            text="text"
+            editable={false}
+            onCardSaved={this.onCardSaved.bind(this)}>
+          </Card>
+        );        
+      }
       markup.push(
         <Card
           key={this.state.cards[i].key}
           id={this.state.cards[i].key}
-          deleteCard={(event, key) => this.deleteCard(event, key)}>
+          deleteCard={(event, key) => this.deleteCard(event, key)}
+          editable={true}
+          onCardSaved={this.onCardSaved.bind(this)}>
         </Card>
       );
     }
