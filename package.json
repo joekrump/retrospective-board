@@ -6,26 +6,35 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@clio/nova-core-react": "^0.2.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.7",
+    "express": "^4.17.1",
     "react": "^16.11.0",
-    "react-dom": "^16.11.0"
+    "react-dom": "^16.11.0",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0"
   },
   "scripts": {
     "tsc": "tsc",
     "build": "webpack",
-    "dev": "webpack-dev-server --mode development --open --hot"
+    "dev": "concurrently --kill-others \"npm run watch\" \"npm run start-server\"",
+    "watch": "webpack --watch",
+    "start-server": "ts-node-dev --respawn --transpileOnly index.ts"
   },
   "devDependencies": {
+    "@types/express": "^4.17.2",
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.3",
+    "@types/socket.io": "^2.1.4",
+    "@types/socket.io-client": "^1.4.32",
+    "concurrently": "^5.0.0",
     "css-loader": "^3.2.0",
     "html-webpack-plugin": "^3.2.0",
     "source-map-loader": "^0.2.4",
     "style-loader": "^1.0.0",
     "ts-loader": "^6.2.1",
+    "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.6.4",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
