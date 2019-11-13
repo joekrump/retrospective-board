@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/index.tsx',
-  resolve: { extensions: ['.ts', '.js', '.tsx'] },
+  resolve: { extensions: ['.ts', '.js', '.tsx', '.svg', '.css'] },
   module: {
     rules: [
       {
@@ -18,6 +18,10 @@ module.exports = {
       {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.svg$/,
+        use: ["svg-url-loader"],
       },
       {
         enforce: "pre",
