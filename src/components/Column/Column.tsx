@@ -36,20 +36,33 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
 
     this.props.socket.on("card-created", (data: any) => {
       if (data.column === this.props.id) {
-        console.log(data);
         if (!this.state.cards.some((card: CardData) => card.key === data.id)) {
           console.log("adding from socket");
           this.addCardFromSocket({key: data.id, text: data.text});
+        } else {
+          console.log("card exists!");
+          this.updateCardFromSocket({key: data.id, text: data.text});
         }
       }
     });
   }
 
+  updateCardFromSocket(updatedCard: CardData) {
+    let newCards = this.state.cards.map((card) => {
+      let cardCopy = Object.assign({}, card);
+      if (card.key === updatedCard.key) {
+        cardCopy.text = updatedCard.text;
+      }
+      return cardCopy;
+    });
+    console.log(newCards);
+    this.setState({cards: newCards});
+    this.forceUpdate();
+  }
+
   addCardFromSocket(card: CardData) {
     let newCards = this.state.cards.slice(0);
     newCards.push(card);
-    console.log("we settin' state:");
-    console.log(newCards[newCards.length - 1]);
     this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
   }
 
