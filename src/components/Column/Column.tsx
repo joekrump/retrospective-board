@@ -23,16 +23,24 @@ interface ColumnProps {
 interface ColumnState {
   cards: CardData[];
   lastIndex: number;
+  name: string;
+  isEditing: boolean;
 }
 
 export class Column extends React.Component<ColumnProps, ColumnState> {
+  private nameInput: React.RefObject<HTMLInputElement>;
+  
   constructor(props: ColumnProps) {
     super(props);
 
     this.state = {
       cards: [],
       lastIndex: 0,
+      name: this.props.name,
+      isEditing: false,
     };
+
+    this.nameInput = React.createRef();
   }
 
   componentWillMount() {
@@ -103,11 +111,37 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     return markup;
   }
 
+  flipIsEditing(event?: React.MouseEvent) {
+    if (event) {
+      event.preventDefault();
+    }
+    this.setState({
+      isEditing: !this.state.isEditing,
+    });
+  }
+
+  updateColumnName() {
+    this.setState({
+      name: (this.nameInput as any).current.value
+    });
+    this.flipIsEditing();
+  }
+
   render() {
+    if (this.state.isEditing) {
+      return (
+        <div className="column-edit">
+          <input type="text" defaultValue={this.state.name} ref={this.nameInput} />
+          <button onClick={this.updateColumnName.bind(this)}>Save</button>
+          <a href="" onClick={event => this.flipIsEditing(event)}>cancel</a>
+        </div>
+      )
+    }
+
     return (
       <div className="column">
         <div className="header-row">
-          <h2><FontAwesomeIcon icon={faSquare} />{this.props.name}</h2>
+          <h2 onClick={this.flipIsEditing.bind(this)}><FontAwesomeIcon icon={faSquare} />{this.state.name}</h2>
           <a href="" onClick={event => this.props.deleteColumn(event, this.props.id)}><FontAwesomeIcon icon={faTrash} /></a>
         </div>
         <div className="body-row">
