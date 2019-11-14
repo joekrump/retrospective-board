@@ -4,44 +4,55 @@ import { faPencilAlt, faCog } from "@fortawesome/free-solid-svg-icons";
 
 import "./main.css";
 import { Column } from "../Column/Column";
+import uuid = require("uuid");
 
 interface ColumnData {
   key: string;
+  name: string;
 }
 
 interface MainProps {
-  socket: SocketIOClient.Socket,
+  socket: SocketIOClient.Socket;
+  boardId: string;
 }
 
 interface MainState {
   columns: ColumnData[];
-  lastColumnIndex: number;
 }
 
 export class Main extends React.Component<MainProps, MainState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      columns: [
-        {key: "Column-1"},
-        {key: "Column-2"},
-        {key: "Column-3"}
-      ],
-      lastColumnIndex: 3,
+      columns: [],
     }
   }
   
-  addColumn() {
+  componentWillMount() {
+    this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
+      console.log(data);
+      data.columns.forEach((column: {id: string}) => {
+        this.addColumn(column);
+      })
+    });
+  }
+
+  addColumn(column?: any) {
     let newColumns = this.state.columns.slice(0);
-    newColumns.push({key: `Column-${this.state.lastColumnIndex+1}`})
-    this.setState({columns: newColumns, lastColumnIndex: this.state.lastColumnIndex+1 });
+    if (column) {
+      newColumns.push({key: column.id, name: column.title});
+    } else {
+      newColumns.push({key: uuid.v4(), name: "New Column"})
+    }
+
+    this.setState({columns: newColumns });
   }
 
   renderColumns() {
     let markup: JSX.Element[] = [];
 
     for (let i = 0; i < this.state.columns.length; i++) {
-      let name = this.state.columns[i].key.replace("-", " ");
+      let name = this.state.columns[i].name;
       markup.push(
         <Column
           key={this.state.columns[i].key}
