@@ -17,7 +17,8 @@ interface ColumnProps {
   id: string;
   name: string;
   deleteColumn: (event: React.MouseEvent, key: string) => void;
-  socket: SocketIOClient.Socket,
+  socket: SocketIOClient.Socket;
+  boardId: string;
 }
 
 interface ColumnState {
@@ -54,10 +55,16 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       });
       this.setState({cards: newCards});
     });
+
+    this.props.socket.on(`column:updated:${this.props.id}`, (data: any) => {
+      this.setState({name: data.title});
+    });
   }
 
   componentWillUnmount() {
     this.props.socket.removeListener(`card:created:${this.props.id}`);
+    this.props.socket.removeListener(`card:deleted:${this.props.id}`);
+    this.props.socket.removeListener(`column:updated:${this.props.id}`);
   }
 
   addCard(key?: string) {
@@ -122,6 +129,11 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
 
   updateColumnName() {
     this.setState({
+      name: (this.nameInput as any).current.value
+    });
+    this.props.socket.emit("column:updated", {
+      boardId: this.props.boardId,
+      id: this.props.id,
       name: (this.nameInput as any).current.value
     });
     this.flipIsEditing();

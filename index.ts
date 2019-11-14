@@ -77,6 +77,18 @@ io.on('connection', function (socket) {
     });
   });
 
+  socket.on("column:updated", function(data) {
+    console.log("column updated");
+    console.log(data);
+    let column = boards[data.boardId].columns.find((column) => column.id === data.id);
+    if (column) {
+      column.title = data.name;
+      socket.broadcast.emit(`column:updated:${data.id}`, {
+        title: data.name
+      });
+    }
+  });
+
   socket.on("card:created", function(data) {
     console.log("card created");
     console.log(data);

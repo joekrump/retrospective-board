@@ -72,7 +72,8 @@ export class Main extends React.Component<MainProps, MainState> {
           id={this.state.columns[i].key}
           name={name}
           deleteColumn={(event, key) =>this.deleteColumn(event, key)}
-          socket={this.props.socket}>
+          socket={this.props.socket}
+          boardId={this.props.boardId}>
         </Column>
       );
     }
