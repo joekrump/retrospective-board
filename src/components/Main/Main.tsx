@@ -27,7 +27,7 @@ export class Main extends React.Component<MainProps, MainState> {
       columns: [],
     }
   }
-  
+
   componentWillMount() {
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
       data.columns.forEach((column: {id: string}) => {
@@ -52,6 +52,10 @@ export class Main extends React.Component<MainProps, MainState> {
     let newColumns = this.state.columns.slice(0);
     if (column) {
       newColumns.push({key: column.id, name: column.title});
+      this.props.socket.emit("column:loaded", {
+        boardId: this.props.boardId,
+        id: column.id,
+      });
     } else {
       const newColumn = {key: uuid.v4(), name: "New Column"};
       newColumns.push(newColumn)
@@ -120,7 +124,7 @@ export class Main extends React.Component<MainProps, MainState> {
         <div id="columns">
           {this.renderColumns()}
         </div>
-      </main>    
+      </main>
     );
   }
 }

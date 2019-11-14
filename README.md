@@ -14,8 +14,8 @@
 * [x] "create new board" from step 2 creates & passes initial columns to board on creation
 
 3. store data so people joining URL see what's already been created
-* store card data in memory on server
-* socket on "connection" passes columns and cards down to client
+* [x] store card data in memory on server
+* [x] socket on "connection" passes columns and cards down to client
 
 4. editable board traits
 * title and description save to server

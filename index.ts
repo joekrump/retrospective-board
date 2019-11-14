@@ -72,6 +72,17 @@ io.on('connection', function (socket) {
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
   });
 
+  socket.on("column:loaded", function(data) {
+    console.log("column created");
+    console.log(data);
+    const column = boards[data.boardId].columns.find((column) => column.id === data.id);
+    if (column) {
+      socket.emit(`column:loaded:${data.id}`, {
+        cards: column.cards,
+      });
+    }
+  });
+
   socket.on("column:created", function(data) {
     console.log("column created");
     console.log(data);

@@ -10,6 +10,8 @@ import "./column.css";
 interface CardData {
   key: string;
   editable: boolean;
+  text?: string;
+  votes?: number;
 }
 
 interface ColumnProps {
@@ -45,8 +47,22 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   }
 
   componentWillMount() {
+    this.props.socket.on(`column:loaded:${this.props.id}`, (data: any) => {
+      for (let i = 0; i < data.cards.length; i++) {
+        this.addCard({
+          key: data.cards[i].id,
+          editable: false,
+          text: data.cards[i].text,
+          votes: data.cards[i].votes,
+        } as CardData);
+      }
+    });
+
     this.props.socket.on(`card:created:${this.props.id}`, (data: {id: string}) => {
-      this.addCard(data.id);
+      this.addCard({
+        key: data.id,
+        editable: false,
+      } as CardData);
     });
 
     this.props.socket.on(`card:deleted:${this.props.id}`, (data: any) => {
@@ -67,10 +83,10 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.props.socket.removeListener(`column:updated:${this.props.id}`);
   }
 
-  addCard(key?: string) {
+  addCard(data?: CardData) {
     let newCards = this.state.cards.slice(0);
-    if (key) {
-      newCards.push({key, editable: false});
+    if (data) {
+      newCards.push(data);
     } else {
       let newCard = {key: `card-${uuid.v4()}`, editable: true }
       newCards.push(newCard);
@@ -105,15 +121,19 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     let markup: JSX.Element[] = [];
 
     for (let i = 0; i < this.state.cards.length; i++) {
+      let card = this.state.cards[i];
+
       markup.push(
         <Card
-          key={this.state.cards[i].key}
-          id={this.state.cards[i].key}
+          key={card.key}
+          id={card.key}
           deleteCard={(event, key) => this.deleteCard(event, key)}
-          editable={this.state.cards[i].editable}
+          editable={card.editable}
           socket={this.props.socket}
           columnId={this.props.id}
-          boardId={this.props.boardId}>
+          boardId={this.props.boardId}
+          text={card.text ? card.text : ""}
+          votes={card.votes ? card.votes : 0}>
         </Card>
       );
     }

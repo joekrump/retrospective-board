@@ -12,6 +12,8 @@ interface CardProps {
   socket: SocketIOClient.Socket;
   columnId: string;
   boardId: string;
+  text: string;
+  votes: number;
 }
 
 interface CardState {
@@ -26,8 +28,8 @@ export class Card extends React.Component<CardProps, CardState> {
 
     let stateToSet = {
       isEditing: true,
-      votes: 0,
-      text: "",
+      votes: this.props.votes,
+      text: this.props.text,
     }
 
     if (!this.props.editable) {
