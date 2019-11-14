@@ -30,11 +30,18 @@ export class Main extends React.Component<MainProps, MainState> {
   
   componentWillMount() {
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
-      console.log(data);
       data.columns.forEach((column: {id: string}) => {
         this.addColumn(column);
       })
     });
+
+    this.props.socket.on(`column:created:${this.props.boardId}`, (data: any) => {
+      this.addColumn(data);
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.socket.removeListener(`board:loaded:${this.props.boardId}`);
   }
 
   addColumn(column?: any) {
@@ -42,7 +49,13 @@ export class Main extends React.Component<MainProps, MainState> {
     if (column) {
       newColumns.push({key: column.id, name: column.title});
     } else {
-      newColumns.push({key: uuid.v4(), name: "New Column"})
+      const newColumn = {key: uuid.v4(), name: "New Column"};
+      newColumns.push(newColumn)
+      this.props.socket.emit("column:created", {
+        boardId: this.props.boardId,
+        id: newColumn.key,
+        name: newColumn.name
+      });
     }
 
     this.setState({columns: newColumns });

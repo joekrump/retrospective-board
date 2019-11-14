@@ -14,7 +14,7 @@ interface Column {
 interface Board {
   title?: string;
   description?: string;
-  columns?: Column[];
+  columns: Column[];
 }
 
 let boards: {[key: string]: Board} = {};
@@ -65,6 +65,16 @@ io.on('connection', function (socket) {
   socket.on('cardCreated', function (data) {
     console.log(data);
     socket.broadcast.emit("card-created", data);
+  });
+
+  socket.on("column:created", function(data) {
+    console.log("column created");
+    console.log(data);
+    boards[data.boardId].columns.push({id: data.id, title: data.name})
+    socket.broadcast.emit(`column:created:${data.boardId}`, {
+      id: data.id,
+      title: data.name
+    });
   });
 
   socket.on("card:created", function(data) {
