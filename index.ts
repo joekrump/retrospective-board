@@ -6,9 +6,16 @@ let server = require("http").Server(app);
 let io = SocketIO(server);
 import uuid from "uuid";
 
+interface Card {
+  id: string;
+  text: string;
+  votes: number;
+}
+
 interface Column {
   title: string;
   id: string;
+  cards: Card[];
 }
 
 interface Board {
@@ -39,15 +46,18 @@ app.post("/create-board", function(_req, res) {
     columns: [
       {
         id: uuid.v4(),
-        title: "Column 1"
+        title: "Column 1",
+        cards: []
       },
       {
         id: uuid.v4(),
-        title: "Column 2"
+        title: "Column 2",
+        cards: []
       },
       {
         id: uuid.v4(),
-        title: "Column 3"
+        title: "Column 3",
+        cards: []
       }
     ]
   };
@@ -56,7 +66,7 @@ app.post("/create-board", function(_req, res) {
 });
 
 io.on('connection', function (socket) {
-  console.log("connected!");
+  console.log("user connected!");
 
   socket.on('board:loaded', function (data) {
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
@@ -65,7 +75,7 @@ io.on('connection', function (socket) {
   socket.on("column:created", function(data) {
     console.log("column created");
     console.log(data);
-    boards[data.boardId].columns.push({id: data.id, title: data.name})
+    boards[data.boardId].columns.push({id: data.id, title: data.name, cards: []})
     socket.broadcast.emit(`column:created:${data.boardId}`, {
       id: data.id,
       title: data.name
@@ -97,8 +107,14 @@ io.on('connection', function (socket) {
   })
 
   socket.on("card:created", function(data) {
+    // data: boardId, columnId, id
     console.log("card created");
     console.log(data);
+    const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
+    if (column) {
+      column.cards.push({id: data.id, text: "", votes: 0});
+    }
+
     socket.broadcast.emit(`card:created:${data.columnId}`, {
       id: data.id
     });
@@ -107,6 +123,13 @@ io.on('connection', function (socket) {
   socket.on("card:updated", function (data) {
     console.log("card updated");
     console.log(data);
+    const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
+    if (column) {
+      const card = column.cards.find((card) => card.id === data.id);
+      if (card) {
+        card.text = data.text;
+      }
+    }
     socket.broadcast.emit(`card:updated:${data.id}`, {
       text: data.text,
     });
@@ -115,6 +138,12 @@ io.on('connection', function (socket) {
   socket.on("card:deleted", function (data) {
     console.log("card deleted");
     console.log(data);
+    const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
+    if (column) {
+      const cardIndex = column.cards.findIndex((card) => card.id === data.id);
+      column.cards.splice(cardIndex, 1);
+    }
+
     socket.broadcast.emit(`card:deleted:${data.columnId}`, {
       id: data.id
     });
@@ -123,6 +152,13 @@ io.on('connection', function (socket) {
   socket.on("card:voted", function (data) {
     console.log("card vote");
     console.log(data);
+    const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
+    if (column) {
+      const card = column.cards.find((card) => card.id === data.id);
+      if (card) {
+        card.votes += data.vote;
+      }
+    }
     socket.broadcast.emit(`card:voted:${data.id}`, {
       vote: data.vote
     });

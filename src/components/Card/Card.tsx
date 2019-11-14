@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt, faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
 
 import "./card.css";
-import { Socket } from "net";
 
 interface CardProps {
   key: string;
@@ -12,6 +11,7 @@ interface CardProps {
   editable: boolean;
   socket: SocketIOClient.Socket;
   columnId: string;
+  boardId: string;
 }
 
 interface CardState {
@@ -67,6 +67,8 @@ export class Card extends React.Component<CardProps, CardState> {
     this.flipEditable(event);
 
     this.props.socket.emit(`card:updated`, {
+      boardId: this.props.boardId,
+      columnId: this.props.columnId,
       id: this.props.id,
       text: this.state.text,
     });
@@ -76,6 +78,8 @@ export class Card extends React.Component<CardProps, CardState> {
     event.preventDefault();
 
     this.props.socket.emit("card:voted", {
+      boardId: this.props.boardId,
+      columnId: this.props.columnId,
       id: this.props.id,
       vote: 1
     });
@@ -89,6 +93,8 @@ export class Card extends React.Component<CardProps, CardState> {
     event.preventDefault();
 
     this.props.socket.emit("card:voted", {
+      boardId: this.props.boardId,
+      columnId: this.props.columnId,
       id: this.props.id,
       vote: -1
     });

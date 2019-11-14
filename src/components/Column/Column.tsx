@@ -30,7 +30,7 @@ interface ColumnState {
 
 export class Column extends React.Component<ColumnProps, ColumnState> {
   private nameInput: React.RefObject<HTMLInputElement>;
-  
+
   constructor(props: ColumnProps) {
     super(props);
 
@@ -76,6 +76,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       newCards.push(newCard);
 
       this.props.socket.emit(`card:created`, {
+        boardId: this.props.boardId,
         columnId: this.props.id,
         id: newCard.key,
       });
@@ -92,6 +93,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     });
 
     this.props.socket.emit("card:deleted", {
+      boardId: this.props.boardId,
       columnId: this.props.id,
       id: key
     });
@@ -110,7 +112,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
           deleteCard={(event, key) => this.deleteCard(event, key)}
           editable={this.state.cards[i].editable}
           socket={this.props.socket}
-          columnId={this.props.id}>
+          columnId={this.props.id}
+          boardId={this.props.boardId}>
         </Card>
       );
     }
