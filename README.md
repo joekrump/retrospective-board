@@ -3,12 +3,12 @@
 ## TODO
 
 1. sockets for column create, delete, rename
-* Ability to rename columns
+* [x] Ability to rename columns
 * socket wire ups
 
 2. create a board (index -> create new button -> new board with unique URL)
-* board is held in memory - don't overthink it
-* board stores name, context
+* [x] board is held in memory - don't overthink it
+* [x] board stores name, context
 * UUID for column ids - board stores column IDs
 * socket on "connection" passes down name/context/boards if you create/join
 * share button now shares link

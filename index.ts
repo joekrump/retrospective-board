@@ -4,17 +4,64 @@ import SocketIO from "socket.io";
 let app = express();
 let server = require("http").Server(app);
 let io = SocketIO(server);
+import uuid from "uuid";
+
+interface Column {
+  title: string;
+  id: string;
+}
+
+interface Board {
+  title?: string;
+  description?: string;
+  columns?: Column[];
+}
+
+let boards: {[key: string]: Board} = {};
 
 server.listen(8000);
 
 app.use(express.static('public'));
 
 app.get("/", function(_req, res) {
-  res.sendFile(__dirname + "/public/index.html")
+  res.sendFile(__dirname + "/create.html")
+});
+
+app.get("/board/:boardId", function(_req, res) {
+  res.sendFile(__dirname + "/public/board.html")
+});
+
+app.post("/create-board", function(_req, res) {
+  let boardId = uuid.v4();
+  boards[boardId] = {
+    title: "New Board",
+    description: "",
+    columns: [
+      {
+        id: uuid.v4(),
+        title: "Column 1"
+      },
+      {
+        id: uuid.v4(),
+        title: "Column 2"
+      },
+      {
+        id: uuid.v4(),
+        title: "Column 3"
+      }
+    ]
+  };
+  console.log(boards);
+  res.redirect(`/board/${boardId}`);
 });
 
 io.on('connection', function (socket) {
   console.log("connected!");
+
+  socket.on('board:loaded', function (data) {
+    socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
+  });
+
   socket.on('cardCreated', function (data) {
     console.log(data);
     socket.broadcast.emit("card-created", data);
