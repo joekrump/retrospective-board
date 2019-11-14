@@ -84,6 +84,18 @@ io.on('connection', function (socket) {
     }
   });
 
+  socket.on("column:deleted", function(data) {
+    console.log("column deleted");
+    console.log(data);
+    let columnIndex = boards[data.boardId].columns.findIndex((column) => column.id === data.id);
+    if (columnIndex) {
+      boards[data.boardId].columns.splice(columnIndex, 1);
+      socket.broadcast.emit(`column:deleted:${data.boardId}`, {
+        id: data.id
+      });
+    }
+  })
+
   socket.on("card:created", function(data) {
     console.log("card created");
     console.log(data);

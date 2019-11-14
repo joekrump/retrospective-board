@@ -38,6 +38,10 @@ export class Main extends React.Component<MainProps, MainState> {
     this.props.socket.on(`column:created:${this.props.boardId}`, (data: any) => {
       this.addColumn(data);
     });
+
+    this.props.socket.on(`column:deleted:${this.props.boardId}`, (data: any) => {
+      this.deleteColumn(null, data.id, true);
+    });
   }
 
   componentWillUnmount() {
@@ -81,12 +85,22 @@ export class Main extends React.Component<MainProps, MainState> {
     return markup;
   }
 
-  deleteColumn(event: React.MouseEvent, key: string) {
-    event.preventDefault();
+  deleteColumn(event: React.MouseEvent | null, key: string, fromSocket: boolean = false) {
+    if (event) {
+      event.preventDefault();
+    }
 
     let newColumns = this.state.columns.filter((column: ColumnData) => {
       return column.key !== key;
     });
+
+    if (!fromSocket) {
+      this.props.socket.emit(`column:deleted`, {
+        boardId: this.props.boardId,
+        id: key,
+      });
+    }
+
     this.setState({columns: newColumns});
   }
 
