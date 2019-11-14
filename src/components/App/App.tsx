@@ -7,7 +7,8 @@ import { Header } from "../Header/Header";
 import { Main } from "../Main/Main";
 
 interface AppState {
-  socket: SocketIOClient.Socket,
+  socket: SocketIOClient.Socket;
+  boardId: string;
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -15,17 +16,24 @@ export class App extends React.Component<{}, AppState> {
     super(props);
 
     const socket = io.connect('http://localhost:8000');
-
+    const boardId = window.location.pathname.split("/").pop() || "";
     this.state = {
       socket,
+      boardId,
     };
+  }
+
+  componentDidMount() {
+    this.state.socket.emit("board:loaded", {
+      boardId: this.state.boardId,
+    });
   }
 
   render() {
     return (
       <>
         <Header></Header>
-        <Main socket={this.state.socket}></Main>
+        <Main socket={this.state.socket} boardId={this.state.boardId}></Main>
         <footer></footer>
       </>
     );
