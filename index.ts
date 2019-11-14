@@ -62,11 +62,6 @@ io.on('connection', function (socket) {
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
   });
 
-  socket.on('cardCreated', function (data) {
-    console.log(data);
-    socket.broadcast.emit("card-created", data);
-  });
-
   socket.on("column:created", function(data) {
     console.log("column created");
     console.log(data);
