@@ -5,6 +5,7 @@ import { faPencilAlt, faCog } from "@fortawesome/free-solid-svg-icons";
 import "./main.css";
 import { Column } from "../Column/Column";
 import uuid = require("uuid");
+import { BoardControls } from "../BoardControls/BoardControls";
 
 interface ColumnData {
   key: string;
@@ -112,15 +113,7 @@ export class Main extends React.Component<MainProps, MainState> {
   render() {
     return (
       <main>
-        <div id="board-title">Title Edit!<FontAwesomeIcon icon={faPencilAlt} /></div>
-        <div id="board-description">
-          <input placeholder="Set the context of the retrospective here..." />
-        </div>
-        <div id="board-controls">
-          <button>Share</button>
-          <button onClick={() => this.addColumn()}>New Column</button>
-          <a href="#"><FontAwesomeIcon icon={faCog} /></a>
-        </div>
+        <BoardControls addColumn={() => this.addColumn()}></BoardControls>
         <div id="columns">
           {this.renderColumns()}
         </div>
