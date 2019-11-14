@@ -18,7 +18,8 @@
 * [x] socket on "connection" passes columns and cards down to client
 
 4. editable board traits
-* title and description save to server
+* [x] title saves to server
+* description saves to server
 
 5. figure out ngrok or some other way to make the link public
 

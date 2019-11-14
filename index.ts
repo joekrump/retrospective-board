@@ -19,8 +19,8 @@ interface Column {
 }
 
 interface Board {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
   columns: Column[];
 }
 
@@ -70,6 +70,13 @@ io.on('connection', function (socket) {
 
   socket.on('board:loaded', function (data) {
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
+  });
+
+  socket.on('board:updated', function(data) {
+    boards[data.boardId].title = data.title;
+    socket.broadcast.emit(`board:updated:${data.boardId}`, {
+      title: data.title,
+    });
   });
 
   socket.on("column:loaded", function(data) {

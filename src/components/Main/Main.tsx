@@ -19,6 +19,8 @@ interface MainProps {
 
 interface MainState {
   columns: ColumnData[];
+  boardTitle: string;
+  boardDescription: string;
 }
 
 export class Main extends React.Component<MainProps, MainState> {
@@ -26,6 +28,8 @@ export class Main extends React.Component<MainProps, MainState> {
     super(props);
     this.state = {
       columns: [],
+      boardTitle: "",
+      boardDescription: "",
     }
   }
 
@@ -33,7 +37,7 @@ export class Main extends React.Component<MainProps, MainState> {
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
       data.columns.forEach((column: {id: string}) => {
         this.addColumn(column);
-      })
+      });
     });
 
     this.props.socket.on(`column:created:${this.props.boardId}`, (data: any) => {
@@ -111,9 +115,17 @@ export class Main extends React.Component<MainProps, MainState> {
 
 
   render() {
+    console.log(this.state.boardTitle);
     return (
       <main>
-        <BoardControls addColumn={() => this.addColumn()}></BoardControls>
+        <BoardControls
+          addColumn={() => this.addColumn()}
+          title={this.state.boardTitle}
+          description={this.state.boardDescription}
+          socket={this.props.socket}
+          boardId={this.props.boardId}>
+
+        </BoardControls>
         <div id="columns">
           {this.renderColumns()}
         </div>
