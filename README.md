@@ -30,3 +30,9 @@
 8. cleanup
 * share button now shares link
 * column data: title vs name, id vs key. Gross.
+* GIF support
+
+
+BUGS
+[ ] when you refresh the page, you can't edit your cards (session auth)
+[ ] when you edit the column names, all the card data is deleted locally (not on the server, thankfully)
