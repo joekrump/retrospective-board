@@ -19,20 +19,24 @@
 
 4. editable board traits
 * [x] title saves to server
-* description saves to server
+* [ ] description saves to server
 
-5. figure out ngrok or some other way to make the link public
+5. make it public!
+* [x] figure out ngrok or some other system
 
-6. style! make it look nice
+6. style!
+* [ ] make it look nice
 
-7. voting - number of votes, can't remove other votes
+7. voting
+* [ ] config - number of votes per user
+* [ ] users can't remove other users' votes
 
 8. cleanup
-* share button now shares link
-* column data: title vs name, id vs key. Gross.
-* GIF support
+* [ ] share button now shares link
+* [ ] column data: title vs name, id vs key. Gross.
+* [ ] GIF support (/rich text?)
 
 
-BUGS
-[ ] when you refresh the page, you can't edit your cards (session auth)
-[ ] when you edit the column names, all the card data is deleted locally (not on the server, thankfully)
+## BUGS
+* [ ] when you refresh the page, you can't edit your cards (session auth)
+* [ ] when you edit the column names, all the card data is deleted locally (not on the server, thankfully)
