@@ -5,6 +5,15 @@ header {
   background: #2196f3;
 }
 
+#logo {
+  font-family: "Pacifico";
+  color: #fff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
 #top-header {
   grid-row: 1 / span 1;
   grid-column: 1 / span 12;

@@ -7,7 +7,9 @@ export function Header() {
     return (
       <header>
         <div id="top-header">
-          <div id="logo">Retro</div>
+          <div id="logo">
+            <div className="text">Retro</div>
+          </div>
           <div id="app-controls"></div>
         </div>
       </header>
