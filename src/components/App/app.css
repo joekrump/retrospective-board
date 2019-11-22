@@ -1,21 +1,17 @@
-html, body {
+html, body, #react-root {
   height: 100%;
 }
 
 body {
-  height: 100%;
   margin: 0;
 }
 
-header, main, footer {
+main, footer {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
 }
 
-header {
-  height: 8%;
-  background: #2196f3;
-}
+
 
 main {
   height: 88%;
