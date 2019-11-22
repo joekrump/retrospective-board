@@ -1,5 +1,6 @@
 import express from "express";
 import SocketIO from "socket.io";
+import ngrok from "ngrok";
 
 let app = express();
 let server = require("http").Server(app);
@@ -180,5 +181,15 @@ io.on('connection', function (socket) {
     socket.broadcast.emit(`card:voted:${data.id}`, {
       vote: data.vote
     });
-  })
+  });
 });
+
+(async function() {
+  const url = await ngrok.connect({
+    proto: 'http',
+    addr: 8000,
+  });
+
+  console.log('Tunnel Created -> ', url);
+  console.log('Tunnel Inspector ->  http://127.0.0.1:4040');
+})();
