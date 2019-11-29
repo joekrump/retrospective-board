@@ -34,8 +34,10 @@
 8. cleanup
 * [ ] share button now shares link
 * [ ] column data: title vs name, id vs key. Gross.
-* [ ] GIF support (/rich text?)
 
+9. Features
+* [ ] GIF support (/rich text?)
+* [ ] Colours for columns
 
 ## BUGS
 * [ ] when you refresh the page, you can't edit your cards (session auth)
