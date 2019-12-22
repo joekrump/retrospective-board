@@ -1,5 +1,9 @@
 # Standup
 
+## Getting Started
+
+1. `npm run start`
+
 ## TODO
 
 1. sockets for column create, delete, rename
