@@ -26,7 +26,7 @@ A tool for running retros.
 
 4. editable board traits
 * [x] title saves to server
-* [ ] description saves to server
+* [x] description saves to server
 
 5. make it public!
 * [x] figure out ngrok or some other system
