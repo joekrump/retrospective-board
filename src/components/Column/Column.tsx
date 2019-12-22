@@ -20,6 +20,7 @@ interface ColumnProps {
   deleteColumn: (event: React.MouseEvent, key: string) => void;
   socket: SocketIOClient.Socket;
   boardId: string;
+  maxWidthPercentage: number;
 }
 
 interface ColumnState {
@@ -164,8 +165,10 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   render() {
     if (this.state.isEditing) {
       return (
-        <div className="column-edit">
-          <input type="text" defaultValue={this.state.name} ref={this.nameInput} />
+        <div className="column column-edit" style={{maxWidth: `${this.props.maxWidthPercentage}%`}}>
+          <h2>
+            <input type="text" defaultValue={this.state.name} ref={this.nameInput} />
+          </h2>
           <button onClick={this.updateColumnName.bind(this)}>Save</button>
           <a href="" onClick={event => this.flipIsEditing(event)}>cancel</a>
         </div>

@@ -76,8 +76,11 @@ export class Main extends React.Component<MainProps, MainState> {
 
   renderColumns() {
     let markup: JSX.Element[] = [];
+    const oneHundredPercent = 100;
+    const columnCount = this.state.columns.length;
+    const maxWidthPercentage = oneHundredPercent / columnCount;
 
-    for (let i = 0; i < this.state.columns.length; i++) {
+    for (let i = 0; i < columnCount; i++) {
       let name = this.state.columns[i].name;
       markup.push(
         <Column
@@ -86,7 +89,9 @@ export class Main extends React.Component<MainProps, MainState> {
           name={name}
           deleteColumn={(event, key) =>this.deleteColumn(event, key)}
           socket={this.props.socket}
-          boardId={this.props.boardId}>
+          boardId={this.props.boardId}
+          maxWidthPercentage={maxWidthPercentage}
+        >
         </Column>
       );
     }
