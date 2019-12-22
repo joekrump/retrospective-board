@@ -18,6 +18,7 @@ interface BoardControlsState {
 
 export class BoardControls extends React.Component<BoardControlsProps, BoardControlsState> {
   private titleInput: React.RefObject<HTMLInputElement>;
+  private descriptionInput: HTMLInputElement | null = null;
 
   constructor(props: BoardControlsProps) {
     super(props);
@@ -42,6 +43,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
     this.props.socket.on(`board:updated:${this.props.boardId}`, (data: any) => {
       this.setState({
         title: data.title,
+        description: data.description,
       });
     });
   }
@@ -57,13 +59,30 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
 
   saveTitle() {
     this.setState({
-      title: (this.titleInput as any).current.value
+      title: (this.titleInput as any).current.value,
     });
     this.props.socket.emit("board:updated", {
       boardId: this.props.boardId,
-      title: (this.titleInput as any).current.value
+      description: this.state.description,
+      title: (this.titleInput as any).current.value,
     });
     this.editTitle();
+  }
+
+  saveDescription(e: React.KeyboardEvent) {
+    if(e.key === "Enter") {
+      e.preventDefault();
+      this.setState({
+        description: (this.descriptionInput as HTMLInputElement).value,
+      });
+      this.props.socket.emit("board:updated", {
+        boardId: this.props.boardId,
+        description: (this.descriptionInput as HTMLInputElement).value,
+        title: this.state.title,
+      });
+    } else {
+      return;
+    }
   }
 
   render() {
@@ -84,7 +103,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
       <>
         {boardTitle}
         <div id="board-description">
-          <input placeholder="Set the context of the retrospective here..." />
+          <input type="text" defaultValue={this.state.description} placeholder="Add a description" onKeyDown={(e) => this.saveDescription(e)} ref={ref => this.descriptionInput = ref}></input>
         </div>
         <div id="board-controls">
           <button>Share</button>

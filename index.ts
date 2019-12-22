@@ -75,8 +75,10 @@ io.on('connection', function (socket) {
 
   socket.on('board:updated', function(data) {
     boards[data.boardId].title = data.title;
+    boards[data.boardId].description = data.description;
     socket.broadcast.emit(`board:updated:${data.boardId}`, {
       title: data.title,
+      description: data.description,
     });
   });
 
