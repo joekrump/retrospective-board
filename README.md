@@ -1,4 +1,6 @@
-# Standup
+# Retro
+
+A tool for running retros.
 
 ## Getting Started
 
