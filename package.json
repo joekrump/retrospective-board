@@ -21,7 +21,7 @@
   "scripts": {
     "tsc": "tsc",
     "build": "webpack",
-    "dev": "concurrently --kill-others \"npm run watch\" \"npm run start-server\"",
+    "start": "concurrently --kill-others \"npm run watch\" \"npm run start-server\"",
     "watch": "webpack --watch",
     "start-server": "ts-node-dev --respawn --transpileOnly index.ts"
   },
