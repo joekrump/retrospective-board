@@ -187,7 +187,9 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
           </a>
         </div>
         <div className="body-row">
-          <button style={ {width:"100%"} } onClick={() => this.addCard()}><FontAwesomeIcon icon={faPlusCircle} /></button>
+          <button onClick={() => this.addCard()}>
+            <FontAwesomeIcon icon={faPlusCircle} />
+          </button>
           {this.renderCards()}
         </div>
       </div>
