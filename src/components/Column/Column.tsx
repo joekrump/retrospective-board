@@ -1,9 +1,8 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquare, faTrash, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import { faSquare, faTrash, faPlusCircle, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
-
 
 import "./column.css";
 
@@ -176,8 +175,15 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     return (
       <div className="column">
         <div className="header-row">
-          <h2 onClick={this.flipIsEditing.bind(this)}><FontAwesomeIcon icon={faSquare} />{this.state.name}</h2>
-          <a href="" onClick={event => this.props.deleteColumn(event, this.props.id)}><FontAwesomeIcon icon={faTrash} /></a>
+          <h2 onClick={this.flipIsEditing.bind(this)}>
+            {this.state.name}<FontAwesomeIcon icon={faPencilAlt} />
+          </h2>
+          <a
+            href=""
+            onClick={event => this.props.deleteColumn(event, this.props.id)}
+          >
+            <FontAwesomeIcon icon={faTrash} />
+          </a>
         </div>
         <div className="body-row">
           <button style={ {width:"100%"} } onClick={() => this.addCard()}><FontAwesomeIcon icon={faPlusCircle} /></button>

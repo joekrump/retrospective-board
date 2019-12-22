@@ -2,3 +2,17 @@
   flex-grow: 1;
   margin: 20px;
 }
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-row > h2 {
+  flex: 0 0 auto;
+}
+
+.header-row > a {
+  flex: 0 0 auto;
+}
