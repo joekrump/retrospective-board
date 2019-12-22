@@ -166,9 +166,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     if (this.state.isEditing) {
       return (
         <div className="column column-edit" style={{maxWidth: `${this.props.maxWidthPercentage}%`}}>
-          <h2>
-            <input type="text" defaultValue={this.state.name} ref={this.nameInput} />
-          </h2>
+          <input type="text" defaultValue={this.state.name} ref={this.nameInput} />
           <button onClick={this.updateColumnName.bind(this)}>Save</button>
           <a href="" onClick={event => this.flipIsEditing(event)}>cancel</a>
         </div>
