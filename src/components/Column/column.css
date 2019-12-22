@@ -6,7 +6,7 @@
 .column-edit > input {
   /* The same font-size and margin as a h2 element */
   font-size: 1.5em;
-  margin: 1.0em;
+  margin: 1.0em 0;
 }
 
 .header-row {
