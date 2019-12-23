@@ -134,8 +134,7 @@ export class Card extends React.Component<CardProps, CardState> {
 
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
-          <div>{this.state.text}</div>
-          {editLink}
+          <div>{this.state.text}{editLink}</div>
           <a href="" onClick={event => this.voteUp(event)} className="vote-link"><FontAwesomeIcon icon={faThumbsUp} /></a>
           <span className="vote-count">{this.state.votes}</span>
           {downvote}
