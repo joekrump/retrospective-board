@@ -29,6 +29,10 @@ export class App extends React.Component<{}, AppState> {
     });
   }
 
+  componentWillUnmount() {
+    this.state.socket.close();
+  }
+
   render() {
     return (
       <>
