@@ -49,12 +49,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   componentWillMount() {
     this.props.socket.on(`column:loaded:${this.props.id}`, (data: any) => {
       for (let i = 0; i < data.cards.length; i++) {
-        this.addCard({
-          key: data.cards[i].id,
-          editable: false,
-          text: data.cards[i].text,
-          votes: data.cards[i].votes,
-        } as CardData);
+        if (!!data.cards[i].text) {
+          this.addCard({
+            key: data.cards[i].id,
+            editable: false,
+            text: data.cards[i].text,
+            votes: data.cards[i].votes,
+          } as CardData);
+        }
       }
     });
 
