@@ -1,6 +1,4 @@
 import * as React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt, faCog } from "@fortawesome/free-solid-svg-icons";
 
 import "./main.css";
 import { Column } from "../Column/Column";

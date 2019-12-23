@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquare, faTrash, faPlusCircle, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPlusCircle, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
 
