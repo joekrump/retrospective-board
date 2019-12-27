@@ -2,7 +2,15 @@ import express from "express";
 import SocketIO from "socket.io";
 import ngrok from "ngrok";
 
+const session = require('express-session');
 let app = express();
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true, maxAge: 60000 },
+});
+app.use(sessionMiddleware);
 let server = require("http").Server(app);
 let io = SocketIO(server);
 import uuid from "uuid";
@@ -66,9 +74,11 @@ app.post("/create-board", function(_req, res) {
   res.redirect(`/board/${boardId}`);
 });
 
-io.on('connection', function (socket) {
-  console.log("user connected!");
+io.use(function(socket, next) {
+  sessionMiddleware(socket.request, socket.request.res, next);
+});
 
+io.on('connection', function (socket) {
   socket.on('board:loaded', function (data) {
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
   });
