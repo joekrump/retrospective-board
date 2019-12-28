@@ -21,6 +21,7 @@ interface Card {
   votes: {
     [sessionId: number]: number;
   };
+  totalVotesCount: number;
   ownerId: number;
 }
 
@@ -201,6 +202,7 @@ io.on('connection', function (socket) {
       const card = column.cards.find((card) => card.id === data.id);
       if (card) {
         card.votes[sessionId] += data.vote;
+        card.totalVotesCount += data.vote;
       }
     }
     socket.broadcast.emit(`card:voted:${data.id}`, {
