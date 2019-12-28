@@ -5,7 +5,7 @@ import ngrok from "ngrok";
 const session = require('express-session');
 let app = express();
 const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.RETRO_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: { secure: true, maxAge: 60000 },
