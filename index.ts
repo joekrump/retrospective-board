@@ -2,7 +2,15 @@ import express from "express";
 import SocketIO from "socket.io";
 import ngrok from "ngrok";
 
+const session = require('express-session');
 let app = express();
+const sessionMiddleware = session({
+  secret: process.env.RETRO_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true, maxAge: 60000 },
+});
+app.use(sessionMiddleware);
 let server = require("http").Server(app);
 let io = SocketIO(server);
 import uuid from "uuid";
@@ -10,7 +18,11 @@ import uuid from "uuid";
 interface Card {
   id: string;
   text: string;
-  votes: number;
+  votes: {
+    [sessionId: number]: number;
+  };
+  totalVotesCount: number;
+  ownerId: number;
 }
 
 interface Column {
@@ -66,8 +78,17 @@ app.post("/create-board", function(_req, res) {
   res.redirect(`/board/${boardId}`);
 });
 
+io.use(function(socket, next) {
+  sessionMiddleware(socket.request, socket.request.res, next);
+});
+
 io.on('connection', function (socket) {
-  console.log("user connected!");
+  let sessionId: number;
+
+  if(!socket.request.session || !socket.request.session.id) {
+    socket.request.session.save();
+    sessionId = socket.request.session.id;
+  }
 
   socket.on('board:loaded', function (data) {
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
@@ -133,7 +154,7 @@ io.on('connection', function (socket) {
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
-      column.cards.push({id: data.id, text: "", votes: 0});
+      column.cards.push({id: data.id, text: "", votes: {}, ownerId: sessionId });
     }
 
     socket.broadcast.emit(`card:created:${data.columnId}`, {
@@ -162,12 +183,15 @@ io.on('connection', function (socket) {
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
       const cardIndex = column.cards.findIndex((card) => card.id === data.id);
-      column.cards.splice(cardIndex, 1);
-    }
+      // Check to see if the request is coming from the card's owner
+      if( column.cards[cardIndex].ownerId === sessionId) {
+        column.cards.splice(cardIndex, 1);
 
-    socket.broadcast.emit(`card:deleted:${data.columnId}`, {
-      id: data.id
-    });
+        socket.broadcast.emit(`card:deleted:${data.columnId}`, {
+          id: data.id
+        });
+      }
+    }
   });
 
   socket.on("card:voted", function (data) {
@@ -177,7 +201,8 @@ io.on('connection', function (socket) {
     if (column) {
       const card = column.cards.find((card) => card.id === data.id);
       if (card) {
-        card.votes += data.vote;
+        card.votes[sessionId] += data.vote;
+        card.totalVotesCount += data.vote;
       }
     }
     socket.broadcast.emit(`card:voted:${data.id}`, {
