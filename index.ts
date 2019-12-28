@@ -79,6 +79,10 @@ io.use(function(socket, next) {
 });
 
 io.on('connection', function (socket) {
+  if(!socket.request.session || !socket.request.session.id) {
+    socket.request.session.save();
+  }
+
   socket.on('board:loaded', function (data) {
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
   });
