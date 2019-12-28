@@ -108,23 +108,32 @@ export class Card extends React.Component<CardProps, CardState> {
     if (this.state.isEditing) {
       cardContents = (
         <div>
-          <textarea onChange={event => this.setState({text: event.target.value})} value={this.state.text}></textarea>
+          <textarea
+            onChange={event => this.setState({text: event.target.value})}
+            value={this.state.text}>
+          </textarea>
           <button onClick={event => this.save(event)}>Add</button>
-          <a href="" onClick={event => this.props.deleteCard(event, this.props.id)}><FontAwesomeIcon icon={faTrash} /></a>
+          <a href="" onClick={event => this.props.deleteCard(event, this.props.id)}>
+            <FontAwesomeIcon icon={faTrash} />
+          </a>
         </div>
       );
     } else {
       let downvote;
       if (this.state.votes > 0) {
         downvote = (
-          <a href="" onClick={event => this.voteDown(event)} className="vote-link"><FontAwesomeIcon icon={faThumbsDown} /></a>
+          <a href="" onClick={event => this.voteDown(event)} className="vote-link">
+            <FontAwesomeIcon icon={faThumbsDown} />
+          </a>
         );
       }
 
       let editLink;
       if (this.props.editable) {
         editLink = (
-          <a href="" onClick={event => this.flipEditable(event)} className="edit-link"><FontAwesomeIcon icon={faPencilAlt} /></a>
+          <a href="" onClick={event => this.flipEditable(event)} className="edit-link">
+            <FontAwesomeIcon icon={faPencilAlt} />
+          </a>
         );
       }
 
@@ -133,10 +142,13 @@ export class Card extends React.Component<CardProps, CardState> {
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
           <div>{this.state.text}{editLink}</div>
-          <a href="" onClick={event => this.voteUp(event)} className="vote-link"><FontAwesomeIcon icon={faThumbsUp} /></a>
+          <a href="" onClick={event => this.voteUp(event)} className="vote-link">
+            <FontAwesomeIcon icon={faThumbsUp} />
+          </a>
           <span className="vote-count">{this.state.votes}</span>
           {downvote}
-        </div>);
+        </div>
+      );
     }
 
     return (
