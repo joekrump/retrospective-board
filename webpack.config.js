@@ -45,7 +45,7 @@ module.exports = {
     compress: true,
     contentBase: path.join(__dirname, 'src'),
     hot: true,
-    port: 9000,
+    port: 8000,
     watchContentBase: true,
   }
 };
