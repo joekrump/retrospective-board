@@ -46,7 +46,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.nameInput = React.createRef();
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.socket.on(`column:loaded:${this.props.id}`, (data: any) => {
       for (let i = 0; i < data.cards.length; i++) {
         if (!!data.cards[i].text) {

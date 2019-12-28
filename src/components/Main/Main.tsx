@@ -31,7 +31,7 @@ export class Main extends React.Component<MainProps, MainState> {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
       data.columns.forEach((column: {id: string}) => {
         this.addColumn(column);

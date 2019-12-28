@@ -32,7 +32,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
     this.titleInput = React.createRef();
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
       this.setState({
         description: data.description,

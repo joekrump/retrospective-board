@@ -215,8 +215,6 @@ io.on('connection', function (socket) {
         card.totalVotesCount += vote;
 
         socket.request.session.votes[boardId] -= vote;
-        console.log("BOARD VOTES REMAINING");
-        console.log(socket.request.session.votes[boardId]);
 
         socket.broadcast.emit(`card:voted:${id}`, { vote });
       }

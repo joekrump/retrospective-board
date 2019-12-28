@@ -38,7 +38,8 @@ export class Card extends React.Component<CardProps, CardState> {
     this.state = stateToSet;
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    debugger;
     this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
       this.setState({
         text: data.text,

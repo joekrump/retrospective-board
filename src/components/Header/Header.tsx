@@ -4,14 +4,14 @@ import * as React from "react";
 import "./header.css";
 
 export function Header() {
-    return (
-      <header>
-        <div id="top-header">
-          <div id="logo">
-            <div className="text">Retro</div>
-          </div>
-          <div id="app-controls"></div>
+  return (
+    <header>
+      <div id="top-header">
+        <div id="logo">
+          <div className="text">Retro</div>
         </div>
-      </header>
-    );
+        <div id="app-controls"></div>
+      </div>
+    </header>
+  );
 }
