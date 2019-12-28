@@ -20,7 +20,7 @@
     "uuid": "^3.3.3"
   },
   "scripts": {
-    "dev": "webpack-dev-server --hotOnly",
+    "dev": "webpack-dev-server",
     "tsc": "tsc",
     "build": "webpack",
     "start": "concurrently --kill-others \"npm run watch\" \"npm run start-server\"",
