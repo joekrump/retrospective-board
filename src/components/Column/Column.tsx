@@ -75,7 +75,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     });
 
     this.props.socket.on(`column:updated:${this.props.id}`, (data: any) => {
-      this.setState({name: data.title});
+      this.setState({name: data.name});
     });
   }
 
