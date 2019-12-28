@@ -119,30 +119,6 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.setState({cards: newCards});
   }
 
-  renderCards() {
-    let markup: JSX.Element[] = [];
-
-    for (let i = 0; i < this.state.cards.length; i++) {
-      let card = this.state.cards[i];
-
-      markup.push(
-        <Card
-          key={card.id}
-          id={card.id}
-          deleteCard={(event, id) => this.deleteCard(event, id)}
-          editable={card.editable}
-          socket={this.props.socket}
-          columnId={this.props.id}
-          boardId={this.props.boardId}
-          text={card.text ? card.text : ""}
-          votes={card.votes ? card.votes : 0}>
-        </Card>
-      );
-    }
-
-    return markup;
-  }
-
   flipIsEditing(event?: React.MouseEvent) {
     if (event) {
       event.preventDefault();
@@ -192,7 +168,21 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
           <button onClick={() => this.addCard()}>
             <FontAwesomeIcon icon={faPlusCircle} />
           </button>
-          {this.renderCards()}
+          {
+            this.state.cards.map((card) =>
+              <Card
+                key={card.id}
+                id={card.id}
+                deleteCard={(event, id) => this.deleteCard(event, id)}
+                editable={card.editable}
+                socket={this.props.socket}
+                columnId={this.props.id}
+                boardId={this.props.boardId}
+                text={card.text ? card.text : ""}
+                votes={card.votes ? card.votes : 0}>
+              </Card>
+            )
+          }
         </div>
       </div>
     );

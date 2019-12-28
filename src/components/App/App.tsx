@@ -15,7 +15,7 @@ export class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
 
-    const socket = io.connect(`${window.location.origin}`);
+    const socket = io.connect(`${window.location.origin}:8000`);
     const boardId = window.location.pathname.split("/").pop() || "";
     this.state = {
       socket,

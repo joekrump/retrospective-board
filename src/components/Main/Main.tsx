@@ -1,10 +1,9 @@
 import * as React from "react";
-
-import "./main.css";
 import { Column } from "../Column/Column";
 import uuid = require("uuid");
 import { BoardControls } from "../BoardControls/BoardControls";
 
+import "./main.css";
 interface ColumnData {
   key: string;
   name: string;
@@ -32,8 +31,10 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   componentDidMount() {
+    console.info("MOUNTED");
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
       data.columns.forEach((column: {id: string}) => {
+        console.info(column);
         this.addColumn(column);
       });
     });

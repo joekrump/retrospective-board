@@ -53,7 +53,7 @@ app.get("/", function(_req, res) {
 });
 
 app.get("/board/:boardId", function(_req, res) {
-  res.sendFile(__dirname + "/public/board.html")
+  res.sendFile(__dirname + "/public/index.html");
 });
 
 app.post("/create-board", function(_req, res) {
