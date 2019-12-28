@@ -37,8 +37,13 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./src/board.html",
-      filename: "board.html"
+      template: "./src/index.html",
+      filename: "index.html"
     })
-  ]
+  ],
+  devServer: {
+    contentBase: path.join(__dirname, 'src'),
+    compress: true,
+    port: 9000
+  }
 };

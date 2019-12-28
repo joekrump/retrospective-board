@@ -39,7 +39,7 @@ export class Card extends React.Component<CardProps, CardState> {
   }
 
   componentDidMount() {
-    debugger;
+    console.log("component mounted!")
     this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
       this.setState({
         text: data.text,
