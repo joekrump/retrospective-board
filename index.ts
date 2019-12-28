@@ -31,7 +31,7 @@ interface Card {
 }
 
 interface Column {
-  title: string;
+  name: string;
   id: string;
   cards: Card[];
 }
@@ -64,17 +64,17 @@ app.post("/create-board", function(_req, res) {
     columns: [
       {
         id: uuid.v4(),
-        title: "Column 1",
+        name: "Column 1",
         cards: []
       },
       {
         id: uuid.v4(),
-        title: "Column 2",
+        name: "Column 2",
         cards: []
       },
       {
         id: uuid.v4(),
-        title: "Column 3",
+        name: "Column 3",
         cards: []
       }
     ]
@@ -127,10 +127,10 @@ io.on('connection', function (socket) {
   socket.on("column:created", function(data) {
     console.log("column created");
     console.log(data);
-    boards[data.boardId].columns.push({id: data.id, title: data.name, cards: []})
+    boards[data.boardId].columns.push({id: data.id, name: data.name, cards: []})
     socket.broadcast.emit(`column:created:${data.boardId}`, {
       id: data.id,
-      title: data.name
+      name: data.name
     });
   });
 
@@ -139,9 +139,9 @@ io.on('connection', function (socket) {
     console.log(data);
     let column = boards[data.boardId].columns.find((column) => column.id === data.id);
     if (column) {
-      column.title = data.name;
+      column.name = data.name;
       socket.broadcast.emit(`column:updated:${data.id}`, {
-        title: data.name
+        name: data.name
       });
     }
   });
@@ -226,12 +226,14 @@ function hasRemainingVotes(votesRemaining: number, newVote: number) {
   return (votesRemaining - newVote) > -1;
 }
 
-(async function() {
-  const url = await ngrok.connect({
-    proto: 'http',
-    addr: 8000,
-  });
+if(process.env.NODE_ENV === "production") {
+  (async function() {
+    const url = await ngrok.connect({
+      proto: 'http',
+      addr: 8000,
+    });
 
-  console.log('Tunnel Created -> ', url);
-  console.log('Tunnel Inspector ->  http://127.0.0.1:4040');
-})();
+    console.log('Tunnel Created -> ', url);
+    console.log('Tunnel Inspector ->  http://127.0.0.1:4040');
+  })();
+}
