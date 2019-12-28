@@ -7,7 +7,7 @@ import "./card.css";
 interface CardProps {
   key: string;
   id: string;
-  deleteCard: (event: React.MouseEvent, key: string) => void;
+  deleteCard: (event: React.MouseEvent, id: string) => void;
   editable: boolean;
   socket: SocketIOClient.Socket;
   columnId: string;

@@ -7,7 +7,7 @@ import * as uuid from "uuid";
 import "./column.css";
 
 interface CardData {
-  key: string;
+  id: string;
   editable: boolean;
   text?: string;
   votes?: number;
@@ -17,7 +17,7 @@ interface ColumnProps {
   key: string;
   id: string;
   name: string;
-  deleteColumn: (event: React.MouseEvent, key: string) => void;
+  deleteColumn: (event: React.MouseEvent, id: string) => void;
   socket: SocketIOClient.Socket;
   boardId: string;
   maxWidthPercentage: number;
@@ -51,7 +51,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       for (let i = 0; i < data.cards.length; i++) {
         if (!!data.cards[i].text) {
           this.addCard({
-            key: data.cards[i].id,
+            id: data.cards[i].id,
             editable: false,
             text: data.cards[i].text,
             votes: data.cards[i].votes,
@@ -62,14 +62,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
 
     this.props.socket.on(`card:created:${this.props.id}`, (data: {id: string}) => {
       this.addCard({
-        key: data.id,
+        id: data.id,
         editable: false,
       } as CardData);
     });
 
     this.props.socket.on(`card:deleted:${this.props.id}`, (data: any) => {
       let newCards = this.state.cards.filter((card: CardData) => {
-        return card.key !== data.id;
+        return card.id !== data.id;
       });
       this.setState({cards: newCards});
     });
@@ -90,30 +90,30 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     if (data) {
       newCards.push(data);
     } else {
-      let newCard = {key: `card-${uuid.v4()}`, editable: true }
+      let newCard = {id: `card-${uuid.v4()}`, editable: true }
       newCards.push(newCard);
 
       this.props.socket.emit(`card:created`, {
         boardId: this.props.boardId,
         columnId: this.props.id,
-        id: newCard.key,
+        id: newCard.id,
       });
     }
 
     this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
   }
 
-  deleteCard(event: React.MouseEvent, key: string) {
+  deleteCard(event: React.MouseEvent, id: string) {
     event.preventDefault();
 
     let newCards = this.state.cards.filter((card: CardData) => {
-      return card.key !== key;
+      return card.id !== id;
     });
 
     this.props.socket.emit("card:deleted", {
       boardId: this.props.boardId,
       columnId: this.props.id,
-      id: key
+      id,
     });
 
     this.setState({cards: newCards});
@@ -127,9 +127,9 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
 
       markup.push(
         <Card
-          key={card.key}
-          id={card.key}
-          deleteCard={(event, key) => this.deleteCard(event, key)}
+          key={card.id}
+          id={card.id}
+          deleteCard={(event, id) => this.deleteCard(event, id)}
           editable={card.editable}
           socket={this.props.socket}
           columnId={this.props.id}
