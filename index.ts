@@ -1,6 +1,9 @@
 import express from "express";
 import SocketIO from "socket.io";
 import ngrok from "ngrok";
+import uuid from "uuid";
+
+const MAX_VOTES_PER_USER=10;
 
 const session = require('express-session');
 let app = express();
@@ -9,11 +12,13 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: true,
   cookie: { secure: true, maxAge: 60000 },
+  genid: function(_req: any) {
+    return uuid(); // use UUIDs for session IDs
+  },
 });
 app.use(sessionMiddleware);
 let server = require("http").Server(app);
 let io = SocketIO(server);
-import uuid from "uuid";
 
 interface Card {
   id: string;
@@ -83,14 +88,19 @@ io.use(function(socket, next) {
 });
 
 io.on('connection', function (socket) {
-  let sessionId: number;
-
   if(!socket.request.session || !socket.request.session.id) {
     socket.request.session.save();
-    sessionId = socket.request.session.id;
+  }
+  if(socket.request.session && socket.request.session.votes === undefined) {
+    socket.request.session.votes = {};
+    socket.request.session.save();
   }
 
   socket.on('board:loaded', function (data) {
+    if(socket.request.session.votes[data.boardId] === undefined) {
+      socket.request.session.votes[data.boardId] = MAX_VOTES_PER_USER;
+      socket.request.session.save();
+    }
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
   });
 
@@ -154,7 +164,7 @@ io.on('connection', function (socket) {
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
-      column.cards.push({id: data.id, text: "", votes: {}, ownerId: sessionId });
+      column.cards.push({id: data.id, text: "", votes: {}, ownerId: socket.request.session.id, totalVotesCount: 0 });
     }
 
     socket.broadcast.emit(`card:created:${data.columnId}`, {
@@ -184,7 +194,7 @@ io.on('connection', function (socket) {
     if (column) {
       const cardIndex = column.cards.findIndex((card) => card.id === data.id);
       // Check to see if the request is coming from the card's owner
-      if( column.cards[cardIndex].ownerId === sessionId) {
+      if(column.cards[cardIndex].ownerId === socket.request.session.id) {
         column.cards.splice(cardIndex, 1);
 
         socket.broadcast.emit(`card:deleted:${data.columnId}`, {
@@ -194,22 +204,27 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("card:voted", function (data) {
-    console.log("card vote");
-    console.log(data);
-    const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
+  socket.on("card:voted", function ({ id, vote, boardId, columnId }) {
+    console.log("VOTING FOR CARD")
+    console.log(socket.request.session.id);
+    const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
-      const card = column.cards.find((card) => card.id === data.id);
-      if (card) {
-        card.votes[sessionId] += data.vote;
-        card.totalVotesCount += data.vote;
+      const card = column.cards.find((card) => card.id === id);
+      if (card && hasRemainingVotes(socket.request.session.votes[boardId], vote)) {
+        card.votes[socket.request.session.id] += vote;
+        card.totalVotesCount += vote;
+
+        socket.request.session.votes[boardId] -= vote;
+
+        socket.broadcast.emit(`card:voted:${id}`, { vote });
       }
     }
-    socket.broadcast.emit(`card:voted:${data.id}`, {
-      vote: data.vote
-    });
   });
 });
+
+function hasRemainingVotes(votesRemaining: number, newVote: number) {
+  return (votesRemaining - newVote) > -1;
+}
 
 (async function() {
   const url = await ngrok.connect({

@@ -38,7 +38,8 @@ export class Card extends React.Component<CardProps, CardState> {
     this.state = stateToSet;
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    debugger;
     this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
       this.setState({
         text: data.text,
@@ -46,14 +47,17 @@ export class Card extends React.Component<CardProps, CardState> {
     });
 
     this.props.socket.on(`card:voted:${this.props.id}`, (data: any) => {
-      this.setState({
-        votes: this.state.votes + data.vote,
-      });
+      if(data && data.vote) {
+        this.setState({
+          votes: this.state.votes + data.vote,
+        });
+      }
     });
   }
 
   componentWillUnmount() {
     this.props.socket.removeListener(`card:updated:${this.props.id}`);
+    this.props.socket.removeListener(`card:voted:${this.props.id}`);
   }
 
   flipEditable(event: React.MouseEvent) {
@@ -85,10 +89,6 @@ export class Card extends React.Component<CardProps, CardState> {
       id: this.props.id,
       vote: 1
     });
-
-    this.setState({
-      votes: this.state.votes + 1,
-    })
   }
 
   voteDown(event: React.MouseEvent) {
@@ -100,8 +100,6 @@ export class Card extends React.Component<CardProps, CardState> {
       id: this.props.id,
       vote: -1
     });
-
-    this.setState({votes: this.state.votes - 1});
   }
 
   render() {
