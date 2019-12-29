@@ -123,8 +123,8 @@ export class Main extends React.Component<MainProps, MainState> {
           title={this.state.boardTitle}
           description={this.state.boardDescription}
           socket={this.props.socket}
-          boardId={this.props.boardId}>
-
+          boardId={this.props.boardId}
+        >
         </BoardControls>
         <div id="columns">
           {this.renderColumns()}
