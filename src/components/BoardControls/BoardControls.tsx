@@ -33,11 +33,13 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
   }
 
   componentDidMount() {
-    this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
-      this.setState({
-        description: data.description,
-        title: data.title,
-      });
+    this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: { title: string; description: string; }) => {
+      if (data) {
+        this.setState({
+          description: data.description,
+          title: data.title,
+        });
+      }
     });
 
     this.props.socket.on(`board:updated:${this.props.boardId}`, (data: any) => {

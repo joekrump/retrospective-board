@@ -43,43 +43,40 @@ interface Board {
 }
 
 let boards: {[key: string]: Board} = {};
+const NEW_BOARD = {
+  title: "New Board",
+  description: "",
+  columns: [
+    {
+      id: uuid.v4(),
+      name: "Column 1",
+      cards: []
+    },
+    {
+      id: uuid.v4(),
+      name: "Column 2",
+      cards: []
+    },
+    {
+      id: uuid.v4(),
+      name: "Column 3",
+      cards: []
+    }
+  ]
+};
 
 server.listen(8000);
 
-app.use(express.static('public'));
-
-app.get("/", function(_req, res) {
-  res.sendFile(__dirname + "/create.html")
-});
-
-app.get("/board/:boardId", function(_req, res) {
-  res.sendFile(__dirname + "/public/index.html");
-});
+function createNewBoard(boardId?: string) {
+  if(!boardId) {
+    boardId = uuid.v4();
+  }
+  boards[boardId] = NEW_BOARD;
+  return boardId;
+}
 
 app.post("/create-board", function(_req, res) {
-  let boardId = uuid.v4();
-  boards[boardId] = {
-    title: "New Board",
-    description: "",
-    columns: [
-      {
-        id: uuid.v4(),
-        name: "Column 1",
-        cards: []
-      },
-      {
-        id: uuid.v4(),
-        name: "Column 2",
-        cards: []
-      },
-      {
-        id: uuid.v4(),
-        name: "Column 3",
-        cards: []
-      }
-    ]
-  };
-  console.log(boards);
+  const boardId = createNewBoard();
   res.redirect(`/board/${boardId}`);
 });
 
@@ -100,6 +97,10 @@ io.on('connection', function (socket) {
     if(socket.request.session.votes[data.boardId] === undefined) {
       socket.request.session.votes[data.boardId] = MAX_VOTES_PER_USER;
       socket.request.session.save();
+    }
+
+    if(!data.boardId || !boards[data.boardId]) {
+      data.boardId = createNewBoard(data.boardId);
     }
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
   });
