@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as io from "socket.io-client";
+import * as uuid from "uuid";
 
 import "./app.css";
 
@@ -14,9 +15,14 @@ interface AppState {
 export class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
+    let serverURL = window.location.origin;
+    if (!!window.location.port && (window.location.port !== "8000")) {
+      serverURL = window.location.origin.replace(window.location.port, "8000");
+    }
 
-    const socket = io.connect(`${window.location.origin}`);
-    const boardId = window.location.pathname.split("/").pop() || "";
+    const socket = io.connect(serverURL);
+    const boardId = window.location.pathname.split("/").pop() || uuid.v4();
+
     this.state = {
       socket,
       boardId,

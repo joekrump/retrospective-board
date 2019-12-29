@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPencilAlt, faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPencilAlt, faThumbsUp, faThumbsDown, faThList } from "@fortawesome/free-solid-svg-icons";
 
 import "./card.css";
 
@@ -39,17 +39,16 @@ export class Card extends React.Component<CardProps, CardState> {
   }
 
   componentDidMount() {
-    console.log("component mounted!")
     this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
       this.setState({
         text: data.text,
       });
     });
 
-    this.props.socket.on(`card:voted:${this.props.id}`, (data: any) => {
-      if(data && data.vote) {
+    this.props.socket.on(`card:voted:${this.props.id}`, (data: { totalVotesCount: number }) => {
+      if(!!data) {
         this.setState({
-          votes: this.state.votes + data.vote,
+          votes: data.totalVotesCount,
         });
       }
     });
@@ -119,12 +118,12 @@ export class Card extends React.Component<CardProps, CardState> {
         </div>
       );
     } else {
-      let downvote;
+      let downvoteButton;
       if (this.state.votes > 0) {
-        downvote = (
-          <a href="" onClick={event => this.voteDown(event)} className="vote-link">
+        downvoteButton = (
+          <button onClick={event => this.voteDown(event)} className="vote-link">
             <FontAwesomeIcon icon={faThumbsDown} />
-          </a>
+          </button>
         );
       }
 
@@ -142,11 +141,11 @@ export class Card extends React.Component<CardProps, CardState> {
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
           <div>{this.state.text}{editLink}</div>
-          <a href="" onClick={event => this.voteUp(event)} className="vote-link">
-            <FontAwesomeIcon icon={faThumbsUp} />
-          </a>
           <span className="vote-count">{this.state.votes}</span>
-          {downvote}
+          <button onClick={event => this.voteUp(event)} className="vote-link">
+            <FontAwesomeIcon icon={faThumbsUp} />
+          </button>
+          { downvoteButton }
         </div>
       );
     }

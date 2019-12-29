@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/index.tsx',
+  devtool: "source-map",
   resolve: { extensions: ['.ts', '.js', '.tsx', '.svg', '.css'] },
   module: {
     rules: [
@@ -45,7 +46,8 @@ module.exports = {
     compress: true,
     contentBase: path.join(__dirname, 'src'),
     hot: true,
-    port: 8000,
+    inline: true,
+    port: 4000,
     watchContentBase: true,
   }
 };

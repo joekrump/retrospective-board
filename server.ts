@@ -43,8 +43,37 @@ interface Board {
 }
 
 let boards: {[key: string]: Board} = {};
+const NEW_BOARD = {
+  title: "New Board",
+  description: "",
+  columns: [
+    {
+      id: uuid.v4(),
+      name: "The Good",
+      cards: []
+    },
+    {
+      id: uuid.v4(),
+      name: "The Bad",
+      cards: []
+    },
+    {
+      id: uuid.v4(),
+      name: "To Improve",
+      cards: []
+    }
+  ]
+};
 
 server.listen(8000);
+
+function createNewBoard(boardId?: string) {
+  if(!boardId) {
+    boardId = uuid.v4();
+  }
+  boards[boardId] = NEW_BOARD;
+  return boardId;
+}
 
 app.use(express.static('public'));
 
@@ -53,33 +82,11 @@ app.get("/", function(_req, res) {
 });
 
 app.get("/board/:boardId", function(_req, res) {
-  res.sendFile(__dirname + "/public/board.html")
+  res.sendFile(__dirname + "/public/index.html");
 });
 
 app.post("/create-board", function(_req, res) {
-  let boardId = uuid.v4();
-  boards[boardId] = {
-    title: "New Board",
-    description: "",
-    columns: [
-      {
-        id: uuid.v4(),
-        name: "Column 1",
-        cards: []
-      },
-      {
-        id: uuid.v4(),
-        name: "Column 2",
-        cards: []
-      },
-      {
-        id: uuid.v4(),
-        name: "Column 3",
-        cards: []
-      }
-    ]
-  };
-  console.log(boards);
+  const boardId = createNewBoard();
   res.redirect(`/board/${boardId}`);
 });
 
@@ -100,6 +107,10 @@ io.on('connection', function (socket) {
     if(socket.request.session.votes[data.boardId] === undefined) {
       socket.request.session.votes[data.boardId] = MAX_VOTES_PER_USER;
       socket.request.session.save();
+    }
+
+    if(!data.boardId || !boards[data.boardId]) {
+      data.boardId = createNewBoard(data.boardId);
     }
     socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
   });
@@ -206,24 +217,25 @@ io.on('connection', function (socket) {
 
   socket.on("card:voted", function ({ id, vote, boardId, columnId }) {
     console.log("VOTING FOR CARD")
-    console.log(socket.request.session.id);
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
       if (card && hasRemainingVotes(socket.request.session.votes[boardId], vote)) {
         card.votes[socket.request.session.id] += vote;
         card.totalVotesCount += vote;
-
-        socket.request.session.votes[boardId] -= vote;
-
-        socket.broadcast.emit(`card:voted:${id}`, { vote });
+        socket.request.session.votes[boardId]--;
+        console.log(`card:voted:${id}`);
+        console.log(card.totalVotesCount);
+        socket.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
       }
+    } {
+      console.log("No more votes left");
     }
   });
 });
 
 function hasRemainingVotes(votesRemaining: number, newVote: number) {
-  return (votesRemaining - newVote) > -1;
+  return (votesRemaining - 1) > -1;
 }
 
 if(process.env.NODE_ENV === "production") {

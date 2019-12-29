@@ -10,7 +10,7 @@ interface CardData {
   id: string;
   editable: boolean;
   text?: string;
-  votes?: number;
+  votes: number;
 }
 
 interface ColumnProps {
@@ -54,7 +54,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             id: data.cards[i].id,
             editable: false,
             text: data.cards[i].text,
-            votes: data.cards[i].votes,
+            votes: data.cards[i].totalVotesCount,
           } as CardData);
         }
       }
@@ -75,6 +75,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     });
 
     this.props.socket.on(`column:updated:${this.props.id}`, (data: any) => {
+      debugger;
       this.setState({name: data.name});
     });
   }
@@ -90,7 +91,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     if (data) {
       newCards.push(data);
     } else {
-      let newCard = {id: `card-${uuid.v4()}`, editable: true }
+      let newCard = {id: `card-${uuid.v4()}`, editable: true, votes: 0 }
       newCards.push(newCard);
 
       this.props.socket.emit(`card:created`, {
@@ -117,30 +118,6 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     });
 
     this.setState({cards: newCards});
-  }
-
-  renderCards() {
-    let markup: JSX.Element[] = [];
-
-    for (let i = 0; i < this.state.cards.length; i++) {
-      let card = this.state.cards[i];
-
-      markup.push(
-        <Card
-          key={card.id}
-          id={card.id}
-          deleteCard={(event, id) => this.deleteCard(event, id)}
-          editable={card.editable}
-          socket={this.props.socket}
-          columnId={this.props.id}
-          boardId={this.props.boardId}
-          text={card.text ? card.text : ""}
-          votes={card.votes ? card.votes : 0}>
-        </Card>
-      );
-    }
-
-    return markup;
   }
 
   flipIsEditing(event?: React.MouseEvent) {
@@ -192,7 +169,21 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
           <button onClick={() => this.addCard()}>
             <FontAwesomeIcon icon={faPlusCircle} />
           </button>
-          {this.renderCards()}
+          {
+            this.state.cards.map((card) =>
+              <Card
+                key={card.id}
+                id={card.id}
+                deleteCard={(event, id) => this.deleteCard(event, id)}
+                editable={card.editable}
+                socket={this.props.socket}
+                columnId={this.props.id}
+                boardId={this.props.boardId}
+                text={card.text ? card.text : ""}
+                votes={card.votes}>
+              </Card>
+            )
+          }
         </div>
       </div>
     );
