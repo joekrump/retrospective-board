@@ -55,7 +55,7 @@ export class Main extends React.Component<MainProps, MainState> {
   addColumn(column?: any) {
     let newColumns = this.state.columns.slice(0);
     if (column) {
-      newColumns.push({key: column.id, name: column.title});
+      newColumns.push({key: column.id, name: column.name});
       this.props.socket.emit("column:loaded", {
         boardId: this.props.boardId,
         id: column.id,
