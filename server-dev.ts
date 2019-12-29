@@ -49,17 +49,17 @@ const NEW_BOARD = {
   columns: [
     {
       id: uuid.v4(),
-      name: "Column 1",
+      name: "The Good",
       cards: []
     },
     {
       id: uuid.v4(),
-      name: "Column 2",
+      name: "The Bad",
       cards: []
     },
     {
       id: uuid.v4(),
-      name: "Column 3",
+      name: "To Improve",
       cards: []
     }
   ]
