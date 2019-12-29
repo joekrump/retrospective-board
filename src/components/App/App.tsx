@@ -19,7 +19,7 @@ export class App extends React.Component<{}, AppState> {
     if (!!window.location.port && (window.location.port !== "8000")) {
       serverURL = window.location.origin.replace(window.location.port, "8000");
     }
-    console.log(serverURL)
+
     const socket = io.connect(serverURL);
     const boardId = window.location.pathname.split("/").pop() || uuid.v4();
 

@@ -54,7 +54,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             id: data.cards[i].id,
             editable: false,
             text: data.cards[i].text,
-            votes: data.cards[i].votes,
+            votes: data.cards[i].totalVotes,
           } as CardData);
         }
       }

@@ -207,7 +207,6 @@ io.on('connection', function (socket) {
 
   socket.on("card:voted", function ({ id, vote, boardId, columnId }) {
     console.log("VOTING FOR CARD")
-    console.log(socket.request.session.id);
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
@@ -216,8 +215,8 @@ io.on('connection', function (socket) {
         card.totalVotesCount += vote;
 
         socket.request.session.votes[boardId] -= vote;
-
-        socket.broadcast.emit(`card:voted:${id}`, { vote });
+        console.log(`card:voted:${id}`);
+        socket.broadcast.emit(`card:voted:${id}`, { totalVotes: card.totalVotesCount });
       }
     }
   });

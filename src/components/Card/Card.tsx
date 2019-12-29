@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPencilAlt, faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPencilAlt, faThumbsUp, faThumbsDown, faThList } from "@fortawesome/free-solid-svg-icons";
 
 import "./card.css";
 
@@ -39,26 +39,27 @@ export class Card extends React.Component<CardProps, CardState> {
   }
 
   componentDidMount() {
-    console.log("component mounted!")
     this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
+      debugger;
       this.setState({
         text: data.text,
       });
     });
 
-    this.props.socket.on(`card:voted:${this.props.id}`, (data: any) => {
-      if(data && data.vote) {
+    this.props.socket.on(`card:voted:${this.props.id}`, (data: { totalVotes: number }) => {
+      debugger;
+      if(data && data.totalVotes) {
         this.setState({
-          votes: this.state.votes + data.vote,
+          votes: data.totalVotes,
         });
       }
     });
   }
 
-  componentWillUnmount() {
-    this.props.socket.removeListener(`card:updated:${this.props.id}`);
-    this.props.socket.removeListener(`card:voted:${this.props.id}`);
-  }
+  // componentWillUnmount() {
+  //   this.props.socket.removeListener(`card:updated:${this.props.id}`);
+  //   this.props.socket.removeListener(`card:voted:${this.props.id}`);
+  // }
 
   flipEditable(event: React.MouseEvent) {
     event.preventDefault();
