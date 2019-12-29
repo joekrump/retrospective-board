@@ -31,10 +31,8 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   componentDidMount() {
-    console.info("MOUNTED");
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
       data.columns.forEach((column: {id: string}) => {
-        console.info(column);
         this.addColumn(column);
       });
     });
@@ -117,9 +115,7 @@ export class Main extends React.Component<MainProps, MainState> {
     this.setState({columns: newColumns});
   }
 
-
   render() {
-    console.log(this.state.boardTitle);
     return (
       <main>
         <BoardControls
