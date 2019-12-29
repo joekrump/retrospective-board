@@ -1,5 +1,6 @@
 html, body, #react-root {
   height: 100%;
+  background-color: #e6e6e6;
 }
 
 body {
@@ -11,11 +12,25 @@ footer {
   grid-template-columns: repeat(12, 1fr);
 }
 
-footer {
-  height: 4%;
-}
-
 h2 {
   font-size: 1.5em;
   margin: 1.0em 0;
+}
+
+.alert {
+  display: none;
+}
+
+.alert--show {
+  position: fixed;
+  bottom: 0px;
+  display: block;
+}
+
+.alert-vote-limit {
+  border: 1px solid orangered;
+  background-color: #363636;
+  width: 100%;
+  color: white;
+  padding: 5px 10px
 }

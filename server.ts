@@ -96,7 +96,9 @@ function updateRemainingVotes(socket: SocketIO.Socket, card: Card, boardId: numb
   } else if (socket.request.session.remainingVotes[boardId] > 0){
     socket.request.session.remainingVotes[boardId]--;
   } else {
-    return; // exit early because votes have been makes out and the user is not attempting to undo a previous vote.
+    console.log("No more votes left");
+    socket.emit(`board:vote-limit-reached:${boardId}`, { maxVotes: MAX_VOTES_PER_USER });
+    return; // exit early because votes have been maxed out and the user is not attempting to undo a previous vote.
   }
 
   if(socket.request.session.remainingVotes[boardId] >= 0) {
@@ -253,8 +255,6 @@ io.on('connection', function (socket) {
         updateRemainingVotes(socket, card, boardId, vote);
         socket.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
         socket.broadcast.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
-      } else {
-        console.log("No more votes left");
       }
     }
   });

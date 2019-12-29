@@ -28,6 +28,5 @@ main {
 #columns {
   grid-row: 2 / span 1;
   grid-column: 1 / span 12;
-  background: #f3f3f3;
   display: flex;
 }
