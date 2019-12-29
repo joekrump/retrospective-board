@@ -227,6 +227,7 @@ io.on('connection', function (socket) {
         console.log(`card:voted:${id}`);
         console.log(card.totalVotesCount);
         socket.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
+        socket.broadcast.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
       }
     } {
       console.log("No more votes left");

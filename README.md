@@ -44,8 +44,8 @@ _This makes it easy for others to acess this app, running off your machine_
 7. voting
 * [ ] config - number of votes per user
   * [x] Works per-session, however, sessions don't persist past a page refresh.
-* [ ] users can't remove other users' votes
-* [ ] Fix error that doesn't show your votes for yourself and only for others.
+* [x] users can't remove other users' votes
+* [x] Fix error that doesn't show your votes for yourself and only for others.
 
 8. cleanup
 * [ ] share button now shares link
