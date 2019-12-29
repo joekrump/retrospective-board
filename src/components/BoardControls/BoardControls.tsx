@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt, faCog } from "@fortawesome/free-solid-svg-icons";
+import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 interface BoardControlsProps {
   addColumn: () => void;
@@ -108,9 +108,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
           <input type="text" defaultValue={this.state.description} placeholder="Add a description" onKeyDown={(e) => this.saveDescription(e)} ref={ref => this.descriptionInput = ref}></input>
         </div>
         <div id="board-controls">
-          <button>Share</button>
           <button onClick={() => this.props.addColumn()}>New Column</button>
-          <a href="#"><FontAwesomeIcon icon={faCog} /></a>
         </div>
       </>
     );
