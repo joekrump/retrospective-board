@@ -6,8 +6,8 @@ A tool for running retros.
 
 1. `npm install` // Installs package dependencies.
 1. Create an environment variable called `RETRO_SECRET` and store its value somewhere safe. It must be able to be accessed via `process.env.RETRO_SECRET` in the server code. If you do not do this, you will see an error when you try to access the app after running the steps below.
-1. `npm start` // Starts webpack dev server for the client-side code running on **localhost:8000**.
-1. `npm run start-server` // Starts the express server running locally.
+1. `npm run start:dev-client` // Starts webpack dev server for the client-side code running on **localhost:4000**.
+1. `npm run start:dev-server` // Starts the express server running locally.
 
 ## Server a build of the app over HTTPS using NGROK
 _This makes it easy for others to acess this app, running off your machine_
@@ -42,8 +42,7 @@ _This makes it easy for others to acess this app, running off your machine_
 * [ ] make it look nice - WIP
 
 7. voting
-* [ ] config - number of votes per user
-  * [x] Works per-session, however, sessions don't persist past a page refresh.
+* [x] config - number of votes per user
 * [x] users can't remove other users' votes
 * [x] Fix error that doesn't show your votes for yourself and only for others.
 
