@@ -54,10 +54,10 @@ export class Card extends React.Component<CardProps, CardState> {
     });
   }
 
-  // componentWillUnmount() {
-  //   this.props.socket.removeListener(`card:updated:${this.props.id}`);
-  //   this.props.socket.removeListener(`card:voted:${this.props.id}`);
-  // }
+  componentWillUnmount() {
+    this.props.socket.removeListener(`card:updated:${this.props.id}`);
+    this.props.socket.removeListener(`card:voted:${this.props.id}`);
+  }
 
   flipEditable(event: React.MouseEvent) {
     event.preventDefault();
