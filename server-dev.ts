@@ -216,7 +216,8 @@ io.on('connection', function (socket) {
 
         socket.request.session.votes[boardId] -= vote;
         console.log(`card:voted:${id}`);
-        socket.broadcast.emit(`card:voted:${id}`, { totalVotes: card.totalVotesCount });
+        console.log(card.totalVotesCount);
+        socket.broadcast.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
       }
     }
   });

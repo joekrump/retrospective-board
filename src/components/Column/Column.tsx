@@ -54,7 +54,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             id: data.cards[i].id,
             editable: false,
             text: data.cards[i].text,
-            votes: data.cards[i].totalVotes,
+            votes: data.cards[i].totalVotesCount,
           } as CardData);
         }
       }
@@ -75,6 +75,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     });
 
     this.props.socket.on(`column:updated:${this.props.id}`, (data: any) => {
+      debugger;
       this.setState({name: data.name});
     });
   }

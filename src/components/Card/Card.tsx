@@ -40,17 +40,15 @@ export class Card extends React.Component<CardProps, CardState> {
 
   componentDidMount() {
     this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
-      debugger;
       this.setState({
         text: data.text,
       });
     });
 
-    this.props.socket.on(`card:voted:${this.props.id}`, (data: { totalVotes: number }) => {
-      debugger;
-      if(data && data.totalVotes) {
+    this.props.socket.on(`card:voted:${this.props.id}`, (data: { totalVotesCount: number }) => {
+      if(data && data.totalVotesCount) {
         this.setState({
-          votes: data.totalVotes,
+          votes: data.totalVotesCount,
         });
       }
     });
