@@ -24,7 +24,7 @@ interface Card {
   id: string;
   text: string;
   votes: {
-    [sessionId: number]: number;
+    [sessionId: string]: number;
   };
   totalVotesCount: number;
   ownerId: number;
@@ -40,6 +40,13 @@ interface Board {
   title: string;
   description: string;
   columns: Column[];
+}
+
+interface Session {
+  id: string;
+  remainingVotes: {
+    [boardId: string]: number
+  };
 }
 
 let boards: {[key: string]: Board} = {};
@@ -75,6 +82,29 @@ function createNewBoard(boardId?: string) {
   return boardId;
 }
 
+function updateRemainingVotes(socket: SocketIO.Socket, card: Card, boardId: number, vote: number) {
+  if (card.votes[socket.request.session.id] === undefined) {
+    card.votes[socket.request.session.id] = 0;
+  }
+
+  // Check if the vote undoes a previous one and adds a remaining vote back.
+  if(
+     (vote > 0 && card.votes[socket.request.session.id] < 0)
+  || (vote < 0 && card.votes[socket.request.session.id] > 0)
+  ) {
+    socket.request.session.remainingVotes[boardId]++;
+  } else if (socket.request.session.remainingVotes[boardId] > 0){
+    socket.request.session.remainingVotes[boardId]--;
+  } else {
+    return; // exit early because votes have been makes out and the user is not attempting to undo a previous vote.
+  }
+
+  if(socket.request.session.remainingVotes[boardId] >= 0) {
+    card.votes[socket.request.session.id] += vote;
+    card.totalVotesCount += vote;
+  }
+}
+
 app.use(express.static('public'));
 
 app.get("/", function(_req, res) {
@@ -98,14 +128,14 @@ io.on('connection', function (socket) {
   if(!socket.request.session || !socket.request.session.id) {
     socket.request.session.save();
   }
-  if(socket.request.session && socket.request.session.votes === undefined) {
-    socket.request.session.votes = {};
+  if(socket.request.session && socket.request.session.remainingVotes === undefined) {
+    socket.request.session.remainingVotes = {};
     socket.request.session.save();
   }
 
   socket.on('board:loaded', function (data) {
-    if(socket.request.session.votes[data.boardId] === undefined) {
-      socket.request.session.votes[data.boardId] = MAX_VOTES_PER_USER;
+    if(socket.request.session.remainingVotes[data.boardId] === undefined) {
+      socket.request.session.remainingVotes[data.boardId] = MAX_VOTES_PER_USER;
       socket.request.session.save();
     }
 
@@ -216,27 +246,22 @@ io.on('connection', function (socket) {
   });
 
   socket.on("card:voted", function ({ id, vote, boardId, columnId }) {
-    console.log("VOTING FOR CARD")
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
-      if (card && hasRemainingVotes(socket.request.session.votes[boardId], vote)) {
-        card.votes[socket.request.session.id] += vote;
-        card.totalVotesCount += vote;
-        socket.request.session.votes[boardId]--;
-        console.log(`card:voted:${id}`);
-        console.log(card.totalVotesCount);
+      if (card && canVote(socket.request.session.remainingVotes[boardId])) {
+        updateRemainingVotes(socket, card, boardId, vote);
         socket.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
         socket.broadcast.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
+      } else {
+        console.log("No more votes left");
       }
-    } {
-      console.log("No more votes left");
     }
   });
 });
 
-function hasRemainingVotes(votesRemaining: number, newVote: number) {
-  return (votesRemaining - 1) > -1;
+function canVote(remainingVotes: number) {
+  return remainingVotes >= 0;
 }
 
 if(process.env.NODE_ENV === "production") {
