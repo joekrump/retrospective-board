@@ -223,18 +223,19 @@ io.on('connection', function (socket) {
       if (card && hasRemainingVotes(socket.request.session.votes[boardId], vote)) {
         card.votes[socket.request.session.id] += vote;
         card.totalVotesCount += vote;
-
-        socket.request.session.votes[boardId] -= vote;
+        socket.request.session.votes[boardId]--;
         console.log(`card:voted:${id}`);
         console.log(card.totalVotesCount);
         socket.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
       }
+    } {
+      console.log("No more votes left");
     }
   });
 });
 
 function hasRemainingVotes(votesRemaining: number, newVote: number) {
-  return (votesRemaining - newVote) > -1;
+  return (votesRemaining - 1) > -1;
 }
 
 if(process.env.NODE_ENV === "production") {

@@ -46,7 +46,7 @@ export class Card extends React.Component<CardProps, CardState> {
     });
 
     this.props.socket.on(`card:voted:${this.props.id}`, (data: { totalVotesCount: number }) => {
-      if(data && data.totalVotesCount) {
+      if(!!data) {
         this.setState({
           votes: data.totalVotesCount,
         });
@@ -118,12 +118,12 @@ export class Card extends React.Component<CardProps, CardState> {
         </div>
       );
     } else {
-      let downvote;
+      let downvoteButton;
       if (this.state.votes > 0) {
-        downvote = (
-          <a href="" onClick={event => this.voteDown(event)} className="vote-link">
+        downvoteButton = (
+          <button onClick={event => this.voteDown(event)} className="vote-link">
             <FontAwesomeIcon icon={faThumbsDown} />
-          </a>
+          </button>
         );
       }
 
@@ -141,11 +141,11 @@ export class Card extends React.Component<CardProps, CardState> {
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
           <div>{this.state.text}{editLink}</div>
-          <a href="" onClick={event => this.voteUp(event)} className="vote-link">
-            <FontAwesomeIcon icon={faThumbsUp} />
-          </a>
           <span className="vote-count">{this.state.votes}</span>
-          {downvote}
+          <button onClick={event => this.voteUp(event)} className="vote-link">
+            <FontAwesomeIcon icon={faThumbsUp} />
+          </button>
+          { downvoteButton }
         </div>
       );
     }

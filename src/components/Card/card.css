@@ -1,7 +1,7 @@
 .card-container {
-  min-height: 60px;
   border: 1px solid #D8D8D8;
   margin: 0.5em 0;
+  padding: 10px 5px;
 }
 
 .card-container textarea {
@@ -10,6 +10,11 @@
   width: 100%;
   padding: 0;
   border: 0;
+}
+
+.card-container .vote-count {
+  vertical-align: middle;
+  margin-right: 10px;
 }
 
 .card-container .blur {
