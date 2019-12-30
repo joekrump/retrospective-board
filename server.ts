@@ -51,7 +51,7 @@ interface Session {
 
 let boards: {[key: string]: Board} = {};
 const NEW_BOARD = {
-  title: "New Board",
+  title: "Retro",
   description: "",
   columns: [
     {

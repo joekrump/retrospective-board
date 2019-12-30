@@ -1,0 +1,38 @@
+.board-controls {
+  margin: 0 20px;
+  grid-row: 1 / span 1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-column: 1 / span 12;
+}
+
+#board-title {
+  grid-row: 1 / span 1;
+  grid-column: 1 / span 2;
+  height: 100%;
+}
+
+#board-title > h2 {
+  margin: 0;
+  padding: 5px;
+}
+
+#board-description {
+  grid-row: 1 / span 1;
+  grid-column: 3 / span 8;
+}
+
+#board-description input {
+  padding: 5px;
+  width: 98%;
+  height: 100%;
+}
+
+#board-controls {
+  grid-row: 1 / span 1;
+  grid-column: 11 / span 2;
+  text-align: right;
+}
+#board-controls > .button--create {
+  height: 100%;
+}

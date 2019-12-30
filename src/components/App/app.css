@@ -5,6 +5,11 @@ html, body, #react-root {
 
 body {
   margin: 0;
+  font: 400 11px system-ui;
+}
+
+input {
+  font: 400 11px system-ui;
 }
 
 footer {
@@ -33,4 +38,14 @@ h2 {
   width: 100%;
   color: white;
   padding: 5px 10px
+}
+
+.button {
+  padding: 5px 10px;
+}
+
+.button--create {
+  color: #e6e6e6;
+  border: 1px solid #e6e6e6;
+  background-color: #007B23;
 }

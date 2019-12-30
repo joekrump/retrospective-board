@@ -7,6 +7,7 @@ import "./main.css";
 interface ColumnData {
   key: string;
   name: string;
+  isEditing: boolean;
 }
 
 interface MainProps {
@@ -53,13 +54,13 @@ export class Main extends React.Component<MainProps, MainState> {
   addColumn(column?: any) {
     let newColumns = this.state.columns.slice(0);
     if (column) {
-      newColumns.push({key: column.id, name: column.name});
+      newColumns.push({key: column.id, name: column.name, isEditing: false });
       this.props.socket.emit("column:loaded", {
         boardId: this.props.boardId,
         id: column.id,
       });
     } else {
-      const newColumn = {key: uuid.v4(), name: "New Column"};
+      const newColumn = {key: uuid.v4(), name: "New Column", isEditing: true };
       newColumns.push(newColumn)
       this.props.socket.emit("column:created", {
         boardId: this.props.boardId,
@@ -88,6 +89,7 @@ export class Main extends React.Component<MainProps, MainState> {
           socket={this.props.socket}
           boardId={this.props.boardId}
           maxWidthPercentage={maxWidthPercentage}
+          isEditing={this.state.columns[i].isEditing}
         >
         </Column>
       );
@@ -123,8 +125,8 @@ export class Main extends React.Component<MainProps, MainState> {
           title={this.state.boardTitle}
           description={this.state.boardDescription}
           socket={this.props.socket}
-          boardId={this.props.boardId}>
-
+          boardId={this.props.boardId}
+        >
         </BoardControls>
         <div id="columns">
           {this.renderColumns()}

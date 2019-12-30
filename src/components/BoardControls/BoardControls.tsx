@@ -2,6 +2,7 @@ import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
+import "./board-controls.css";
 interface BoardControlsProps {
   addColumn: () => void;
   title: string;
@@ -98,19 +99,28 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
         </>
       );
     } else {
-      boardTitle = <div id="board-title">{this.state.title}<FontAwesomeIcon icon={faPencilAlt} onClick={() => this.editTitle()} /></div>;
+      boardTitle = (<div id="board-title">
+        <h2>
+          {this.state.title} <FontAwesomeIcon icon={faPencilAlt} onClick={() => this.editTitle()} />
+        </h2>
+      </div>);
     }
 
     return (
-      <>
-        {boardTitle}
+      <div className="board-controls">
+        { boardTitle }
         <div id="board-description">
           <input type="text" defaultValue={this.state.description} placeholder="Add a description" onKeyDown={(e) => this.saveDescription(e)} ref={ref => this.descriptionInput = ref}></input>
         </div>
         <div id="board-controls">
-          <button onClick={() => this.props.addColumn()}>New Column</button>
+          <button
+            className="button button--create"
+            onClick={() => this.props.addColumn()}
+          >
+            New Column
+          </button>
         </div>
-      </>
+      </div>
     );
   }
 }

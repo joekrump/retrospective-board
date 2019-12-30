@@ -21,6 +21,7 @@ interface ColumnProps {
   socket: SocketIOClient.Socket;
   boardId: string;
   maxWidthPercentage: number;
+  isEditing?: boolean;
 }
 
 interface ColumnState {
@@ -40,7 +41,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       cards: [],
       lastIndex: 0,
       name: this.props.name,
-      isEditing: false,
+      isEditing: !!this.props.isEditing ? true : false,
     };
 
     this.nameInput = React.createRef();
@@ -141,23 +142,40 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.flipIsEditing();
   }
 
-  render() {
-    if (this.state.isEditing) {
+  renderColumnTitle() {
+    if(this.state.isEditing) {
       return (
-        <div className="column column-edit" style={{maxWidth: `${this.props.maxWidthPercentage}%`}}>
-          <input type="text" defaultValue={this.state.name} ref={this.nameInput} />
+        <div className="column-header column-header--editing">
+          <input
+            type="text"
+            defaultValue={this.state.name}
+            ref={this.nameInput}
+            autoFocus={true}
+          />
           <button onClick={this.updateColumnName.bind(this)}>Save</button>
-          <a href="" onClick={event => this.flipIsEditing(event)}>cancel</a>
+          <button onClick={event => this.flipIsEditing(event)}>cancel</button>
         </div>
-      )
+      );
+    } else {
+      return (
+        <h2
+          className="column-header"
+          onClick={this.flipIsEditing.bind(this)}
+        >
+          {this.state.name}&nbsp;<FontAwesomeIcon icon={faPencilAlt} />
+        </h2>
+      );
     }
+  }
 
+  render() {
     return (
-      <div className="column">
+      <div
+        className={"column" + (this.state.isEditing ? " column-edit" : "") }
+        style={{ maxWidth: `${this.props.maxWidthPercentage}%`}}
+      >
         <div className="header-row">
-          <h2 onClick={this.flipIsEditing.bind(this)}>
-            {this.state.name}<FontAwesomeIcon icon={faPencilAlt} />
-          </h2>
+          { this.renderColumnTitle() }
           <a
             href=""
             onClick={event => this.props.deleteColumn(event, this.props.id)}
