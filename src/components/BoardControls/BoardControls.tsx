@@ -2,6 +2,7 @@ import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
+import "./board-controls.css";
 interface BoardControlsProps {
   addColumn: () => void;
   title: string;
@@ -102,7 +103,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
     }
 
     return (
-      <>
+      <div className="board-controls">
         {boardTitle}
         <div id="board-description">
           <input type="text" defaultValue={this.state.description} placeholder="Add a description" onKeyDown={(e) => this.saveDescription(e)} ref={ref => this.descriptionInput = ref}></input>
@@ -110,7 +111,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
         <div id="board-controls">
           <button onClick={() => this.props.addColumn()}>New Column</button>
         </div>
-      </>
+      </div>
     );
   }
 }
