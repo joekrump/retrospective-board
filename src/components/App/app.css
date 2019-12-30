@@ -39,3 +39,13 @@ h2 {
   color: white;
   padding: 5px 10px
 }
+
+.button {
+  padding: 5px 10px;
+}
+
+.button--create {
+  color: #e6e6e6;
+  border: 1px solid #e6e6e6;
+  background-color: #007B23;
+}
