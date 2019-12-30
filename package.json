@@ -21,7 +21,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "start:prod": "NODE_ENV=production concurrently --kill-others \"npm run watch\" \"npm run start-server\"",
+    "start:prod": "NODE_ENV=production concurrently --kill-others \"npm run watch\" \"ts-node-dev --respawn --transpileOnly server.ts\"",
     "start:dev-client": "webpack-dev-server --mode development --open",
     "start:dev-server": "ts-node-dev --respawn --transpileOnly server.ts",
     "watch": "webpack --watch"

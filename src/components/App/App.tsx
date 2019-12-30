@@ -20,13 +20,19 @@ export class App extends React.Component<{}, AppState> {
     super(props);
 
     let serverURL = window.location.origin;
+    let boardId = window.location.pathname.split("/").pop() || "";
+
     if (!!window.location.port && (window.location.port !== "8000")) {
       serverURL = window.location.origin.replace(window.location.port, "8000");
+      boardId = uuid.v4();
+    } else if (!boardId) {
+      boardId = uuid.v4();
+      window.location.assign(`/board/${boardId}`);
     }
 
     this.state = {
+      boardId,
       socket: io.connect(serverURL),
-      boardId: window.location.pathname.split("/").pop() || uuid.v4(),
       showVoteLimitAlert: false,
       showResults: false
     };

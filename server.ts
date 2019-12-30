@@ -89,6 +89,7 @@ function createNewBoard(boardId?: string) {
 app.use(express.static('public'));
 
 app.get("/", function(_req, res) {
+  console.log("GET")
   res.sendFile(__dirname + "/create.html")
 });
 
