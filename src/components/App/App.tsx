@@ -45,11 +45,11 @@ export class App extends React.Component<{}, AppState> {
       showVoteLimitAlert: true,
     });
 
-    // setTimeout(() => {
-    //   this.setState({
-    //     showVoteLimitAlert: false,
-    //   })
-    // }, 3000);
+    setTimeout(() => {
+      this.setState({
+        showVoteLimitAlert: false,
+      })
+    }, 3000);
   }
 
   componentWillUnmount() {

@@ -37,7 +37,8 @@ h2 {
   background-color: #363636;
   width: 100%;
   color: white;
-  padding: 5px 10px
+  font-size: 1.5em;
+  padding: 15px 10px
 }
 
 .button {
