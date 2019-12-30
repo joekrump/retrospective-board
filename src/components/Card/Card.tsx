@@ -118,15 +118,6 @@ export class Card extends React.Component<CardProps, CardState> {
         </div>
       );
     } else {
-      let downvoteButton;
-      if (this.state.votes > 0) {
-        downvoteButton = (
-          <button onClick={event => this.voteDown(event)} className="vote-link">
-            <FontAwesomeIcon icon={faThumbsDown} />
-          </button>
-        );
-      }
-
       let editLink;
       if (this.props.editable) {
         editLink = (
@@ -145,7 +136,9 @@ export class Card extends React.Component<CardProps, CardState> {
           <button onClick={event => this.voteUp(event)} className="vote-link">
             <FontAwesomeIcon icon={faThumbsUp} />
           </button>
-          { downvoteButton }
+          <button onClick={event => this.voteDown(event)} className="vote-link">
+            <FontAwesomeIcon icon={faThumbsDown} />
+          </button>
         </div>
       );
     }
