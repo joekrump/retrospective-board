@@ -9,7 +9,6 @@ interface HeaderProps {
 
 export class Header extends React.Component<HeaderProps> {
 
-
   toggleShowResults(e: React.MouseEvent) {
     e.preventDefault();
     // emit an event to show results.

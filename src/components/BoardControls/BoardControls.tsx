@@ -9,6 +9,7 @@ interface BoardControlsProps {
   description: string;
   socket: SocketIOClient.Socket;
   boardId: string;
+  votesRemaining: number | undefined;
 };
 
 interface BoardControlsState {
@@ -113,6 +114,9 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
           <input type="text" defaultValue={this.state.description} placeholder="Add a description" onKeyDown={(e) => this.saveDescription(e)} ref={ref => this.descriptionInput = ref}></input>
         </div>
         <div id="board-controls">
+          <strong className="votes-remaining">
+            Votes Remaining: {this.props.votesRemaining === undefined ? null : this.props.votesRemaining}
+          </strong>
           <button
             className="button button--create"
             onClick={() => this.props.addColumn()}

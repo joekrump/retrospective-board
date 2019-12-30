@@ -20,6 +20,7 @@ interface MainState {
   columns: ColumnData[];
   boardTitle: string;
   boardDescription: string;
+  votesRemaining?: number | undefined;
 }
 
 export class Main extends React.Component<MainProps, MainState> {
@@ -37,7 +38,16 @@ export class Main extends React.Component<MainProps, MainState> {
       data.columns.forEach((column: {id: string}) => {
         this.addColumn(column);
       });
+      this.setState({
+        votesRemaining: data.maxVotes,
+      })
     });
+
+    this.props.socket.on(`board:update-remaining-votes:${this.props.boardId}`, (data: any) => {
+      this.setState({
+        votesRemaining: data.votesRemaining,
+      });
+    })
 
     this.props.socket.on(`column:created:${this.props.boardId}`, (data: any) => {
       this.addColumn(data);
@@ -50,6 +60,9 @@ export class Main extends React.Component<MainProps, MainState> {
 
   componentWillUnmount() {
     this.props.socket.removeListener(`board:loaded:${this.props.boardId}`);
+    this.props.socket.removeListener(`board:update-remaining-votes:${this.props.boardId}`);
+    this.props.socket.removeListener(`column:deleted:${this.props.boardId}`);
+    this.props.socket.removeListener(`column:created:${this.props.boardId}`);
   }
 
   addColumn(column?: any) {
@@ -128,6 +141,7 @@ export class Main extends React.Component<MainProps, MainState> {
           description={this.state.boardDescription}
           socket={this.props.socket}
           boardId={this.props.boardId}
+          votesRemaining={this.state.votesRemaining}
         >
         </BoardControls>
         <div id="columns">

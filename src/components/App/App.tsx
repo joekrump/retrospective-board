@@ -59,6 +59,8 @@ export class App extends React.Component<{}, AppState> {
   }
 
   componentWillUnmount() {
+    this.state.socket.removeListener(`board:vote-limit-reached:${this.state.boardId}`);
+    this.state.socket.removeListener(`board:show-results:${this.state.boardId}`);
     this.state.socket.close();
   }
 

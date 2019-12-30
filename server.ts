@@ -56,6 +56,7 @@ const NEW_BOARD = {
   title: "Retro",
   description: "",
   showResults: false,
+  maxVotes: MAX_VOTES_PER_USER,
   columns: [
     {
       id: uuid.v4(),
@@ -164,8 +165,6 @@ io.on('connection', function (socket) {
   });
 
   socket.on("column:updated", function(data) {
-    console.log("column updated");
-    console.log(data);
     let column = boards[data.boardId].columns.find((column) => column.id === data.id);
     if (column) {
       column.name = data.name;
@@ -274,6 +273,7 @@ io.on('connection', function (socket) {
         const { netSentiment, votesCount } = card;
         socket.emit(`card:voted:${id}`, { netSentiment, votesCount, userSentiment });
         socket.broadcast.emit(`card:voted:${id}`, { netSentiment, votesCount });
+        socket.emit(`board:update-remaining-votes:${boardId}`, { votesRemaining: socket.request.session.remainingVotes[boardId] });
       }
     }
   });
