@@ -108,6 +108,7 @@ export class Card extends React.Component<CardProps, CardState> {
       cardContents = (
         <div>
           <textarea
+            autoFocus={true}
             onChange={event => this.setState({text: event.target.value})}
             value={this.state.text}>
           </textarea>
