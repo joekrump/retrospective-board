@@ -66,7 +66,7 @@ export class App extends React.Component<{}, AppState> {
     return (
       <>
         <Header showResults={this.state.showResults} socket={this.state.socket} boardId={this.state.boardId}></Header>
-        <Main socket={this.state.socket} boardId={this.state.boardId}></Main>
+        <Main socket={this.state.socket} boardId={this.state.boardId} showResults={this.state.showResults}></Main>
         <div className={"alert alert-vote-limit" + (this.state.showVoteLimitAlert ? " alert--show" : "")}>
           Your voting limit of {this.state.maxVotes} has been reached. Undo previous votes if you want some back.
         </div>

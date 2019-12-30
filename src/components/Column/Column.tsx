@@ -23,6 +23,7 @@ interface ColumnProps {
   boardId: string;
   maxWidthPercentage: number;
   isEditing?: boolean;
+  showResults: boolean;
 }
 
 interface ColumnState {
@@ -202,6 +203,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                 text={card.text ? card.text : ""}
                 votesCount={card.votesCount}
                 netSentiment={card.netSentiment}
+                showResults={this.props.showResults}
               >
               </Card>
             )

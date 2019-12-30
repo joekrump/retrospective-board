@@ -13,7 +13,9 @@ export class Header extends React.Component<HeaderProps> {
   toggleShowResults(e: React.MouseEvent) {
     e.preventDefault();
     // emit an event to show results.
-    this.props.socket.emit(`board:show-results:${this.props.boardId}`);
+    this.props.socket.emit(`board:show-results`, {
+      boardId: this.props.boardId,
+    });
   }
 
   render() {

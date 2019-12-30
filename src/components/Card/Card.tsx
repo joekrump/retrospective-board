@@ -15,6 +15,7 @@ interface CardProps {
   text: string;
   votesCount: number;
   netSentiment: number;
+  showResults: boolean;
 }
 
 interface CardState {
@@ -167,8 +168,7 @@ export class Card extends React.Component<CardProps, CardState> {
           <button onClick={event => this.voteDown(event)} className="vote-link">
             <FontAwesomeIcon icon={faThumbsDown} />
           </button>
-          { this.renderResults() }
-          { this.renderUserSentiment() }
+          { this.props.showResults ? this.renderResults() : this.renderUserSentiment() }
         </div>
       );
     }

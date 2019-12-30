@@ -40,6 +40,7 @@ interface Column {
 interface Board {
   title: string;
   description: string;
+  showResults: boolean;
   columns: Column[];
 }
 
@@ -54,6 +55,7 @@ let boards: {[key: string]: Board} = {};
 const NEW_BOARD = {
   title: "Retro",
   description: "",
+  showResults: false,
   columns: [
     {
       id: uuid.v4(),
@@ -110,6 +112,14 @@ io.on('connection', function (socket) {
     socket.request.session.remainingVotes = {};
     socket.request.session.save();
   }
+
+  socket.on('board:show-results', function(data) {
+    if (!!boards[data.boardId]) {
+      boards[data.boardId].showResults = !boards[data.boardId].showResults;
+      socket.emit(`board:show-results:${data.boardId}`, { showResults: boards[data.boardId].showResults });
+      socket.broadcast.emit(`board:show-results:${data.boardId}`, { showResults: boards[data.boardId].showResults });
+    }
+  });
 
   socket.on('board:loaded', function (data) {
     if(socket.request.session.remainingVotes[data.boardId] === undefined) {
