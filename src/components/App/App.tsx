@@ -12,6 +12,7 @@ interface AppState {
   socket: SocketIOClient.Socket;
   maxVotes?: number;
   showVoteLimitAlert: boolean;
+  showResults: boolean;
 }
 
 export class App extends React.Component<{}, AppState> {
@@ -27,6 +28,7 @@ export class App extends React.Component<{}, AppState> {
       socket: io.connect(serverURL),
       boardId: window.location.pathname.split("/").pop() || uuid.v4(),
       showVoteLimitAlert: false,
+      showResults: false
     };
   }
 
@@ -36,6 +38,10 @@ export class App extends React.Component<{}, AppState> {
     });
     this.state.socket.on(`board:vote-limit-reached:${this.state.boardId}`, (data: { maxVotes: number }) => {
       this.displayVoteLimitAlert(data.maxVotes);
+    });
+
+    this.state.socket.on(`board:show-results:${this.state.boardId}`, (data: { showResults: boolean }) => {
+      this.setState({showResults: data.showResults})
     });
   }
 
@@ -59,8 +65,8 @@ export class App extends React.Component<{}, AppState> {
   render() {
     return (
       <>
-        <Header></Header>
-        <Main socket={this.state.socket} boardId={this.state.boardId}></Main>
+        <Header showResults={this.state.showResults} socket={this.state.socket} boardId={this.state.boardId}></Header>
+        <Main socket={this.state.socket} boardId={this.state.boardId} showResults={this.state.showResults}></Main>
         <div className={"alert alert-vote-limit" + (this.state.showVoteLimitAlert ? " alert--show" : "")}>
           Your voting limit of {this.state.maxVotes} has been reached. Undo previous votes if you want some back.
         </div>

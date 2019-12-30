@@ -13,6 +13,7 @@ interface ColumnData {
 interface MainProps {
   socket: SocketIOClient.Socket;
   boardId: string;
+  showResults: boolean;
 }
 
 interface MainState {
@@ -90,6 +91,7 @@ export class Main extends React.Component<MainProps, MainState> {
           boardId={this.props.boardId}
           maxWidthPercentage={maxWidthPercentage}
           isEditing={this.state.columns[i].isEditing}
+          showResults={this.props.showResults}
         >
         </Column>
       );
