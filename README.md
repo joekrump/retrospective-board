@@ -25,6 +25,3 @@ _This makes it easy for others to acess this app, running off your machine_
 * [ ] GIF support (/rich text?)
 * [ ] Colours for columns
 * [ ] Persist sessions and add logout functionality.
-
-## BUGS
-* [ ] when you edit the column names, all the card data is deleted locally (not on the server, thankfully)
