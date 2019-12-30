@@ -21,6 +21,7 @@ interface ColumnProps {
   socket: SocketIOClient.Socket;
   boardId: string;
   maxWidthPercentage: number;
+  isEditing?: boolean;
 }
 
 interface ColumnState {
@@ -40,7 +41,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       cards: [],
       lastIndex: 0,
       name: this.props.name,
-      isEditing: false,
+      isEditing: !!this.props.isEditing ? true : false,
     };
 
     this.nameInput = React.createRef();
@@ -145,7 +146,12 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     if(this.state.isEditing) {
       return (
         <div className="column-header column-header--editing">
-          <input type="text" defaultValue={this.state.name} ref={this.nameInput} />
+          <input
+            type="text"
+            defaultValue={this.state.name}
+            ref={this.nameInput}
+            autoFocus={true}
+          />
           <button onClick={this.updateColumnName.bind(this)}>Save</button>
           <button onClick={event => this.flipIsEditing(event)}>cancel</button>
         </div>
