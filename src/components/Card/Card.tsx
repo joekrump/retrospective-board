@@ -22,6 +22,7 @@ interface CardState {
   text: string;
   votesCount: number;
   netSentiment: number;
+  userSentiment: number;
 }
 
 export class Card extends React.Component<CardProps, CardState> {
@@ -33,6 +34,7 @@ export class Card extends React.Component<CardProps, CardState> {
       votesCount: this.props.votesCount,
       netSentiment: this.props.netSentiment,
       text: this.props.text,
+      userSentiment: 0,
     }
 
     if (!this.props.editable) {
@@ -49,12 +51,13 @@ export class Card extends React.Component<CardProps, CardState> {
     });
 
     this.props.socket.on(`card:voted:${this.props.id}`, (
-      data: { netSentiment: number, votesCount: number }
+      data: { netSentiment: number, votesCount: number, userSentiment: number }
     ) => {
       if(!!data) {
         this.setState({
           votesCount: data.votesCount,
           netSentiment: data.netSentiment,
+          userSentiment: !!data.userSentiment ? data.userSentiment : 0,
         });
       }
     });
@@ -107,11 +110,22 @@ export class Card extends React.Component<CardProps, CardState> {
     });
   }
 
-  renderSentiment() {
+  renderUserSentiment() {
     return (
       <span className="sentiment">
-        Sentiment: {this.state.netSentiment > 0 ? `+${this.state.netSentiment}` : this.state.netSentiment}
+        Your Vote: {this.state.userSentiment > 0 ? `+${this.state.userSentiment}` : this.state.userSentiment}
       </span>
+    );
+  }
+
+  renderResults() {
+    return (
+      <>
+        <span className="vote-count">Votes:{this.state.votesCount}</span>
+        <span className="sentiment">
+          Sentiment: {this.state.netSentiment > 0 ? `+${this.state.netSentiment}` : this.state.netSentiment}
+        </span>
+      </>
     );
   }
 
@@ -153,8 +167,8 @@ export class Card extends React.Component<CardProps, CardState> {
           <button onClick={event => this.voteDown(event)} className="vote-link">
             <FontAwesomeIcon icon={faThumbsDown} />
           </button>
-          <span className="vote-count">Total Votes:{this.state.votesCount}</span>
-          { this.renderSentiment() }
+          { this.renderResults() }
+          { this.renderUserSentiment() }
         </div>
       );
     }

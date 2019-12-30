@@ -12,7 +12,8 @@
   border: 0;
 }
 
-.card-container .vote-count {
+.card-container .vote-count,
+.card-container .sentiment {
   vertical-align: middle;
   margin-right: 10px;
 }

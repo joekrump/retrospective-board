@@ -260,8 +260,9 @@ io.on('connection', function (socket) {
       const card = column.cards.find((card) => card.id === id);
       if (card && canVote(socket.request.session.remainingVotes[boardId])) {
         updateRemainingVotes(socket, card, boardId, vote);
+        const userSentiment = card.sentiments[socket.request.session.id];
         const { netSentiment, votesCount } = card;
-        socket.emit(`card:voted:${id}`, { netSentiment, votesCount });
+        socket.emit(`card:voted:${id}`, { netSentiment, votesCount, userSentiment });
         socket.broadcast.emit(`card:voted:${id}`, { netSentiment, votesCount });
       }
     }
