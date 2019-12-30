@@ -10,7 +10,8 @@ interface CardData {
   id: string;
   editable: boolean;
   text?: string;
-  votes: number;
+  votesCount: number;
+  netSentiment: number;
 }
 
 interface ColumnProps {
@@ -55,7 +56,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             id: data.cards[i].id,
             editable: false,
             text: data.cards[i].text,
-            votes: data.cards[i].totalVotesCount,
+            votesCount: data.cards[i].votesCount,
+            netSentiment: data.cards[i].netSentiment,
           } as CardData);
         }
       }
@@ -92,7 +94,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     if (data) {
       newCards.push(data);
     } else {
-      let newCard = {id: `card-${uuid.v4()}`, editable: true, votes: 0 }
+      let newCard = {id: `card-${uuid.v4()}`, editable: true, votesCount: 0, netSentiment: 0 }
       newCards.push(newCard);
 
       this.props.socket.emit(`card:created`, {
@@ -198,7 +200,9 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                 columnId={this.props.id}
                 boardId={this.props.boardId}
                 text={card.text ? card.text : ""}
-                votes={card.votes}>
+                votesCount={card.votesCount}
+                netSentiment={card.netSentiment}
+              >
               </Card>
             )
           }

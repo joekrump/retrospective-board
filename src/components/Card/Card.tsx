@@ -13,13 +13,16 @@ interface CardProps {
   columnId: string;
   boardId: string;
   text: string;
-  votes: number;
+  votesCount: number;
+  netSentiment: number;
 }
 
 interface CardState {
   isEditing: boolean;
   text: string;
-  votes: number;
+  votesCount: number;
+  netSentiment: number;
+  userSentiment: number;
 }
 
 export class Card extends React.Component<CardProps, CardState> {
@@ -28,8 +31,10 @@ export class Card extends React.Component<CardProps, CardState> {
 
     let stateToSet = {
       isEditing: true,
-      votes: this.props.votes,
+      votesCount: this.props.votesCount,
+      netSentiment: this.props.netSentiment,
       text: this.props.text,
+      userSentiment: 0,
     }
 
     if (!this.props.editable) {
@@ -45,10 +50,14 @@ export class Card extends React.Component<CardProps, CardState> {
       });
     });
 
-    this.props.socket.on(`card:voted:${this.props.id}`, (data: { totalVotesCount: number }) => {
+    this.props.socket.on(`card:voted:${this.props.id}`, (
+      data: { netSentiment: number, votesCount: number, userSentiment: number }
+    ) => {
       if(!!data) {
         this.setState({
-          votes: data.totalVotesCount,
+          votesCount: data.votesCount,
+          netSentiment: data.netSentiment,
+          userSentiment: !!data.userSentiment ? data.userSentiment : 0,
         });
       }
     });
@@ -101,6 +110,25 @@ export class Card extends React.Component<CardProps, CardState> {
     });
   }
 
+  renderUserSentiment() {
+    return (
+      <span className="sentiment">
+        Your Vote: {this.state.userSentiment > 0 ? `+${this.state.userSentiment}` : this.state.userSentiment}
+      </span>
+    );
+  }
+
+  renderResults() {
+    return (
+      <>
+        <span className="vote-count">Votes:{this.state.votesCount}</span>
+        <span className="sentiment">
+          Sentiment: {this.state.netSentiment > 0 ? `+${this.state.netSentiment}` : this.state.netSentiment}
+        </span>
+      </>
+    );
+  }
+
   render() {
     let cardContents;
 
@@ -133,13 +161,14 @@ export class Card extends React.Component<CardProps, CardState> {
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
           <div>{this.state.text}{editLink}</div>
-          <span className="vote-count">{this.state.votes}</span>
           <button onClick={event => this.voteUp(event)} className="vote-link">
             <FontAwesomeIcon icon={faThumbsUp} />
           </button>
           <button onClick={event => this.voteDown(event)} className="vote-link">
             <FontAwesomeIcon icon={faThumbsDown} />
           </button>
+          { this.renderResults() }
+          { this.renderUserSentiment() }
         </div>
       );
     }

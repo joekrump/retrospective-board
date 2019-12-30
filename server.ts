@@ -23,10 +23,11 @@ let io = SocketIO(server);
 interface Card {
   id: string;
   text: string;
-  votes: {
+  sentiments: {
     [sessionId: string]: number;
   };
-  totalVotesCount: number;
+  netSentiment: number;
+  votesCount: number;
   ownerId: number;
 }
 
@@ -80,31 +81,6 @@ function createNewBoard(boardId?: string) {
   }
   boards[boardId] = NEW_BOARD;
   return boardId;
-}
-
-function updateRemainingVotes(socket: SocketIO.Socket, card: Card, boardId: number, vote: number) {
-  if (card.votes[socket.request.session.id] === undefined) {
-    card.votes[socket.request.session.id] = 0;
-  }
-
-  // Check if the vote undoes a previous one and adds a remaining vote back.
-  if(
-     (vote > 0 && card.votes[socket.request.session.id] < 0)
-  || (vote < 0 && card.votes[socket.request.session.id] > 0)
-  ) {
-    socket.request.session.remainingVotes[boardId]++;
-  } else if (socket.request.session.remainingVotes[boardId] > 0){
-    socket.request.session.remainingVotes[boardId]--;
-  } else {
-    console.log("No more votes left");
-    socket.emit(`board:vote-limit-reached:${boardId}`, { maxVotes: MAX_VOTES_PER_USER });
-    return; // exit early because votes have been maxed out and the user is not attempting to undo a previous vote.
-  }
-
-  if(socket.request.session.remainingVotes[boardId] >= 0) {
-    card.votes[socket.request.session.id] += vote;
-    card.totalVotesCount += vote;
-  }
 }
 
 app.use(express.static('public'));
@@ -207,7 +183,7 @@ io.on('connection', function (socket) {
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
-      column.cards.push({id: data.id, text: "", votes: {}, ownerId: socket.request.session.id, totalVotesCount: 0 });
+      column.cards.push({id: data.id, text: "", sentiments: {}, ownerId: socket.request.session.id, votesCount: 0, netSentiment: 0 });
     }
 
     socket.broadcast.emit(`card:created:${data.columnId}`, {
@@ -247,14 +223,47 @@ io.on('connection', function (socket) {
     }
   });
 
+  function updateRemainingVotes(
+    socket: SocketIO.Socket,
+    card: Card,
+    boardId: number,
+    sentiment: number,
+  ) {
+    if (card.sentiments[socket.request.session.id] === undefined) {
+      card.sentiments[socket.request.session.id] = 0;
+    }
+
+    // Check if the vote undoes a previous one and adds a remaining vote back.
+    if(
+      (sentiment > 0 && card.sentiments[socket.request.session.id] < 0)
+    || (sentiment < 0 && card.sentiments[socket.request.session.id] > 0)
+    ) {
+      socket.request.session.remainingVotes[boardId]++;
+      card.votesCount--;
+    } else if (socket.request.session.remainingVotes[boardId] > 0){
+      socket.request.session.remainingVotes[boardId]--;
+      card.votesCount++;
+    } else {
+      console.log("No more votes left");
+      socket.emit(`board:vote-limit-reached:${boardId}`, { maxVotes: MAX_VOTES_PER_USER });
+      return; // exit early because votes have been maxed out and the user is not attempting to undo a previous vote.
+    }
+
+    if(socket.request.session.remainingVotes[boardId] >= 0) {
+      card.sentiments[socket.request.session.id] += sentiment;
+      card.netSentiment += sentiment;
+    }
+  }
   socket.on("card:voted", function ({ id, vote, boardId, columnId }) {
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
       if (card && canVote(socket.request.session.remainingVotes[boardId])) {
         updateRemainingVotes(socket, card, boardId, vote);
-        socket.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
-        socket.broadcast.emit(`card:voted:${id}`, { totalVotesCount: card.totalVotesCount });
+        const userSentiment = card.sentiments[socket.request.session.id];
+        const { netSentiment, votesCount } = card;
+        socket.emit(`card:voted:${id}`, { netSentiment, votesCount, userSentiment });
+        socket.broadcast.emit(`card:voted:${id}`, { netSentiment, votesCount });
       }
     }
   });
