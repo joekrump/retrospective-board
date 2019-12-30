@@ -2,24 +2,7 @@ import express from "express";
 import SocketIO from "socket.io";
 import ngrok from "ngrok";
 import uuid from "uuid";
-
-const MAX_VOTES_PER_USER=10;
-
 const session = require('express-session');
-let app = express();
-const sessionMiddleware = session({
-  secret: process.env.RETRO_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true, maxAge: 60000 },
-  genid: function(_req: any) {
-    return uuid(); // use UUIDs for session IDs
-  },
-});
-app.use(sessionMiddleware);
-let server = require("http").Server(app);
-let io = SocketIO(server);
-
 interface Card {
   id: string;
   text: string;
@@ -44,14 +27,9 @@ interface Board {
   columns: Column[];
 }
 
-interface Session {
-  id: string;
-  remainingVotes: {
-    [boardId: string]: number
-  };
-}
-
 let boards: {[key: string]: Board} = {};
+
+const MAX_VOTES_PER_USER = 10;
 const NEW_BOARD = {
   title: "Retro",
   description: "",
@@ -76,7 +54,26 @@ const NEW_BOARD = {
   ]
 };
 
+let app = express();
+const sessionMiddleware = session({
+  secret: process.env.RETRO_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true, maxAge: 60000 },
+  genid: function(_req: any) {
+    return uuid.v4(); // use UUIDs for session IDs
+  },
+});
+
+app.use(sessionMiddleware);
+let server = require("http").Server(app);
+let io = SocketIO(server);
 server.listen(8000);
+app.use(express.static('public'));
+
+app.get("/board/:boardId", function(_req, res) {
+  res.sendFile(__dirname + "/public/index.html");
+});
 
 function createNewBoard(boardId?: string) {
   if(!boardId) {
@@ -85,22 +82,6 @@ function createNewBoard(boardId?: string) {
   boards[boardId] = NEW_BOARD;
   return boardId;
 }
-
-app.use(express.static('public'));
-
-app.get("/", function(_req, res) {
-  console.log("GET")
-  res.sendFile(__dirname + "/create.html")
-});
-
-app.get("/board/:boardId", function(_req, res) {
-  res.sendFile(__dirname + "/public/index.html");
-});
-
-app.post("/create-board", function(_req, res) {
-  const boardId = createNewBoard();
-  res.redirect(`/board/${boardId}`);
-});
 
 io.use(function(socket, next) {
   sessionMiddleware(socket.request, socket.request.res, next);
