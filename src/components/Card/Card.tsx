@@ -16,6 +16,7 @@ interface CardProps {
   votesCount: number;
   netSentiment: number;
   showResults: boolean;
+  userSentiment: number;
 }
 
 interface CardState {
@@ -32,10 +33,10 @@ export class Card extends React.Component<CardProps, CardState> {
 
     let stateToSet = {
       isEditing: true,
-      votesCount: this.props.votesCount,
       netSentiment: this.props.netSentiment,
       text: this.props.text,
-      userSentiment: 0,
+      userSentiment: this.props.userSentiment,
+      votesCount: this.props.votesCount,
     }
 
     if (!this.props.editable) {

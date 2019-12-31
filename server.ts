@@ -175,7 +175,13 @@ io.on('connection', function (socket) {
     const column = boards[data.boardId].columns.find((column) => column.id === data.id);
     if (column) {
       socket.emit(`column:loaded:${data.id}`, {
-        cards: column.cards,
+        cards: column.cards.map((card) => {
+          // Remove all sentiments other than the current users.
+          card.sentiments = {
+            [currentSession.id]: card.sentiments[currentSession.id]
+          };
+          return card;
+        }),
       });
     }
   });

@@ -12,6 +12,7 @@ interface CardData {
   text?: string;
   votesCount: number;
   netSentiment: number;
+  userSentiment: number;
 }
 
 interface ColumnProps {
@@ -50,6 +51,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   }
 
   componentDidMount() {
+    const sessionId = sessionStorage.getItem("retroSessionId") || "";
+
     this.props.socket.on(`column:loaded:${this.props.id}`, (data: any) => {
       for (let i = 0; i < data.cards.length; i++) {
         if (!!data.cards[i].text) {
@@ -59,6 +62,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             text: data.cards[i].text,
             votesCount: data.cards[i].votesCount,
             netSentiment: data.cards[i].netSentiment,
+            userSentiment: data.cards[i].sentiments[sessionId] ? data.cards[i].sentiments[sessionId] : 0,
           } as CardData);
         }
       }
@@ -94,7 +98,13 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     if (data) {
       newCards.push(data);
     } else {
-      let newCard = {id: `card-${uuid.v4()}`, editable: true, votesCount: 0, netSentiment: 0 }
+      let newCard = {
+        id: `card-${uuid.v4()}`,
+        editable: true,
+        votesCount: 0,
+        netSentiment: 0,
+        userSentiment: 0,
+      };
       newCards.push(newCard);
 
       this.props.socket.emit(`card:created`, {
@@ -194,7 +204,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
               <Card
                 key={card.id}
                 id={card.id}
-                deleteCard={(event, id) => this.deleteCard(event, id)}
+                deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
                 editable={card.editable}
                 socket={this.props.socket}
                 columnId={this.props.id}
@@ -203,6 +213,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                 votesCount={card.votesCount}
                 netSentiment={card.netSentiment}
                 showResults={this.props.showResults}
+                userSentiment={card.userSentiment}
               >
               </Card>
             )
