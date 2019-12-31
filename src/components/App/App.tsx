@@ -39,8 +39,11 @@ export class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
+    const sessionId = sessionStorage.getItem("retroSessionId");
+
     this.state.socket.emit("board:loaded", {
       boardId: this.state.boardId,
+      sessionId,
     });
     this.state.socket.on(`board:vote-limit-reached:${this.state.boardId}`, (data: { maxVotes: number }) => {
       this.displayVoteLimitAlert(data.maxVotes);

@@ -34,13 +34,14 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   componentDidMount() {
-    this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
-      data.columns.forEach((column: {id: string}) => {
+    this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: { board: any, sessionId: string}) => {
+      data.board.columns.forEach((column: {id: string}) => {
         this.addColumn(column);
       });
       this.setState({
-        votesRemaining: data.maxVotes,
-      })
+        votesRemaining: data.board.maxVotes,
+      });
+      sessionStorage.setItem("retroSessionId", data.sessionId);
     });
 
     this.props.socket.on(`board:update-remaining-votes:${this.props.boardId}`, (data: any) => {

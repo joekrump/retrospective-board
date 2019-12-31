@@ -28,13 +28,21 @@ interface Board {
 }
 
 let boards: {[key: string]: Board} = {};
+let sessions: {
+  [id: string]: {
+    remainingVotes: {
+      [boardId: string]: number;
+    },
+    session: any;
+  };
+} = {};
 
-const MAX_VOTES_PER_USER = 10;
+const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
 const NEW_BOARD = {
   title: "Retro",
   description: "",
   showResults: false,
-  maxVotes: MAX_VOTES_PER_USER,
+  maxVotes: MAX_VOTES_USER_VOTE_PER_BOARD,
   columns: [
     {
       id: uuid.v4(),
@@ -91,10 +99,6 @@ io.on('connection', function (socket) {
   if(!socket.request.session || !socket.request.session.id) {
     socket.request.session.save();
   }
-  if(socket.request.session && socket.request.session.remainingVotes === undefined) {
-    socket.request.session.remainingVotes = {};
-    socket.request.session.save();
-  }
 
   socket.on('board:show-results', function(data) {
     if (!!boards[data.boardId]) {
@@ -105,15 +109,26 @@ io.on('connection', function (socket) {
   });
 
   socket.on('board:loaded', function (data) {
-    if(socket.request.session.remainingVotes[data.boardId] === undefined) {
-      socket.request.session.remainingVotes[data.boardId] = MAX_VOTES_PER_USER;
-      socket.request.session.save();
+    let sessionId: string;
+
+    if (data.sessionId && sessions[data.sessionId]) {
+      sessionId = data.sessionId;
+    } else {
+      sessionId = socket.request.session.id;
+      sessions[sessionId] = {
+        session: socket.request.session,
+        remainingVotes: {},
+      };
     }
 
     if(!data.boardId || !boards[data.boardId]) {
       data.boardId = createNewBoard(data.boardId);
+      sessions[sessionId].remainingVotes[data.boardId] = MAX_VOTES_USER_VOTE_PER_BOARD;
     }
-    socket.emit(`board:loaded:${data.boardId}`, boards[data.boardId]);
+    socket.emit(`board:loaded:${data.boardId}`, {
+      board: boards[data.boardId],
+      sessionId,
+    });
   });
 
   socket.on('board:updated', function(data) {
@@ -236,7 +251,7 @@ io.on('connection', function (socket) {
       card.votesCount++;
     } else {
       console.log("No more votes left");
-      socket.emit(`board:vote-limit-reached:${boardId}`, { maxVotes: MAX_VOTES_PER_USER });
+      socket.emit(`board:vote-limit-reached:${boardId}`, { maxVotes: MAX_VOTES_USER_VOTE_PER_BOARD });
       return; // exit early because votes have been maxed out and the user is not attempting to undo a previous vote.
     }
 
