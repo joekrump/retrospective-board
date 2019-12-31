@@ -96,10 +96,6 @@ io.use(function(socket, next) {
 });
 
 io.on('connection', function (socket) {
-  if(!socket.request.session || !socket.request.session.id) {
-    socket.request.session.save();
-  }
-
   socket.on('board:show-results', function(data) {
     if (!!boards[data.boardId]) {
       boards[data.boardId].showResults = !boards[data.boardId].showResults;
