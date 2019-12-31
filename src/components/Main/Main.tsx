@@ -20,7 +20,7 @@ interface MainState {
   columns: ColumnData[];
   boardTitle: string;
   boardDescription: string;
-  votesRemaining?: number | undefined;
+  remainingVotes?: number | undefined;
 }
 
 export class Main extends React.Component<MainProps, MainState> {
@@ -34,18 +34,21 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   componentDidMount() {
-    this.props.socket.on(`board:loaded:${this.props.boardId}`, (data: any) => {
-      data.columns.forEach((column: {id: string}) => {
+    this.props.socket.on(`board:loaded:${this.props.boardId}`, (
+      data: { board: any, sessionId: string, remainingVotes: number },
+    ) => {
+      this.setState({
+        remainingVotes: data.remainingVotes,
+      });
+      sessionStorage.setItem("retroSessionId", data.sessionId);
+      data.board.columns.forEach((column: {id: string}) => {
         this.addColumn(column);
       });
-      this.setState({
-        votesRemaining: data.maxVotes,
-      })
     });
 
     this.props.socket.on(`board:update-remaining-votes:${this.props.boardId}`, (data: any) => {
       this.setState({
-        votesRemaining: data.votesRemaining,
+        remainingVotes: data.remainingVotes,
       });
     })
 
@@ -66,12 +69,14 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   addColumn(column?: any) {
+    const sessionId = sessionStorage.getItem("retroSessionId");
     let newColumns = this.state.columns.slice(0);
     if (column) {
       newColumns.push({key: column.id, name: column.name, isEditing: false });
       this.props.socket.emit("column:loaded", {
         boardId: this.props.boardId,
         id: column.id,
+        sessionId,
       });
     } else {
       const newColumn = {key: uuid.v4(), name: "New Column", isEditing: true };
@@ -79,7 +84,8 @@ export class Main extends React.Component<MainProps, MainState> {
       this.props.socket.emit("column:created", {
         boardId: this.props.boardId,
         id: newColumn.key,
-        name: newColumn.name
+        name: newColumn.name,
+        sessionId,
       });
     }
 
@@ -141,7 +147,7 @@ export class Main extends React.Component<MainProps, MainState> {
           description={this.state.boardDescription}
           socket={this.props.socket}
           boardId={this.props.boardId}
-          votesRemaining={this.state.votesRemaining}
+          remainingVotes={this.state.remainingVotes}
         >
         </BoardControls>
         <div id="columns">

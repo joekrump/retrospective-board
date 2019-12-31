@@ -12,6 +12,8 @@ interface CardData {
   text?: string;
   votesCount: number;
   netSentiment: number;
+  userSentiment: number;
+  isEditing: boolean;
 }
 
 interface ColumnProps {
@@ -50,15 +52,19 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   }
 
   componentDidMount() {
+    const sessionId = sessionStorage.getItem("retroSessionId") || "";
+
     this.props.socket.on(`column:loaded:${this.props.id}`, (data: any) => {
       for (let i = 0; i < data.cards.length; i++) {
         if (!!data.cards[i].text) {
           this.addCard({
             id: data.cards[i].id,
-            editable: false,
+            editable: data.cards[i].ownerId === sessionId,
+            isEditing: false,
             text: data.cards[i].text,
             votesCount: data.cards[i].votesCount,
             netSentiment: data.cards[i].netSentiment,
+            userSentiment: data.cards[i].sentiments[sessionId] ? data.cards[i].sentiments[sessionId] : 0,
           } as CardData);
         }
       }
@@ -94,7 +100,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     if (data) {
       newCards.push(data);
     } else {
-      let newCard = {id: `card-${uuid.v4()}`, editable: true, votesCount: 0, netSentiment: 0 }
+      let newCard = {
+        id: `card-${uuid.v4()}`,
+        editable: true,
+        isEditing: true,
+        votesCount: 0,
+        netSentiment: 0,
+        userSentiment: 0,
+      };
       newCards.push(newCard);
 
       this.props.socket.emit(`card:created`, {
@@ -123,7 +136,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.setState({cards: newCards});
   }
 
-  flipIsEditing(event?: React.MouseEvent) {
+  toggleIsEditing(event?: React.MouseEvent) {
     if (event) {
       event.preventDefault();
     }
@@ -141,7 +154,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       id: this.props.id,
       name: (this.nameInput as any).current.value
     });
-    this.flipIsEditing();
+    this.toggleIsEditing();
   }
 
   renderColumnTitle() {
@@ -155,14 +168,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             autoFocus={true}
           />
           <button onClick={this.updateColumnName.bind(this)}>Save</button>
-          <button onClick={event => this.flipIsEditing(event)}>cancel</button>
+          <button onClick={event => this.toggleIsEditing(event)}>cancel</button>
         </div>
       );
     } else {
       return (
         <h2
           className="column-header"
-          onClick={this.flipIsEditing.bind(this)}
+          onClick={this.toggleIsEditing.bind(this)}
         >
           {this.state.name}&nbsp;<FontAwesomeIcon icon={faPencilAlt} />
         </h2>
@@ -194,8 +207,9 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
               <Card
                 key={card.id}
                 id={card.id}
-                deleteCard={(event, id) => this.deleteCard(event, id)}
+                deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
                 editable={card.editable}
+                isEditing={card.isEditing}
                 socket={this.props.socket}
                 columnId={this.props.id}
                 boardId={this.props.boardId}
@@ -203,6 +217,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                 votesCount={card.votesCount}
                 netSentiment={card.netSentiment}
                 showResults={this.props.showResults}
+                userSentiment={card.userSentiment}
               >
               </Card>
             )

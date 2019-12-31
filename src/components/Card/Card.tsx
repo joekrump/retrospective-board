@@ -9,6 +9,7 @@ interface CardProps {
   id: string;
   deleteCard: (event: React.MouseEvent, id: string) => void;
   editable: boolean;
+  isEditing: boolean;
   socket: SocketIOClient.Socket;
   columnId: string;
   boardId: string;
@@ -16,6 +17,7 @@ interface CardProps {
   votesCount: number;
   netSentiment: number;
   showResults: boolean;
+  userSentiment: number;
 }
 
 interface CardState {
@@ -31,16 +33,13 @@ export class Card extends React.Component<CardProps, CardState> {
     super(props);
 
     let stateToSet = {
-      isEditing: true,
-      votesCount: this.props.votesCount,
+      isEditing: this.props.isEditing,
       netSentiment: this.props.netSentiment,
       text: this.props.text,
-      userSentiment: 0,
+      userSentiment: this.props.userSentiment,
+      votesCount: this.props.votesCount,
     }
 
-    if (!this.props.editable) {
-      stateToSet.isEditing = false;
-    }
     this.state = stateToSet;
   }
 
@@ -69,7 +68,7 @@ export class Card extends React.Component<CardProps, CardState> {
     this.props.socket.removeListener(`card:voted:${this.props.id}`);
   }
 
-  flipEditable(event: React.MouseEvent) {
+  toggleIsEditing(event: React.MouseEvent) {
     event.preventDefault();
     let newState = {
       isEditing: !this.state.isEditing,
@@ -79,7 +78,7 @@ export class Card extends React.Component<CardProps, CardState> {
   }
 
   save(event: React.MouseEvent) {
-    this.flipEditable(event);
+    this.toggleIsEditing(event);
 
     this.props.socket.emit(`card:updated`, {
       boardId: this.props.boardId,
@@ -151,7 +150,7 @@ export class Card extends React.Component<CardProps, CardState> {
       let editLink;
       if (this.props.editable) {
         editLink = (
-          <a href="" onClick={event => this.flipEditable(event)} className="edit-link">
+          <a href="" onClick={event => this.toggleIsEditing(event)} className="edit-link">
             <FontAwesomeIcon icon={faPencilAlt} />
           </a>
         );
