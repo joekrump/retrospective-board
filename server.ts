@@ -2,7 +2,7 @@ import express from "express";
 import SocketIO from "socket.io";
 import ngrok from "ngrok";
 import uuid from "uuid";
-const session = require('express-session');
+
 interface Card {
   id: string;
   text: string;
@@ -28,12 +28,11 @@ interface Board {
 }
 
 let boards: {[key: string]: Board} = {};
-let sessions: {
+let sessionStore: {
   [id: string]: {
     remainingVotes: {
       [boardId: string]: number;
     },
-    session: any;
   };
 } = {};
 
@@ -63,17 +62,6 @@ const NEW_BOARD = {
 };
 
 let app = express();
-const sessionMiddleware = session({
-  secret: process.env.RETRO_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true, maxAge: 60000 },
-  genid: function(_req: any) {
-    return uuid.v4(); // use UUIDs for session IDs
-  },
-});
-
-app.use(sessionMiddleware);
 let server = require("http").Server(app);
 let io = SocketIO(server);
 server.listen(8000);
@@ -91,11 +79,70 @@ function createNewBoard(boardId?: string) {
   return boardId;
 }
 
-io.use(function(socket, next) {
-  sessionMiddleware(socket.request, socket.request.res, next);
-});
+function setCurrentSession(session: any, _currentSession: any) {
+  _currentSession = session;
+}
+
+function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
+  socket.emit(`board:loaded:${boardId}`, {
+    board: boards[boardId],
+    sessionId,
+  });
+}
+
+function initializeBoardForUser(boardId: string, sessionId: string) {
+  boardId = createNewBoard(boardId);
+  sessionStore[sessionId].remainingVotes[boardId] = MAX_VOTES_USER_VOTE_PER_BOARD;
+}
+
+function initializeSession(
+  sessionId: string,
+  boardId: string,
+  currentSession: any,
+  socket: SocketIO.Socket,
+) {
+  setCurrentSession(sessionStore[sessionId], currentSession);
+  if(!boardId || !boards[boardId]) {
+    initializeBoardForUser(boardId, sessionId);
+  }
+  emitBoardLoaded(socket, boardId, sessionId);
+}
+
+function updateRemainingVotes(
+    socket: SocketIO.Socket,
+    card: Card,
+    boardId: number,
+    sentiment: number,
+  ) {
+    if (card.sentiments[socket.request.session.id] === undefined) {
+      card.sentiments[socket.request.session.id] = 0;
+    }
+
+    // Check if the vote undoes a previous one and adds a remaining vote back.
+    if(
+      (sentiment > 0 && card.sentiments[socket.request.session.id] < 0)
+    || (sentiment < 0 && card.sentiments[socket.request.session.id] > 0)
+    ) {
+      socket.request.session.remainingVotes[boardId]++;
+      card.votesCount--;
+    } else if (socket.request.session.remainingVotes[boardId] > 0){
+      socket.request.session.remainingVotes[boardId]--;
+      card.votesCount++;
+    } else {
+      console.log("No more votes left");
+      socket.emit(`board:vote-limit-reached:${boardId}`, { maxVotes: MAX_VOTES_USER_VOTE_PER_BOARD });
+      return; // exit early because votes have been maxed out and the user is not attempting to undo a previous vote.
+    }
+
+    if(socket.request.session.remainingVotes[boardId] >= 0) {
+      card.sentiments[socket.request.session.id] += sentiment;
+      card.netSentiment += sentiment;
+    }
+  }
 
 io.on('connection', function (socket) {
+  let currentSession: any;
+
   socket.on('board:show-results', function(data) {
     if (!!boards[data.boardId]) {
       boards[data.boardId].showResults = !boards[data.boardId].showResults;
@@ -107,24 +154,16 @@ io.on('connection', function (socket) {
   socket.on('board:loaded', function (data) {
     let sessionId: string;
 
-    if (data.sessionId && sessions[data.sessionId]) {
+    if (data.sessionId && sessionStore[data.sessionId]) {
       sessionId = data.sessionId;
     } else {
-      sessionId = socket.request.session.id;
-      sessions[sessionId] = {
-        session: socket.request.session,
+      sessionId = uuid.v4();
+      sessionStore[sessionId] = {
         remainingVotes: {},
       };
     }
 
-    if(!data.boardId || !boards[data.boardId]) {
-      data.boardId = createNewBoard(data.boardId);
-      sessions[sessionId].remainingVotes[data.boardId] = MAX_VOTES_USER_VOTE_PER_BOARD;
-    }
-    socket.emit(`board:loaded:${data.boardId}`, {
-      board: boards[data.boardId],
-      sessionId,
-    });
+    initializeSession(sessionId, data.boardId, currentSession, socket);
   });
 
   socket.on('board:updated', function(data) {
@@ -225,37 +264,6 @@ io.on('connection', function (socket) {
     }
   });
 
-  function updateRemainingVotes(
-    socket: SocketIO.Socket,
-    card: Card,
-    boardId: number,
-    sentiment: number,
-  ) {
-    if (card.sentiments[socket.request.session.id] === undefined) {
-      card.sentiments[socket.request.session.id] = 0;
-    }
-
-    // Check if the vote undoes a previous one and adds a remaining vote back.
-    if(
-      (sentiment > 0 && card.sentiments[socket.request.session.id] < 0)
-    || (sentiment < 0 && card.sentiments[socket.request.session.id] > 0)
-    ) {
-      socket.request.session.remainingVotes[boardId]++;
-      card.votesCount--;
-    } else if (socket.request.session.remainingVotes[boardId] > 0){
-      socket.request.session.remainingVotes[boardId]--;
-      card.votesCount++;
-    } else {
-      console.log("No more votes left");
-      socket.emit(`board:vote-limit-reached:${boardId}`, { maxVotes: MAX_VOTES_USER_VOTE_PER_BOARD });
-      return; // exit early because votes have been maxed out and the user is not attempting to undo a previous vote.
-    }
-
-    if(socket.request.session.remainingVotes[boardId] >= 0) {
-      card.sentiments[socket.request.session.id] += sentiment;
-      card.netSentiment += sentiment;
-    }
-  }
   socket.on("card:voted", function ({ id, vote, boardId, columnId }) {
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
