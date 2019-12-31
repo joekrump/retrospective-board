@@ -13,6 +13,7 @@ interface CardData {
   votesCount: number;
   netSentiment: number;
   userSentiment: number;
+  isEditing: boolean;
 }
 
 interface ColumnProps {
@@ -59,6 +60,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
           this.addCard({
             id: data.cards[i].id,
             editable: data.cards[i].ownerId === sessionId,
+            isEditing: false,
             text: data.cards[i].text,
             votesCount: data.cards[i].votesCount,
             netSentiment: data.cards[i].netSentiment,
@@ -101,6 +103,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       let newCard = {
         id: `card-${uuid.v4()}`,
         editable: true,
+        isEditing: true,
         votesCount: 0,
         netSentiment: 0,
         userSentiment: 0,
@@ -133,7 +136,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.setState({cards: newCards});
   }
 
-  flipIsEditing(event?: React.MouseEvent) {
+  toggleIsEditing(event?: React.MouseEvent) {
     if (event) {
       event.preventDefault();
     }
@@ -151,7 +154,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       id: this.props.id,
       name: (this.nameInput as any).current.value
     });
-    this.flipIsEditing();
+    this.toggleIsEditing();
   }
 
   renderColumnTitle() {
@@ -165,14 +168,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             autoFocus={true}
           />
           <button onClick={this.updateColumnName.bind(this)}>Save</button>
-          <button onClick={event => this.flipIsEditing(event)}>cancel</button>
+          <button onClick={event => this.toggleIsEditing(event)}>cancel</button>
         </div>
       );
     } else {
       return (
         <h2
           className="column-header"
-          onClick={this.flipIsEditing.bind(this)}
+          onClick={this.toggleIsEditing.bind(this)}
         >
           {this.state.name}&nbsp;<FontAwesomeIcon icon={faPencilAlt} />
         </h2>
@@ -206,6 +209,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                 id={card.id}
                 deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
                 editable={card.editable}
+                isEditing={card.isEditing}
                 socket={this.props.socket}
                 columnId={this.props.id}
                 boardId={this.props.boardId}
