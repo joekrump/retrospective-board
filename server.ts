@@ -218,7 +218,14 @@ io.on('connection', function (socket) {
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
-      column.cards.push({id: data.id, text: "", sentiments: {}, ownerId: currentSession.id, votesCount: 0, netSentiment: 0 });
+      column.cards.push({
+        id: data.id,
+        text: "",
+        sentiments: {},
+        ownerId: currentSession.id,
+        votesCount: 0,
+        netSentiment: 0,
+      });
     }
 
     socket.broadcast.emit(`card:created:${data.columnId}`, {
