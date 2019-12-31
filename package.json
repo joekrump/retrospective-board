@@ -9,6 +9,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.7",
+    "connect-redis": "^4.0.3",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "localtunnel": "^2.0.0",
