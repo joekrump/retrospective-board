@@ -24,4 +24,3 @@ _This makes it easy for others to acess this app, running off your machine_
 2. Features
 * [ ] GIF support (/rich text?)
 * [ ] Colours for columns
-* [ ] Persist sessions and add logout functionality.
