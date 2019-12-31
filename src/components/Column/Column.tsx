@@ -58,7 +58,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
         if (!!data.cards[i].text) {
           this.addCard({
             id: data.cards[i].id,
-            editable: false,
+            editable: data.cards[i].ownerId === sessionId,
             text: data.cards[i].text,
             votesCount: data.cards[i].votesCount,
             netSentiment: data.cards[i].netSentiment,

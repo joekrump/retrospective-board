@@ -245,13 +245,13 @@ io.on('connection', function (socket) {
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === data.id);
-      if (card) {
+      if (card && card.ownerId === currentSession.id) {
         card.text = data.text;
+        socket.broadcast.emit(`card:updated:${data.id}`, {
+          text: data.text,
+        });
       }
     }
-    socket.broadcast.emit(`card:updated:${data.id}`, {
-      text: data.text,
-    });
   });
 
   socket.on("card:deleted", function (data) {
