@@ -57,7 +57,7 @@ export class Card extends React.Component<CardProps, CardState> {
         this.setState({
           votesCount: data.votesCount,
           netSentiment: data.netSentiment,
-          userSentiment: !!data.userSentiment ? data.userSentiment : this.state.userSentiment,
+          userSentiment: data.userSentiment !== undefined ? data.userSentiment : this.state.userSentiment,
         });
       }
     });
