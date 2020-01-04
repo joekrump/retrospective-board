@@ -83,8 +83,6 @@ function createNewBoard(boardId?: string) {
 }
 
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
-  console.log("REMAINING VOTES: ", sessionStore[sessionId].remainingVotes[boardId])
-  console.log("REMAINING VOTES: ", sessionId)
   socket.emit(`board:loaded:${boardId}`, {
     board: boards[boardId],
     sessionId,
