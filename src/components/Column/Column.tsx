@@ -158,7 +158,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.toggleIsEditing();
   }
 
-  renderColumnTitle() {
+  renderColumnHeader() {
     if(this.state.isEditing) {
       return (
         <form
@@ -194,7 +194,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
         style={{ width: `${this.props.maxWidthPercentage}%`}}
       >
         <div className="header-row">
-          { this.renderColumnTitle() }
+          { this.renderColumnHeader() }
           <a
             href=""
             onClick={event => this.props.deleteColumn(event, this.props.id)}
