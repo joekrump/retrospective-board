@@ -145,7 +145,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     });
   }
 
-  updateColumnName() {
+  updateColumnName(event: React.FormEvent) {
+    event.preventDefault();
     this.setState({
       name: (this.nameInput as any).current.value
     });
@@ -160,22 +161,25 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   renderColumnTitle() {
     if(this.state.isEditing) {
       return (
-        <div className="column-header column-header--editing">
+        <form
+          className="column-header column-header--editing"
+          onSubmit={event => this.updateColumnName(event)}
+        >
           <input
             type="text"
             defaultValue={this.state.name}
             ref={this.nameInput}
             autoFocus={true}
           />
-          <button onClick={this.updateColumnName.bind(this)}>Save</button>
+          <button type="submit">Save</button>
           <button onClick={event => this.toggleIsEditing(event)}>cancel</button>
-        </div>
+        </form>
       );
     } else {
       return (
         <h2
           className="column-header"
-          onClick={this.toggleIsEditing.bind(this)}
+          onClick={event => this.toggleIsEditing(event)}
         >
           {this.state.name}&nbsp;<FontAwesomeIcon icon={faPencilAlt} />
         </h2>
