@@ -4,11 +4,6 @@ import uuid = require("uuid");
 import { BoardControls } from "../BoardControls/BoardControls";
 
 import "./main.css";
-interface ColumnData {
-  key: string;
-  name: string;
-  isEditing: boolean;
-}
 
 interface MainProps {
   socket: SocketIOClient.Socket;
@@ -17,7 +12,7 @@ interface MainProps {
 }
 
 interface MainState {
-  columns: ColumnData[];
+  columns: BoardColumn[];
   boardTitle: string;
   boardDescription: string;
   remainingVotes?: number | undefined;
@@ -124,7 +119,7 @@ export class Main extends React.Component<MainProps, MainState> {
       event.preventDefault();
     }
 
-    let newColumns = this.state.columns.filter((column: ColumnData) => {
+    let newColumns = this.state.columns.filter((column: BoardColumn) => {
       return column.key !== key;
     });
 
