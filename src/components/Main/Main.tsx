@@ -67,20 +67,21 @@ export class Main extends React.Component<MainProps, MainState> {
     const sessionId = sessionStorage.getItem("retroSessionId");
     let newColumns = this.state.columns.slice(0);
     if (column) {
-      newColumns.push({key: column.id, name: column.name, isEditing: false });
+      newColumns.push({ id: column.id, name: column.name, isEditing: false });
       this.props.socket.emit("column:loaded", {
         boardId: this.props.boardId,
         id: column.id,
         sessionId,
       });
     } else {
-      const newColumn = {key: uuid.v4(), name: "New Column", isEditing: true };
-      newColumns.push(newColumn)
+      const newColumn = { id: uuid.v4(), name: "New Column", isEditing: true };
+
+      newColumns.push(newColumn);
+
       this.props.socket.emit("column:created", {
         boardId: this.props.boardId,
-        id: newColumn.key,
+        id: newColumn.id,
         name: newColumn.name,
-        sessionId,
       });
     }
 
@@ -97,10 +98,10 @@ export class Main extends React.Component<MainProps, MainState> {
       let name = this.state.columns[i].name;
       markup.push(
         <Column
-          key={this.state.columns[i].key}
-          id={this.state.columns[i].key}
+          key={this.state.columns[i].id}
+          id={this.state.columns[i].id}
           name={name}
-          deleteColumn={(event, key) =>this.deleteColumn(event, key)}
+          deleteColumn={(event) =>this.deleteColumn(event, this.state.columns[i].id)}
           socket={this.props.socket}
           boardId={this.props.boardId}
           maxWidthPercentage={maxWidthPercentage}
@@ -114,19 +115,19 @@ export class Main extends React.Component<MainProps, MainState> {
     return markup;
   }
 
-  deleteColumn(event: React.MouseEvent | null, key: string, fromSocket: boolean = false) {
+  deleteColumn(event: React.MouseEvent | null, id: string, fromSocket: boolean = false) {
     if (event) {
       event.preventDefault();
     }
 
     let newColumns = this.state.columns.filter((column: BoardColumn) => {
-      return column.key !== key;
+      return column.id !== id;
     });
 
     if (!fromSocket) {
       this.props.socket.emit(`column:deleted`, {
         boardId: this.props.boardId,
-        id: key,
+        id,
       });
     }
 
