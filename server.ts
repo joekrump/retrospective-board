@@ -3,37 +3,6 @@ import SocketIO from "socket.io";
 import ngrok from "ngrok";
 import uuid from "uuid";
 
-interface Card {
-  id: string;
-  text: string;
-  sentiments: {
-    [sessionId: string]: number;
-  };
-  netSentiment: number;
-  votesCount: number;
-  ownerId: string;
-}
-
-interface Column {
-  name: string;
-  id: string;
-  cards: Card[];
-}
-
-interface Board {
-  title: string;
-  description: string;
-  showResults: boolean;
-  columns: Column[];
-}
-
-interface Session {
-  id: string;
-  remainingVotes: {
-    [boardId: string]: number;
-  }
-}
-
 let boards: {[key: string]: Board} = {};
 let sessionStore: {
   [id: string]: Session;
