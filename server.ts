@@ -83,6 +83,8 @@ function createNewBoard(boardId?: string) {
 }
 
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
+  console.log("REMAINING VOTES: ", sessionStore[sessionId].remainingVotes[boardId])
+  console.log("REMAINING VOTES: ", sessionId)
   socket.emit(`board:loaded:${boardId}`, {
     board: boards[boardId],
     sessionId,
@@ -128,6 +130,14 @@ function updateRemainingVotes(
   }
 }
 
+function newBoardSession(session: Session, boardId: string) {
+  return session.remainingVotes[boardId] === undefined;
+}
+
+function assignVotes(assignee: any) {
+  assignee.remainingVotes = MAX_VOTES_USER_VOTE_PER_BOARD;
+}
+
 io.on('connection', function (socket) {
   let currentSession: Session;
 
@@ -156,6 +166,8 @@ io.on('connection', function (socket) {
 
     if(!data.boardId || !boards[data.boardId]) {
       initializeBoardForUser(data.boardId, sessionId);
+    } else if (newBoardSession(sessionStore[sessionId], data.boardId)) {
+      assignVotes(sessionStore[sessionId].remainingVotes[data.boardId])
     }
     emitBoardLoaded(socket, data.boardId, sessionId);
   });
