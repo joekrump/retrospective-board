@@ -88,7 +88,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
         </div>
         <div id="board-controls">
           <strong className="votes-remaining">
-            Votes Remaining: {this.props.remainingVotes === undefined ? null : this.props.remainingVotes}
+            Votes Remaining: {this.props.remainingVotes}
           </strong>
           <button
             className="button button--create"
