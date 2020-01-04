@@ -187,7 +187,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     return (
       <div
         className={"column" + (this.state.isEditing ? " column-edit" : "") }
-        style={{ maxWidth: `${this.props.maxWidthPercentage}%`}}
+        style={{ width: `${this.props.maxWidthPercentage}%`}}
       >
         <div className="header-row">
           { this.renderColumnTitle() }

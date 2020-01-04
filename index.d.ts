@@ -23,7 +23,7 @@ interface Board {
 }
 
 interface BoardColumn {
-  key: string;
+  id: string;
   name: string;
   isEditing: boolean;
 }
