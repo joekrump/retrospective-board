@@ -142,7 +142,6 @@ io.on('connection', function (socket) {
   });
 
   socket.on('board:updated', function(data) {
-    console.log("updated")
     if(data.title !== undefined) {
       console.log(data)
       boards[data.boardId].title = data.title;
@@ -151,8 +150,10 @@ io.on('connection', function (socket) {
       boards[data.boardId].description = data.description;
     }
 
-    console.log(boards[data.boardId]);
-
+    socket.emit(`board:updated:${data.boardId}`, {
+      title: boards[data.boardId].title,
+      description: boards[data.boardId].description
+    });
     socket.broadcast.emit(`board:updated:${data.boardId}`, {
       title: boards[data.boardId].title,
       description: boards[data.boardId].description
