@@ -43,7 +43,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
   saveTitle() {
     this.props.socket.emit("board:updated", {
       boardId: this.props.boardId,
-      title: (this.titleInput as any).current.value,
+      title: this.titleInput?.current?.value,
     });
     this.editTitle();
   }
