@@ -136,15 +136,26 @@ io.on('connection', function (socket) {
     } else if (newBoardSession(sessionStore[sessionId], data.boardId)) {
       assignVotes(sessionStore[sessionId].remainingVotes[data.boardId])
     }
+
+    console.log(boards[data.boardId])
     emitBoardLoaded(socket, data.boardId, sessionId);
   });
 
   socket.on('board:updated', function(data) {
-    boards[data.boardId].title = data.title;
-    boards[data.boardId].description = data.description;
+    console.log("updated")
+    if(data.title !== undefined) {
+      console.log(data)
+      boards[data.boardId].title = data.title;
+    }
+    if(data.description !== undefined) {
+      boards[data.boardId].description = data.description;
+    }
+
+    console.log(boards[data.boardId]);
+
     socket.broadcast.emit(`board:updated:${data.boardId}`, {
-      title: data.title,
-      description: data.description,
+      title: boards[data.boardId].title,
+      description: boards[data.boardId].description
     });
   });
 
