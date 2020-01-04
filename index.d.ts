@@ -22,6 +22,12 @@ interface Board {
   columns: Column[];
 }
 
+interface BoardColumn {
+  key: string;
+  name: string;
+  isEditing: boolean;
+}
+
 interface Session {
   id: string;
   remainingVotes: {
