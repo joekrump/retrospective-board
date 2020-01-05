@@ -87,9 +87,6 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
           <input type="text" defaultValue={this.props.description} placeholder="Add a description" onKeyDown={(e) => this.saveDescription(e)} ref={this.descriptionInput}></input>
         </div>
         <div id="board-controls">
-          <strong className="votes-remaining">
-            Votes Remaining: {this.props.remainingVotes}
-          </strong>
           <button
             className="button button--create"
             onClick={() => this.props.addColumn()}
@@ -97,6 +94,9 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
             New Column
           </button>
         </div>
+        <strong className="votes-remaining">
+          Votes Remaining: {this.props.remainingVotes}
+        </strong>
       </div>
     );
   }
