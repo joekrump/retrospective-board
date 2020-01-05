@@ -1,6 +1,4 @@
 import React, { MouseEvent, ReactText } from "react";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface ButtonDeleteProps {
   id: ReactText;
@@ -8,5 +6,5 @@ interface ButtonDeleteProps {
 }
 
 export const ButtonDelete = (props: ButtonDeleteProps) => (
-  <FontAwesomeIcon icon={faTrash} onClick={event => props.handleClick(event, props.id)} />
+  <span onClick={event => props.handleClick(event, props.id)}>🗑️</span>
 );
