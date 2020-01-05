@@ -68,7 +68,7 @@ function updateRemainingVotes(
   currentSession: Session,
   socket: SocketIO.Socket,
   card: Card,
-  boardId: number,
+  boardId: string,
   sentiment: number,
 ) {
   if (card.sentiments[currentSession.id] === undefined) {
@@ -116,10 +116,10 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('board:loaded', function (data) {
+  socket.on('board:loaded', function (data: { boardId: string, sessionId: string }) {
     let sessionId: string;
 
-    if (data.sessionId && sessionStore[data.sessionId]) {
+    if (!!data.sessionId && !!sessionStore[data.sessionId]) {
       sessionId = data.sessionId;
     } else {
       sessionId = uuid.v4();
@@ -137,13 +137,11 @@ io.on('connection', function (socket) {
       assignVotes(sessionStore[sessionId].remainingVotes[data.boardId])
     }
 
-    console.log(boards[data.boardId])
     emitBoardLoaded(socket, data.boardId, sessionId);
   });
 
-  socket.on('board:updated', function(data) {
+  socket.on('board:updated', function(data: { boardId: string, description: string, title: string }) {
     if(data.title !== undefined) {
-      console.log(data)
       boards[data.boardId].title = data.title;
     }
     if(data.description !== undefined) {
@@ -160,7 +158,7 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("column:loaded", function(data) {
+  socket.on("column:loaded", function(data: { boardId: string, id: string }) {
     console.log("column created");
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.id);
@@ -177,7 +175,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("column:created", function(data) {
+  socket.on("column:created", function(data: { boardId: string, id: string, name: string }) {
     console.log("column created");
     console.log(data);
     boards[data.boardId].columns.push({id: data.id, name: data.name, cards: []})
@@ -187,7 +185,7 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("column:updated", function(data) {
+  socket.on("column:updated", function(data: { boardId: string, id: string, name: string }) {
     let column = boards[data.boardId].columns.find((column) => column.id === data.id);
     if (column) {
       column.name = data.name;
@@ -197,7 +195,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("column:deleted", function(data) {
+  socket.on("column:deleted", function(data: { boardId: string, id: string }) {
     console.log("column deleted");
     console.log(data);
     let columnIndex = boards[data.boardId].columns.findIndex((column) => column.id === data.id);
@@ -209,8 +207,7 @@ io.on('connection', function (socket) {
     }
   })
 
-  socket.on("card:created", function(data) {
-    // data: boardId, columnId, id
+  socket.on("card:created", function(data: { boardId: string, columnId: string, id: string }) {
     console.log("card created");
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
@@ -230,7 +227,7 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("card:updated", function (data) {
+  socket.on("card:updated", function (data: { boardId: string, columnId: string, id: string, text: string }) {
     console.log("card updated");
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
@@ -245,7 +242,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("card:deleted", function (data) {
+  socket.on("card:deleted", function (data: { boardId: string, columnId: string, id: string }) {
     console.log("card deleted");
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
@@ -262,7 +259,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("card:voted", function ({ id, vote, boardId, columnId }) {
+  socket.on("card:voted", function ({ id, vote, boardId, columnId }: { id: string, vote: number, boardId: string, columnId: string }) {
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
