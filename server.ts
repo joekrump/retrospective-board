@@ -105,6 +105,10 @@ function assignVotes(assignee: any) {
   assignee.remainingVotes = MAX_VOTES_USER_VOTE_PER_BOARD;
 }
 
+function canVote(remainingVotes: number) {
+  return remainingVotes >= 0;
+}
+
 io.on('connection', function (socket) {
   let currentSession: Session;
 
@@ -279,10 +283,6 @@ io.on('connection', function (socket) {
     }
   });
 });
-
-function canVote(remainingVotes: number) {
-  return remainingVotes >= 0;
-}
 
 if(process.env.NODE_ENV === "production") {
   (async function() {
