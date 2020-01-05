@@ -169,7 +169,11 @@ io.on('connection', function (socket) {
   });
 
   socket.on("column:loaded", function(data: { boardId: string, id: string }) {
-    console.log("column created");
+    console.log("column load request");
+    if (currentSession === undefined) {
+      console.error("No session");
+      return;
+    }
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.id);
     if (column) {
@@ -186,7 +190,11 @@ io.on('connection', function (socket) {
   });
 
   socket.on("column:created", function(data: { boardId: string, id: string, name: string }) {
-    console.log("column created");
+    console.log("column create request");
+    if (currentSession === undefined) {
+      console.error("No session");
+      return;
+    }
     console.log(data);
     boards[data.boardId].columns.push({id: data.id, name: data.name, cards: []})
     socket.broadcast.emit(`column:created:${data.boardId}`, {
@@ -196,6 +204,11 @@ io.on('connection', function (socket) {
   });
 
   socket.on("column:updated", function(data: { boardId: string, id: string, name: string }) {
+    console.log("column update request");
+    if (currentSession === undefined) {
+      console.error("No session");
+      return;
+    }
     let column = boards[data.boardId].columns.find((column) => column.id === data.id);
     if (column) {
       column.name = data.name;
@@ -206,7 +219,12 @@ io.on('connection', function (socket) {
   });
 
   socket.on("column:deleted", function(data: { boardId: string, id: string }) {
-    console.log("column deleted");
+    console.log("column delete request");
+    if (currentSession === undefined) {
+      console.error("No session");
+      return;
+    }
+
     console.log(data);
     let columnIndex = boards[data.boardId].columns.findIndex((column) => column.id === data.id);
     if (columnIndex) {
@@ -222,8 +240,12 @@ io.on('connection', function (socket) {
   })
 
   socket.on("card:created", function(data: { boardId: string, columnId: string, id: string }) {
-    console.log("card created");
-    console.log(data);
+    console.log("card create request")
+    if (currentSession === undefined) {
+      console.error("No session");
+      return;
+    }
+
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
       column.cards.push({
@@ -242,7 +264,11 @@ io.on('connection', function (socket) {
   });
 
   socket.on("card:updated", function (data: { boardId: string, columnId: string, id: string, text: string }) {
-    console.log("card updated");
+    console.log("card update request");
+    if (currentSession === undefined) {
+      console.error("No session");
+      return;
+    }
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
@@ -257,7 +283,11 @@ io.on('connection', function (socket) {
   });
 
   socket.on("card:deleted", function (data: { boardId: string, columnId: string, id: string }) {
-    console.log("card deleted");
+    console.log("card delete request");
+    if(currentSession === undefined) {
+      console.error("No session");
+      return;
+    }
     console.log(data);
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
@@ -277,6 +307,12 @@ io.on('connection', function (socket) {
   });
 
   socket.on("card:voted", function ({ id, vote, boardId, columnId }: { id: string, vote: number, boardId: string, columnId: string }) {
+    console.log("vote for card request");
+    if(currentSession === undefined) {
+      console.error("No session");
+      return;
+    }
+
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
