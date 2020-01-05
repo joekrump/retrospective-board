@@ -1,0 +1,5 @@
+.button--delete {
+  display: inline-flex;
+  cursor: pointer;
+  align-items: center;
+}
