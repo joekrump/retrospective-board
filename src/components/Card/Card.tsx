@@ -1,9 +1,9 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt, faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
+import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 import "./card.css";
-import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 interface CardProps {
   key: string;
