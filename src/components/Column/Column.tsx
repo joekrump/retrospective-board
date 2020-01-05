@@ -1,10 +1,11 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPlusCircle, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
 import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
 import "./column.css";
+import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 interface CardData {
   id: string;
@@ -172,12 +173,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             onEditToggle={(e) => this.toggleIsEditing(e)}
             onSubmit={(e) => this.updateColumnName(e)}
           />
-          <a
-            href=""
-            onClick={event => this.props.deleteColumn(event, this.props.id)}
-          >
-            <FontAwesomeIcon icon={faTrash} />
-          </a>
+          { this.state.isEditing ? <ButtonDelete id={this.props.id} handleClick={(event, id) => this.props.deleteColumn(event, id as string)}/> : null }
         </div>
         <div className="body-row">
           <button onClick={() => this.addCard()}>
