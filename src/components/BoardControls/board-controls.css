@@ -36,3 +36,10 @@
 #board-controls > .button--create {
   height: 100%;
 }
+
+.votes-remaining {
+  grid-row: 2 / span 1;
+  grid-column: 11 / span 2;
+  display: inline-block;
+  text-align: right;
+}

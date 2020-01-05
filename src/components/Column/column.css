@@ -20,12 +20,3 @@
   justify-content: space-between;
 }
 
-.column-header {
-  flex: 0 0 auto;
-  font-size: 1.5em;
-  margin: 1.0em 0;
-}
-
-.column-header > button {
-  flex: 0 0 auto;
-}

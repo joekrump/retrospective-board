@@ -1,6 +1,7 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPencilAlt, faThumbsUp, faThumbsDown, faThList } from "@fortawesome/free-solid-svg-icons";
+import { faPencilAlt, faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
+import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 import "./card.css";
 
@@ -144,9 +145,10 @@ export class Card extends React.Component<CardProps, CardState> {
             value={this.state.text}>
           </textarea>
           <button type="submit">Add</button>
-          <a href="" onClick={event => this.props.deleteCard(event, this.props.id)}>
-            <FontAwesomeIcon icon={faTrash} />
-          </a>
+          <ButtonDelete
+            id={this.props.id}
+            handleClick={(event, id) => this.props.deleteCard(event, id as string)}
+          />
         </form>
       );
     } else {

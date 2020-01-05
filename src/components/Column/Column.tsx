@@ -1,10 +1,11 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPlusCircle, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
-
+import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
 import "./column.css";
+import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 interface CardData {
   id: string;
@@ -31,7 +32,7 @@ interface ColumnProps {
 interface ColumnState {
   cards: CardData[];
   lastIndex: number;
-  name: string;
+  name: string | undefined;
   isEditing: boolean;
 }
 
@@ -148,43 +149,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   updateColumnName(event: React.FormEvent) {
     event.preventDefault();
     this.setState({
-      name: (this.nameInput as any).current.value
+      name: this.nameInput?.current?.value
     });
     this.props.socket.emit("column:updated", {
       boardId: this.props.boardId,
       id: this.props.id,
-      name: (this.nameInput as any).current.value
+      name: this.nameInput?.current?.value
     });
     this.toggleIsEditing();
-  }
-
-  renderColumnHeader() {
-    if(this.state.isEditing) {
-      return (
-        <form
-          className="column-header column-header--editing"
-          onSubmit={event => this.updateColumnName(event)}
-        >
-          <input
-            type="text"
-            defaultValue={this.state.name}
-            ref={this.nameInput}
-            autoFocus={true}
-          />
-          <button type="submit">Save</button>
-          <button onClick={event => this.toggleIsEditing(event)}>cancel</button>
-        </form>
-      );
-    } else {
-      return (
-        <h2
-          className="column-header"
-          onClick={event => this.toggleIsEditing(event)}
-        >
-          {this.state.name}&nbsp;<FontAwesomeIcon icon={faPencilAlt} />
-        </h2>
-      );
-    }
   }
 
   render() {
@@ -194,13 +166,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
         style={{ width: `${this.props.maxWidthPercentage}%`}}
       >
         <div className="header-row">
-          { this.renderColumnHeader() }
-          <a
-            href=""
-            onClick={event => this.props.deleteColumn(event, this.props.id)}
-          >
-            <FontAwesomeIcon icon={faTrash} />
-          </a>
+          <ColumnHeader
+            isEditing={this.state.isEditing}
+            name={this.state.name}
+            nameInputRef={this.nameInput}
+            onEditToggle={(e) => this.toggleIsEditing(e)}
+            onSubmit={(e) => this.updateColumnName(e)}
+          />
+          { this.state.isEditing ? <ButtonDelete id={this.props.id} handleClick={(event, id) => this.props.deleteColumn(event, id as string)}/> : null }
         </div>
         <div className="body-row">
           <button onClick={() => this.addCard()}>

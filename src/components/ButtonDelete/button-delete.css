@@ -1,0 +1,9 @@
+.button--delete {
+  display: inline-flex;
+  cursor: pointer;
+  align-items: center;
+}
+.button--delete:hover,
+.button--delete:focus {
+  color: red;
+}
