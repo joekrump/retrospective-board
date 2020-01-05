@@ -5,11 +5,12 @@ html, body, #react-root {
 
 body {
   margin: 0;
-  font: 400 11px system-ui;
+  font: 400 11px tahoma;
 }
 
-input {
-  font: 400 11px system-ui;
+input,
+textarea {
+  font: 400 11px tahoma;
 }
 
 footer {
