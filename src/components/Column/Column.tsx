@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlusCircle, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
-
+import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
 import "./column.css";
 
 interface CardData {
@@ -158,35 +158,6 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.toggleIsEditing();
   }
 
-  renderColumnHeader() {
-    if(this.state.isEditing) {
-      return (
-        <form
-          className="column-header column-header--editing"
-          onSubmit={event => this.updateColumnName(event)}
-        >
-          <input
-            type="text"
-            defaultValue={this.state.name}
-            ref={this.nameInput}
-            autoFocus={true}
-          />
-          <button type="submit">Save</button>
-          <button onClick={event => this.toggleIsEditing(event)}>cancel</button>
-        </form>
-      );
-    } else {
-      return (
-        <h2
-          className="column-header"
-          onClick={event => this.toggleIsEditing(event)}
-        >
-          {this.state.name}&nbsp;<FontAwesomeIcon icon={faPencilAlt} />
-        </h2>
-      );
-    }
-  }
-
   render() {
     return (
       <div
@@ -194,7 +165,13 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
         style={{ width: `${this.props.maxWidthPercentage}%`}}
       >
         <div className="header-row">
-          { this.renderColumnHeader() }
+          <ColumnHeader
+            isEditing={this.state.isEditing}
+            name={this.state.name}
+            nameInputRef={this.nameInput}
+            onEditToggle={(e) => this.toggleIsEditing(e)}
+            onSubmit={(e) => this.updateColumnName(e)}
+          />
           <a
             href=""
             onClick={event => this.props.deleteColumn(event, this.props.id)}
