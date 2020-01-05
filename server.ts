@@ -51,6 +51,12 @@ function createNewBoard(boardId?: string) {
   return boardId;
 }
 
+function reclaimVotesFromDeleteCard(card: Card, boardId: string) {
+  Object.keys(card.sentiments).forEach(sessionId => {
+    sessionStore[sessionId].remainingVotes[boardId] += Math.abs(card.sentiments[sessionId]);
+  })
+}
+
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
   socket.emit(`board:loaded:${boardId}`, {
     board: boards[boardId],
@@ -204,6 +210,10 @@ io.on('connection', function (socket) {
     console.log(data);
     let columnIndex = boards[data.boardId].columns.findIndex((column) => column.id === data.id);
     if (columnIndex) {
+      const column = boards[data.boardId].columns[columnIndex];
+
+      column.cards.forEach((card) => { reclaimVotesFromDeleteCard(card, data.boardId); });
+
       boards[data.boardId].columns.splice(columnIndex, 1);
       socket.broadcast.emit(`column:deleted:${data.boardId}`, {
         id: data.id
@@ -252,9 +262,12 @@ io.on('connection', function (socket) {
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
       const cardIndex = column.cards.findIndex((card) => card.id === data.id);
+      const card = column.cards[cardIndex];
       // Check to see if the request is coming from the card's owner
-      if(column.cards[cardIndex].ownerId === currentSession.id) {
+      if(card.ownerId === currentSession.id) {
         column.cards.splice(cardIndex, 1);
+
+        reclaimVotesFromDeleteCard(card, data.boardId);
 
         socket.broadcast.emit(`card:deleted:${data.columnId}`, {
           id: data.id
