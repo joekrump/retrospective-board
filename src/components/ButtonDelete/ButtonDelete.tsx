@@ -7,13 +7,6 @@ interface ButtonDeleteProps {
   handleClick: (event: MouseEvent, id: ReactText) => void;
 }
 
-export const ButtonDelete = (props: ButtonDeleteProps) => {
-  return (
-    <a
-      href=""
-      onClick={event => props.handleClick(event, props.id)}
-    >
-      <FontAwesomeIcon icon={faTrash} />
-    </a>
-  );
-};
+export const ButtonDelete = (props: ButtonDeleteProps) => (
+  <FontAwesomeIcon icon={faTrash} onClick={event => props.handleClick(event, props.id)} />
+);
