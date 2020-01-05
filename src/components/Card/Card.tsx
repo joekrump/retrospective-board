@@ -166,10 +166,10 @@ export class Card extends React.Component<CardProps, CardState> {
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
           <div>{this.state.text}{editLink}</div>
-          <button onClick={event => this.voteUp(event)} className="vote-link">
+          <button onClick={event => this.voteUp(event)} className="vote-button">
             <FontAwesomeIcon icon={faThumbsUp} />
           </button>
-          <button onClick={event => this.voteDown(event)} className="vote-link">
+          <button onClick={event => this.voteDown(event)} className="vote-button">
             <FontAwesomeIcon icon={faThumbsDown} />
           </button>
           { this.props.showResults ? this.renderResults() : this.renderUserSentiment() }

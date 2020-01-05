@@ -21,3 +21,7 @@
 .card-container .blur {
   filter: blur(10px);
 }
+
+.vote-button {
+  padding: 2px 5px;
+}
