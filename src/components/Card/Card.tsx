@@ -68,8 +68,10 @@ export class Card extends React.Component<CardProps, CardState> {
     this.props.socket.removeListener(`card:voted:${this.props.id}`);
   }
 
-  toggleIsEditing(event: React.MouseEvent) {
-    event.preventDefault();
+  toggleIsEditing(event?: React.MouseEvent) {
+    if (!!event) {
+      event.preventDefault();
+    }
     let newState = {
       isEditing: !this.state.isEditing,
     }
@@ -77,8 +79,9 @@ export class Card extends React.Component<CardProps, CardState> {
     this.setState(newState);
   }
 
-  save(event: React.MouseEvent) {
-    this.toggleIsEditing(event);
+  save(event: React.FormEvent) {
+    event.preventDefault();
+    this.toggleIsEditing();
 
     this.props.socket.emit(`card:updated`, {
       boardId: this.props.boardId,
@@ -134,17 +137,17 @@ export class Card extends React.Component<CardProps, CardState> {
 
     if (this.state.isEditing) {
       cardContents = (
-        <div>
+        <form onSubmit={event => this.save(event)}>
           <textarea
             autoFocus={true}
             onChange={event => this.setState({text: event.target.value})}
             value={this.state.text}>
           </textarea>
-          <button onClick={event => this.save(event)}>Add</button>
+          <button type="submit">Add</button>
           <a href="" onClick={event => this.props.deleteCard(event, this.props.id)}>
             <FontAwesomeIcon icon={faTrash} />
           </a>
-        </div>
+        </form>
       );
     } else {
       let editLink;

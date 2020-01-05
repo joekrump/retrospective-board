@@ -30,14 +30,23 @@ export class Main extends React.Component<MainProps, MainState> {
 
   componentDidMount() {
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (
-      data: { board: any, sessionId: string, remainingVotes: number },
+      data: { board: Board, sessionId: string, remainingVotes: number },
     ) => {
       this.setState({
         remainingVotes: data.remainingVotes,
+        boardTitle: data.board.title,
+        boardDescription: data.board.description,
       });
       sessionStorage.setItem("retroSessionId", data.sessionId);
       data.board.columns.forEach((column: {id: string}) => {
         this.addColumn(column);
+      });
+    });
+
+    this.props.socket.on(`board:updated:${this.props.boardId}`, (data: any) => {
+      this.setState({
+        boardTitle: data.title,
+        boardDescription: data.description,
       });
     });
 
