@@ -31,7 +31,7 @@ interface ColumnProps {
 interface ColumnState {
   cards: CardData[];
   lastIndex: number;
-  name: string;
+  name: string | undefined;
   isEditing: boolean;
 }
 
@@ -148,12 +148,12 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   updateColumnName(event: React.FormEvent) {
     event.preventDefault();
     this.setState({
-      name: (this.nameInput as any).current.value
+      name: this.nameInput?.current?.value
     });
     this.props.socket.emit("column:updated", {
       boardId: this.props.boardId,
       id: this.props.id,
-      name: (this.nameInput as any).current.value
+      name: this.nameInput?.current?.value
     });
     this.toggleIsEditing();
   }

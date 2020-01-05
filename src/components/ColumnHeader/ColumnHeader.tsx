@@ -6,7 +6,7 @@ import "./column-header.css";
 
 interface ColumnHeaderProps {
   isEditing: boolean;
-  name: string;
+  name?: string;
   nameInputRef: RefObject<HTMLInputElement>
   onSubmit: (e: FormEvent) => void;
   onEditToggle: (e: MouseEvent) => void;
@@ -26,7 +26,7 @@ export const ColumnHeader = (props: ColumnHeaderProps) => {
           autoFocus={true}
         />
         <button type="submit">Save</button>
-        <button onClick={event => props.onEditToggle(event)}>cancel</button>
+        <button type="button" onClick={event => props.onEditToggle(event)}>cancel</button>
       </form>
     );
   } else {
