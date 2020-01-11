@@ -107,10 +107,6 @@ function newBoardSession(session: Session, boardId: string) {
   return session.remainingVotes[boardId] === undefined;
 }
 
-function assignVotes(assignee: any) {
-  assignee.remainingVotes = MAX_VOTES_USER_VOTE_PER_BOARD;
-}
-
 function canVote(remainingVotes: number) {
   return remainingVotes >= 0;
 }
@@ -133,6 +129,9 @@ io.on('connection', function (socket) {
       sessionId = data.sessionId;
     } else {
       sessionId = uuid.v4();
+    }
+
+    if(!sessionStore[sessionId]) {
       sessionStore[sessionId] = {
         id: sessionId,
         remainingVotes: {},
@@ -144,7 +143,7 @@ io.on('connection', function (socket) {
     if(!data.boardId || !boards[data.boardId]) {
       initializeBoardForUser(data.boardId, sessionId);
     } else if (newBoardSession(sessionStore[sessionId], data.boardId)) {
-      assignVotes(sessionStore[sessionId].remainingVotes[data.boardId])
+      sessionStore[sessionId].remainingVotes[data.boardId] = MAX_VOTES_USER_VOTE_PER_BOARD
     }
 
     emitBoardLoaded(socket, data.boardId, sessionId);
