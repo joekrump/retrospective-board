@@ -49,16 +49,18 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
     let boardTitle;
     if (this.state.isEditingTitle) {
       boardTitle = (
-        <>
-          <input type="text" defaultValue={this.props.title} ref={this.titleInput}></input>
-          <button onClick={this.saveTitle.bind(this)}>Save</button>
-          <a href="" onClick={event => this.editTitle(event)}>cancel</a>
-        </>
+        <div id="board-title">
+          <input className="board-title--text" type="text" autoFocus={true} defaultValue={this.props.title} ref={this.titleInput}></input>
+          <div className="board-title--actions">
+            <button onClick={this.saveTitle.bind(this)}>Save</button>
+            <a href="" onClick={event => this.editTitle(event)}>cancel</a>
+          </div>
+        </div>
       );
     } else {
       boardTitle = (
         <div id="board-title">
-          <h1>
+          <h1 className="board-title--text">
             {this.props.title} <FontAwesomeIcon icon={faPencilAlt} className="pencil-icon" onClick={() => this.editTitle()} />
           </h1>
         </div>
