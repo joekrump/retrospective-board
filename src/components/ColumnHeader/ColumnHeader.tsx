@@ -35,7 +35,7 @@ export const ColumnHeader = (props: ColumnHeaderProps) => {
         className="column-header"
         onClick={event => props.onEditToggle(event)}
       >
-        {props.name}&nbsp;<FontAwesomeIcon icon={faPencilAlt} />
+        {props.name}&nbsp;<FontAwesomeIcon className="pencil-icon" icon={faPencilAlt} />
       </h2>
     );
   }

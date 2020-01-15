@@ -74,7 +74,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
       boardTitle = (
         <div id="board-title">
           <h1>
-            {this.props.title} <FontAwesomeIcon icon={faPencilAlt} onClick={() => this.editTitle()} />
+            {this.props.title} <FontAwesomeIcon icon={faPencilAlt} className="pencil-icon" onClick={() => this.editTitle()} />
           </h1>
         </div>
       );
