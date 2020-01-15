@@ -1,10 +1,10 @@
-import React, { MouseEvent, ReactText } from "react";
+import React, { MouseEvent } from "react";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./button-delete.css";
 interface ButtonDeleteProps {
-  id: ReactText;
-  handleClick: (event: MouseEvent, id: ReactText) => void;
+  id: string;
+  handleClick: (event: MouseEvent, id: string) => void;
 }
 
 export const ButtonDelete = (props: ButtonDeleteProps) => (

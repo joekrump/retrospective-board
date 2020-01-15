@@ -1,7 +1,20 @@
 .column-header {
   flex: 0 0 auto;
+  margin: 1.0rem 0;
+  width: 100%;
+}
+
+.column-header--text {
+  display: block;
+  padding: 0;
+  border: 0;
   font-size: 1.5em;
-  margin: 1.0em 0;
+  font-weight: 600;
+  width: 100%;
+}
+
+.column-header--editing .column-header--text {
+  margin-bottom: 0.5rem;
 }
 
 .column-header > .pencil-icon {
