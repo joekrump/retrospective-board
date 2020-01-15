@@ -125,12 +125,6 @@ io.on('connection', function (socket) {
       };
     }
 
-    console.log("****************")
-    console.log("SESSION_ID: ", sessionId)
-    console.log("SESSION STORE")
-    console.log(sessionStore)
-    console.log("BOARD ID: ", data.boardId)
-
     currentSession = sessionStore[sessionId];
     if(!data.boardId || !boards[data.boardId]) {
       initializeBoardForUser(data.boardId, sessionId);
