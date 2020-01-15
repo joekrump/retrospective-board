@@ -48,7 +48,7 @@ export class Card extends React.Component<CardProps, CardState> {
       });
     });
 
-    this.props.socket.on(`card:stard:${this.props.id}`, (
+    this.props.socket.on(`card:starred:${this.props.id}`, (
       data: { starsCount: number, userStars: number }
     ) => {
       if(!!data) {
@@ -62,7 +62,7 @@ export class Card extends React.Component<CardProps, CardState> {
 
   componentWillUnmount() {
     this.props.socket.removeListener(`card:updated:${this.props.id}`);
-    this.props.socket.removeListener(`card:stard:${this.props.id}`);
+    this.props.socket.removeListener(`card:starred:${this.props.id}`);
   }
 
   toggleIsEditing(event?: React.MouseEvent) {
@@ -91,7 +91,7 @@ export class Card extends React.Component<CardProps, CardState> {
   starUp(event: React.MouseEvent) {
     event.preventDefault();
 
-    this.props.socket.emit("card:stard", {
+    this.props.socket.emit("card:starred", {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
       id: this.props.id,
@@ -102,7 +102,7 @@ export class Card extends React.Component<CardProps, CardState> {
   starDown(event: React.MouseEvent) {
     event.preventDefault();
 
-    this.props.socket.emit("card:stard", {
+    this.props.socket.emit("card:starred", {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
       id: this.props.id,

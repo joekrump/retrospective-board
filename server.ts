@@ -176,7 +176,7 @@ io.on('connection', function (socket) {
     if (column) {
       socket.emit(`column:loaded:${data.id}`, {
         cards: column.cards.map((card) => {
-          // Remove all sentiments other than the current users.
+          // Remove all stars other than the current users.
           card.stars = {
             [currentSession.id]: card.stars[currentSession.id]
           };
@@ -302,7 +302,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("card:stard", function ({ id, star, boardId, columnId }: { id: string, star: number, boardId: string, columnId: string }) {
+  socket.on("card:starred", function ({ id, star, boardId, columnId }: { id: string, star: number, boardId: string, columnId: string }) {
     console.log("star for card request");
     if(currentSession === undefined) {
       console.error("No session");
@@ -317,8 +317,8 @@ io.on('connection', function (socket) {
         const userStars = card.stars[currentSession.id];
         const { starsCount } = card;
 
-        socket.emit(`card:stard:${id}`, { starsCount, userStars });
-        socket.broadcast.emit(`card:stard:${id}`, {
+        socket.emit(`card:starred:${id}`, { starsCount, userStars });
+        socket.broadcast.emit(`card:starred:${id}`, {
           starsCount,
         });
         socket.emit(`board:update-remaining-stars:${boardId}`, {
