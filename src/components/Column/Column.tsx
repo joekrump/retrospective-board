@@ -11,9 +11,8 @@ interface CardData {
   id: string;
   editable: boolean;
   text?: string;
-  votesCount: number;
-  netSentiment: number;
-  userSentiment: number;
+  starsCount: number;
+  userStars: number;
   isEditing: boolean;
 }
 
@@ -63,9 +62,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             editable: data.cards[i].ownerId === sessionId,
             isEditing: false,
             text: data.cards[i].text,
-            votesCount: data.cards[i].votesCount,
-            netSentiment: data.cards[i].netSentiment,
-            userSentiment: data.cards[i].sentiments[sessionId] ? data.cards[i].sentiments[sessionId] : 0,
+            starsCount: data.cards[i].starsCount,
+            userStars: data.cards[i].stars[sessionId] ? data.cards[i].stars[sessionId] : 0,
           } as CardData);
         }
       }
@@ -105,9 +103,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
         id: `card-${uuid.v4()}`,
         editable: true,
         isEditing: true,
-        votesCount: 0,
-        netSentiment: 0,
-        userSentiment: 0,
+        starsCount: 0,
+        userStars: 0,
       };
       newCards.push(newCard);
 
@@ -191,10 +188,9 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                 columnId={this.props.id}
                 boardId={this.props.boardId}
                 text={card.text ? card.text : ""}
-                votesCount={card.votesCount}
-                netSentiment={card.netSentiment}
+                starsCount={card.starsCount}
                 showResults={this.props.showResults}
-                userSentiment={card.userSentiment}
+                userStars={card.userStars}
               >
               </Card>
             )

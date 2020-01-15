@@ -38,7 +38,7 @@
   height: 100%;
 }
 
-.votes-remaining {
+.stars-remaining {
   grid-row: 2 / span 1;
   grid-column: 11 / span 2;
   display: inline-block;

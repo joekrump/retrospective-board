@@ -9,7 +9,7 @@ interface BoardControlsProps {
   description: string;
   socket: SocketIOClient.Socket;
   boardId: string;
-  remainingVotes: number | undefined;
+  remainingStars: number | undefined;
 };
 
 interface BoardControlsState {
@@ -94,8 +94,8 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
             New Column
           </button>
         </div>
-        <strong className="votes-remaining">
-          Votes Remaining: {this.props.remainingVotes}
+        <strong className="stars-remaining">
+          Remaining ⭐️: {this.props.remainingStars}
         </strong>
       </div>
     );

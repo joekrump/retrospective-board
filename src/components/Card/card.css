@@ -12,16 +12,29 @@
   border: 0;
 }
 
-.card-container .vote-count,
-.card-container .sentiment {
+.card-container .star-count,
+.card-container .user-stars {
   vertical-align: middle;
   margin-right: 10px;
+  user-select: none;
 }
 
 .card-container .blur {
   filter: blur(10px);
 }
 
-.vote-button {
+.star-button {
+  cursor: pointer;
+  padding: 2px 5px;
+  font-size: 1.4rem;
+  user-select: none;
+  opacity: 0.7;
+}
+.star-button:hover,
+.star-button:focus {
+  opacity: 1.0;
+}
+
+.undo-button {
   padding: 2px 5px;
 }
