@@ -8,12 +8,21 @@
   flex-direction: column;
   font-size: 12pt;
   background-color: white;
+  position: relative;
 }
+
 .card-container .edit-link {
   display: none;
+  margin: 0 5px;
 }
-.card-container:hover .edit-link {
+
+.card--text:hover > .edit-link {
   display: inline-block;
+}
+
+.card-container .card--text,
+.card-container textarea {
+  margin: 1rem 0;
 }
 
 .card-container textarea {
@@ -56,4 +65,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.button--delete {
+  margin-left: 5px;
 }

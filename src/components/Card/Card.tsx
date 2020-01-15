@@ -143,11 +143,13 @@ export class Card extends React.Component<CardProps, CardState> {
             onChange={event => this.setState({text: event.target.value})}
             value={this.state.text}>
           </textarea>
-          <button type="submit">Add</button>
-          <ButtonDelete
-            id={this.props.id}
-            handleClick={(event, id) => this.props.deleteCard(event, id as string)}
-          />
+          <div className="card--footer">
+            <button type="submit">Save</button>
+            <ButtonDelete
+              id={this.props.id}
+              handleClick={(event, id) => this.props.deleteCard(event, id as string)}
+            />
+          </div>
         </form>
       );
     } else {
@@ -164,7 +166,8 @@ export class Card extends React.Component<CardProps, CardState> {
 
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
-          <p>{this.state.text}</p>
+          <p className="card--text">{this.state.text}{editLink}</p>
+
           <div className="card--footer">
             <span className="star-button" onClick={event => this.starUp(event)}>
               ⭐️

@@ -5,5 +5,5 @@
 }
 .button--delete:hover,
 .button--delete:focus {
-  color: red;
+  color: #c41414;
 }
