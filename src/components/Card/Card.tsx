@@ -164,12 +164,14 @@ export class Card extends React.Component<CardProps, CardState> {
 
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
-          <div>{this.state.text}{editLink}</div>
-          <span className="star-button" onClick={event => this.starUp(event)}>
-            ⭐️
-          </span>
-          { this.props.showResults ? this.renderResults() : this.renderUserStars() }
-          { this.state.userStars > 0 ? this.renderUndoButton() : null }
+          <p>{this.state.text}</p>
+          <div className="card--footer">
+            <span className="star-button" onClick={event => this.starUp(event)}>
+              ⭐️
+            </span>
+            { this.props.showResults ? this.renderResults() : this.renderUserStars() }
+            { this.state.userStars > 0 ? this.renderUndoButton() : null }
+          </div>
         </div>
       );
     }
