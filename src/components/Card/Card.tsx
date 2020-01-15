@@ -113,7 +113,7 @@ export class Card extends React.Component<CardProps, CardState> {
   renderUserStars() {
     return (
       <span className="user-stars">
-        {this.state.userStars > 0 ? `+${this.state.userStars}` : this.state.userStars}
+        {this.state.userStars > 0 ? this.state.userStars : this.state.userStars}
       </span>
     );
   }
