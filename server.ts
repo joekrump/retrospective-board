@@ -11,7 +11,6 @@ let sessionStore: {
 const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
 const NEW_BOARD = {
   title: "Retro",
-  description: "",
   showResults: false,
   maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
   columns: [
@@ -135,21 +134,16 @@ io.on('connection', function (socket) {
     emitBoardLoaded(socket, data.boardId, sessionId);
   });
 
-  socket.on('board:updated', function(data: { boardId: string, description: string, title: string }) {
+  socket.on('board:updated', function(data: { boardId: string, title: string }) {
     if(data.title !== undefined) {
       boards[data.boardId].title = data.title;
-    }
-    if(data.description !== undefined) {
-      boards[data.boardId].description = data.description;
     }
 
     socket.emit(`board:updated:${data.boardId}`, {
       title: boards[data.boardId].title,
-      description: boards[data.boardId].description
     });
     socket.broadcast.emit(`board:updated:${data.boardId}`, {
       title: boards[data.boardId].title,
-      description: boards[data.boardId].description
     });
   });
 

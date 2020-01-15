@@ -16,7 +16,6 @@ interface Column {
 
 interface Board {
   title: string;
-  description: string;
   showResults: boolean;
   columns: Column[];
 }
