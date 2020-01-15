@@ -66,9 +66,9 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
     }
 
     return (
-      <div className="board-controls">
+      <div id="board-controls">
         { boardTitle }
-        <div id="board-controls">
+        <div className="board-actions">
           <button
             className="button button--create"
             onClick={() => this.props.addColumn()}

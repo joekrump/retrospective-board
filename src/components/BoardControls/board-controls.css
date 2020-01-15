@@ -1,10 +1,11 @@
-.board-controls {
+#board-controls {
   margin: 0 20px;
   grid-row: 1 / span 1;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-column: 1 / span 12;
   height: max-content;
+  align-items: center;
 }
 
 #board-title {
@@ -27,13 +28,10 @@
   padding: 5px 0px;
 }
 
-#board-controls {
+.board-actions {
   grid-row: 1 / span 1;
   grid-column: 11 / span 2;
   text-align: right;
-}
-#board-controls > .button--create {
-  height: 100%;
 }
 
 .stars-remaining {
