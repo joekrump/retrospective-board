@@ -9,6 +9,12 @@
   font-size: 12pt;
   background-color: white;
 }
+.card-container .edit-link {
+  display: none;
+}
+.card-container:hover .edit-link {
+  display: inline-block;
+}
 
 .card-container textarea {
   font-size: 12pt;
