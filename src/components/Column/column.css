@@ -5,7 +5,7 @@
 
 .column {
   flex-grow: 1;
-  margin: 20px;
+  margin: 20px 10px;
 }
 
 .column-edit > input {
