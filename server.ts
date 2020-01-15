@@ -82,23 +82,17 @@ function updateRemainingStars(
   }
 
   // Check if the star undoes a previous one and adds a remaining star back.
-  if(
-    (star > 0 && card.stars[currentSession.id] < 0)
-  || (star < 0 && card.stars[currentSession.id] > 0)
-  ) {
+  if((star < 0 && card.stars[currentSession.id] > 0)) {
     currentSession.remainingStars[boardId]++;
     card.starsCount--;
-  } else if (currentSession.remainingStars[boardId] > 0){
+    card.stars[currentSession.id]--;
+  } else if (star > 0 && currentSession.remainingStars[boardId] > 0){
     currentSession.remainingStars[boardId]--;
     card.starsCount++;
+    card.stars[currentSession.id]++;
   } else {
     console.log("No more stars left");
     socket.emit(`board:star-limit-reached:${boardId}`, { maxStars: MAX_VOTES_USER_VOTE_PER_BOARD });
-    return; // exit early because stars have been maxed out and the user is not attempting to undo a previous star.
-  }
-
-  if(currentSession.remainingStars[boardId] >= 0) {
-    card.stars[currentSession.id] += star;
   }
 }
 
