@@ -85,6 +85,7 @@ export class Card extends React.Component<CardProps, CardState> {
       columnId: this.props.columnId,
       id: this.props.id,
       text: this.state.text,
+      sessionId: sessionStorage.getItem("retroSessionId"),
     });
   }
 
@@ -95,7 +96,8 @@ export class Card extends React.Component<CardProps, CardState> {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
       id: this.props.id,
-      star: 1
+      star: 1,
+      sessionId: sessionStorage.getItem("retroSessionId"),
     });
   }
 
@@ -106,7 +108,8 @@ export class Card extends React.Component<CardProps, CardState> {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
       id: this.props.id,
-      star: -1
+      star: -1,
+      sessionId: sessionStorage.getItem("retroSessionId"),
     });
   }
 

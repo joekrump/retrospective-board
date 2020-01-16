@@ -111,6 +111,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
         boardId: this.props.boardId,
         columnId: this.props.id,
         id: newCard.id,
+        sessionId: sessionStorage.getItem("retroSessionId"),
       });
     }
 
@@ -128,6 +129,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       boardId: this.props.boardId,
       columnId: this.props.id,
       id,
+      sessionId: sessionStorage.getItem("retroSessionId"),
     });
 
     this.setState({cards: newCards});
@@ -150,7 +152,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.props.socket.emit("column:updated", {
       boardId: this.props.boardId,
       id: this.props.id,
-      name: this.nameInput?.current?.value
+      name: this.nameInput?.current?.value,
+      sessionId: sessionStorage.getItem("retroSessionId"),
     });
     this.toggleIsEditing();
   }

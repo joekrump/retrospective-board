@@ -41,6 +41,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
     this.props.socket.emit("board:updated", {
       boardId: this.props.boardId,
       title: this.titleInput?.current?.value,
+      sessionId: sessionStorage.getItem("retroSessionId"),
     });
     this.editTitle();
   }

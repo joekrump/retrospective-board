@@ -69,14 +69,13 @@ export class Main extends React.Component<MainProps, MainState> {
   }
 
   addColumn(column?: any) {
-    const sessionId = sessionStorage.getItem("retroSessionId");
     let newColumns = this.state.columns.slice(0);
     if (column) {
       newColumns.push({ id: column.id, name: column.name, isEditing: false });
       this.props.socket.emit("column:loaded", {
         boardId: this.props.boardId,
         id: column.id,
-        sessionId,
+        sessionId: sessionStorage.getItem("retroSessionId"),
       });
     } else {
       const newColumn = { id: uuid.v4(), name: "New Column", isEditing: true };
@@ -87,6 +86,7 @@ export class Main extends React.Component<MainProps, MainState> {
         boardId: this.props.boardId,
         id: newColumn.id,
         name: newColumn.name,
+        sessionId: sessionStorage.getItem("retroSessionId"),
       });
     }
 
@@ -133,6 +133,7 @@ export class Main extends React.Component<MainProps, MainState> {
       this.props.socket.emit(`column:deleted`, {
         boardId: this.props.boardId,
         id,
+        sessionId: sessionStorage.getItem("retroSessionId"),
       });
     }
 

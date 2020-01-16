@@ -14,6 +14,7 @@ export class Header extends React.Component<HeaderProps> {
     // emit an event to show results.
     this.props.socket.emit(`board:show-results`, {
       boardId: this.props.boardId,
+      sessionId: sessionStorage.getItem("retroSessionId"),
     });
   }
 
