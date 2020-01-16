@@ -5,7 +5,6 @@ import { Card } from "../Card/Card";
 import * as uuid from "uuid";
 import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
 import "./column.css";
-import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 interface CardData {
   id: string;
@@ -164,13 +163,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       >
         <div className="header-row">
           <ColumnHeader
+            columnId={this.props.id}
             isEditing={this.state.isEditing}
             name={this.state.name}
             nameInputRef={this.nameInput}
             onEditToggle={(e) => this.toggleIsEditing(e)}
             onSubmit={(e) => this.updateColumnName(e)}
+            onDeleteClick={(event, id) => this.props.deleteColumn(event, id)}
           />
-          { this.state.isEditing ? <ButtonDelete id={this.props.id} handleClick={(event, id) => this.props.deleteColumn(event, id as string)}/> : null }
         </div>
         <div className="body-row">
           <button onClick={() => this.addCard()}>

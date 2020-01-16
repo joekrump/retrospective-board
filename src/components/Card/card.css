@@ -23,6 +23,7 @@
 .card-container .card--text,
 .card-container textarea {
   margin: 1rem 0;
+  min-height: 40px;
 }
 
 .card-container textarea {
@@ -65,6 +66,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.card--footer button[type="submit"] {
+  font-size: 14pt;
 }
 
 .button--delete {
