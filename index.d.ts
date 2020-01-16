@@ -1,11 +1,10 @@
 interface Card {
   id: string;
   text: string;
-  sentiments: {
+  stars: {
     [sessionId: string]: number;
   };
-  netSentiment: number;
-  votesCount: number;
+  starsCount: number;
   ownerId: string;
 }
 
@@ -17,7 +16,6 @@ interface Column {
 
 interface Board {
   title: string;
-  description: string;
   showResults: boolean;
   columns: Column[];
 }
@@ -30,7 +28,7 @@ interface BoardColumn {
 
 interface Session {
   id: string;
-  remainingVotes: {
+  remainingStars: {
     [boardId: string]: number;
   }
 }

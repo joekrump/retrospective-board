@@ -14,8 +14,7 @@ interface MainProps {
 interface MainState {
   columns: BoardColumn[];
   boardTitle: string;
-  boardDescription: string;
-  remainingVotes?: number | undefined;
+  remainingStars?: number | undefined;
 }
 
 export class Main extends React.Component<MainProps, MainState> {
@@ -24,18 +23,16 @@ export class Main extends React.Component<MainProps, MainState> {
     this.state = {
       columns: [],
       boardTitle: "",
-      boardDescription: "",
     }
   }
 
   componentDidMount() {
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (
-      data: { board: Board, sessionId: string, remainingVotes: number },
+      data: { board: Board, sessionId: string, remainingStars: number },
     ) => {
       this.setState({
-        remainingVotes: data.remainingVotes,
+        remainingStars: data.remainingStars,
         boardTitle: data.board.title,
-        boardDescription: data.board.description,
       });
       sessionStorage.setItem("retroSessionId", data.sessionId);
       data.board.columns.forEach((column: {id: string}) => {
@@ -46,13 +43,12 @@ export class Main extends React.Component<MainProps, MainState> {
     this.props.socket.on(`board:updated:${this.props.boardId}`, (data: any) => {
       this.setState({
         boardTitle: data.title,
-        boardDescription: data.description,
       });
     });
 
-    this.props.socket.on(`board:update-remaining-votes:${this.props.boardId}`, (data: any) => {
+    this.props.socket.on(`board:update-remaining-stars:${this.props.boardId}`, (data: any) => {
       this.setState({
-        remainingVotes: data.remainingVotes,
+        remainingStars: data.remainingStars,
       });
     })
 
@@ -67,7 +63,7 @@ export class Main extends React.Component<MainProps, MainState> {
 
   componentWillUnmount() {
     this.props.socket.removeListener(`board:loaded:${this.props.boardId}`);
-    this.props.socket.removeListener(`board:update-remaining-votes:${this.props.boardId}`);
+    this.props.socket.removeListener(`board:update-remaining-stars:${this.props.boardId}`);
     this.props.socket.removeListener(`column:deleted:${this.props.boardId}`);
     this.props.socket.removeListener(`column:created:${this.props.boardId}`);
   }
@@ -149,10 +145,9 @@ export class Main extends React.Component<MainProps, MainState> {
         <BoardControls
           addColumn={() => this.addColumn()}
           title={this.state.boardTitle}
-          description={this.state.boardDescription}
           socket={this.props.socket}
           boardId={this.props.boardId}
-          remainingVotes={this.state.remainingVotes}
+          remainingStars={this.state.remainingStars}
         >
         </BoardControls>
         <div id="columns">

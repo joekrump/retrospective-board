@@ -10,8 +10,8 @@ import { Main } from "../Main/Main";
 interface AppState {
   boardId: string;
   socket: SocketIOClient.Socket;
-  maxVotes?: number;
-  showVoteLimitAlert: boolean;
+  maxStars?: number;
+  showStarLimitAlert: boolean;
   showResults: boolean;
 }
 
@@ -33,7 +33,7 @@ export class App extends React.Component<{}, AppState> {
     this.state = {
       boardId,
       socket: io.connect(serverURL),
-      showVoteLimitAlert: false,
+      showStarLimitAlert: false,
       showResults: false
     };
   }
@@ -45,8 +45,8 @@ export class App extends React.Component<{}, AppState> {
       boardId: this.state.boardId,
       sessionId,
     });
-    this.state.socket.on(`board:vote-limit-reached:${this.state.boardId}`, (data: { maxVotes: number }) => {
-      this.displayVoteLimitAlert(data.maxVotes);
+    this.state.socket.on(`board:star-limit-reached:${this.state.boardId}`, (data: { maxStars: number }) => {
+      this.displayStarLimitAlert(data.maxStars);
     });
 
     this.state.socket.on(`board:show-results:${this.state.boardId}`, (data: { showResults: boolean }) => {
@@ -54,21 +54,21 @@ export class App extends React.Component<{}, AppState> {
     });
   }
 
-  private displayVoteLimitAlert(maxVotes: number) {
+  private displayStarLimitAlert(maxStars: number) {
     this.setState({
-      maxVotes,
-      showVoteLimitAlert: true,
+      maxStars,
+      showStarLimitAlert: true,
     });
 
     setTimeout(() => {
       this.setState({
-        showVoteLimitAlert: false,
+        showStarLimitAlert: false,
       })
     }, 3000);
   }
 
   componentWillUnmount() {
-    this.state.socket.removeListener(`board:vote-limit-reached:${this.state.boardId}`);
+    this.state.socket.removeListener(`board:star-limit-reached:${this.state.boardId}`);
     this.state.socket.removeListener(`board:show-results:${this.state.boardId}`);
     this.state.socket.close();
   }
@@ -78,8 +78,8 @@ export class App extends React.Component<{}, AppState> {
       <>
         <Header showResults={this.state.showResults} socket={this.state.socket} boardId={this.state.boardId}></Header>
         <Main socket={this.state.socket} boardId={this.state.boardId} showResults={this.state.showResults}></Main>
-        <div className={"alert alert-vote-limit" + (this.state.showVoteLimitAlert ? " alert--show" : "")}>
-          Your voting limit of {this.state.maxVotes} has been reached. Undo previous votes if you want some back.
+        <div className={"alert alert-star-limit" + (this.state.showStarLimitAlert ? " alert--show" : "")}>
+          Your voting limit of {this.state.maxStars} has been reached. Undo previous stars if you want some back.
         </div>
       </>
     );

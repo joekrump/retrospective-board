@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt, faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
+import { faPencilAlt, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 import "./card.css";
@@ -15,18 +15,16 @@ interface CardProps {
   columnId: string;
   boardId: string;
   text: string;
-  votesCount: number;
-  netSentiment: number;
+  starsCount: number;
   showResults: boolean;
-  userSentiment: number;
+  userStars: number;
 }
 
 interface CardState {
   isEditing: boolean;
   text: string;
-  votesCount: number;
-  netSentiment: number;
-  userSentiment: number;
+  starsCount: number;
+  userStars: number;
 }
 
 export class Card extends React.Component<CardProps, CardState> {
@@ -35,10 +33,9 @@ export class Card extends React.Component<CardProps, CardState> {
 
     let stateToSet = {
       isEditing: this.props.isEditing,
-      netSentiment: this.props.netSentiment,
       text: this.props.text,
-      userSentiment: this.props.userSentiment,
-      votesCount: this.props.votesCount,
+      userStars: this.props.userStars,
+      starsCount: this.props.starsCount,
     }
 
     this.state = stateToSet;
@@ -51,14 +48,13 @@ export class Card extends React.Component<CardProps, CardState> {
       });
     });
 
-    this.props.socket.on(`card:voted:${this.props.id}`, (
-      data: { netSentiment: number, votesCount: number, userSentiment: number }
+    this.props.socket.on(`card:starred:${this.props.id}`, (
+      data: { starsCount: number, userStars: number }
     ) => {
       if(!!data) {
         this.setState({
-          votesCount: data.votesCount,
-          netSentiment: data.netSentiment,
-          userSentiment: data.userSentiment !== undefined ? data.userSentiment : this.state.userSentiment,
+          starsCount: data.starsCount,
+          userStars: data.userStars !== undefined ? data.userStars : this.state.userStars,
         });
       }
     });
@@ -66,7 +62,7 @@ export class Card extends React.Component<CardProps, CardState> {
 
   componentWillUnmount() {
     this.props.socket.removeListener(`card:updated:${this.props.id}`);
-    this.props.socket.removeListener(`card:voted:${this.props.id}`);
+    this.props.socket.removeListener(`card:starred:${this.props.id}`);
   }
 
   toggleIsEditing(event?: React.MouseEvent) {
@@ -92,44 +88,47 @@ export class Card extends React.Component<CardProps, CardState> {
     });
   }
 
-  voteUp(event: React.MouseEvent) {
+  starUp(event: React.MouseEvent) {
     event.preventDefault();
 
-    this.props.socket.emit("card:voted", {
+    this.props.socket.emit("card:starred", {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
       id: this.props.id,
-      vote: 1
+      star: 1
     });
   }
 
-  voteDown(event: React.MouseEvent) {
+  starDown(event: React.MouseEvent) {
     event.preventDefault();
 
-    this.props.socket.emit("card:voted", {
+    this.props.socket.emit("card:starred", {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
       id: this.props.id,
-      vote: -1
+      star: -1
     });
   }
 
-  renderUserSentiment() {
+  renderUserStars() {
     return (
-      <span className="sentiment">
-        Your Vote: {this.state.userSentiment > 0 ? `+${this.state.userSentiment}` : this.state.userSentiment}
+      <span className="user-stars">
+        {this.state.userStars > 0 ? this.state.userStars : this.state.userStars}
       </span>
     );
   }
 
   renderResults() {
     return (
-      <>
-        <span className="vote-count">Votes:{this.state.votesCount}</span>
-        <span className="sentiment">
-          Sentiment: {this.state.netSentiment > 0 ? `+${this.state.netSentiment}` : this.state.netSentiment}
-        </span>
-      </>
+      <span className="star-count">{this.state.starsCount}</span>
+    );
+  }
+
+  renderUndoButton() {
+    return (
+      <button onClick={event => this.starDown(event)} className="undo-button">
+        <FontAwesomeIcon icon={faUndo} />
+      </button>
     );
   }
 
@@ -144,11 +143,13 @@ export class Card extends React.Component<CardProps, CardState> {
             onChange={event => this.setState({text: event.target.value})}
             value={this.state.text}>
           </textarea>
-          <button type="submit">Add</button>
-          <ButtonDelete
-            id={this.props.id}
-            handleClick={(event, id) => this.props.deleteCard(event, id as string)}
-          />
+          <div className="card--footer">
+            <button type="submit">Save</button>
+            <ButtonDelete
+              id={this.props.id}
+              handleClick={(event, id) => this.props.deleteCard(event, id as string)}
+            />
+          </div>
         </form>
       );
     } else {
@@ -165,14 +166,15 @@ export class Card extends React.Component<CardProps, CardState> {
 
       cardContents = (
         <div className={textAndNonEditable ? "blur" : undefined}>
-          <div>{this.state.text}{editLink}</div>
-          <button onClick={event => this.voteUp(event)} className="vote-button">
-            <FontAwesomeIcon icon={faThumbsUp} />
-          </button>
-          <button onClick={event => this.voteDown(event)} className="vote-button">
-            <FontAwesomeIcon icon={faThumbsDown} />
-          </button>
-          { this.props.showResults ? this.renderResults() : this.renderUserSentiment() }
+          <p className="card--text">{this.state.text}{editLink}</p>
+
+          <div className="card--footer">
+            <span className="star-button" onClick={event => this.starUp(event)}>
+              ⭐️
+            </span>
+            { this.props.showResults ? this.renderResults() : this.renderUserStars() }
+            { this.state.userStars > 0 ? this.renderUndoButton() : null }
+          </div>
         </div>
       );
     }

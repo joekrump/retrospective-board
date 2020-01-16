@@ -11,9 +11,8 @@ let sessionStore: {
 const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
 const NEW_BOARD = {
   title: "Retro",
-  description: "",
   showResults: false,
-  maxVotes: MAX_VOTES_USER_VOTE_PER_BOARD,
+  maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
   columns: [
     {
       id: uuid.v4(),
@@ -51,64 +50,57 @@ function createNewBoard(boardId?: string) {
   return boardId;
 }
 
-function reclaimVotesFromDeleteCard(card: Card, boardId: string) {
-  Object.keys(card.sentiments).forEach(sessionId => {
-    sessionStore[sessionId].remainingVotes[boardId] += Math.abs(card.sentiments[sessionId]);
-  })
+function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
+  Object.keys(card.stars).forEach(sessionId => {
+    sessionStore[sessionId].remainingStars[boardId] += Math.abs(card.stars[sessionId]);
+  });
 }
 
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
   socket.emit(`board:loaded:${boardId}`, {
     board: boards[boardId],
     sessionId,
-    remainingVotes: sessionStore[sessionId].remainingVotes[boardId],
+    remainingStars: sessionStore[sessionId].remainingStars[boardId],
   });
 }
 
 function initializeBoardForUser(boardId: string, sessionId: string) {
   boardId = createNewBoard(boardId);
-  sessionStore[sessionId].remainingVotes[boardId] = MAX_VOTES_USER_VOTE_PER_BOARD;
+  sessionStore[sessionId].remainingStars[boardId] = MAX_VOTES_USER_VOTE_PER_BOARD;
 }
 
-function updateRemainingVotes(
+function updateRemainingStars(
   currentSession: Session,
   socket: SocketIO.Socket,
   card: Card,
   boardId: string,
-  sentiment: number,
+  star: number,
 ) {
-  if (card.sentiments[currentSession.id] === undefined) {
-    card.sentiments[currentSession.id] = 0;
+  if (card.stars[currentSession.id] === undefined) {
+    card.stars[currentSession.id] = 0;
   }
 
-  // Check if the vote undoes a previous one and adds a remaining vote back.
-  if(
-    (sentiment > 0 && card.sentiments[currentSession.id] < 0)
-  || (sentiment < 0 && card.sentiments[currentSession.id] > 0)
-  ) {
-    currentSession.remainingVotes[boardId]++;
-    card.votesCount--;
-  } else if (currentSession.remainingVotes[boardId] > 0){
-    currentSession.remainingVotes[boardId]--;
-    card.votesCount++;
+  // Check if the star undoes a previous one and adds a remaining star back.
+  if((star < 0 && card.stars[currentSession.id] > 0)) {
+    currentSession.remainingStars[boardId]++;
+    card.starsCount--;
+    card.stars[currentSession.id]--;
+  } else if (star > 0 && currentSession.remainingStars[boardId] > 0){
+    currentSession.remainingStars[boardId]--;
+    card.starsCount++;
+    card.stars[currentSession.id]++;
   } else {
-    console.log("No more votes left");
-    socket.emit(`board:vote-limit-reached:${boardId}`, { maxVotes: MAX_VOTES_USER_VOTE_PER_BOARD });
-    return; // exit early because votes have been maxed out and the user is not attempting to undo a previous vote.
-  }
-
-  if(currentSession.remainingVotes[boardId] >= 0) {
-    card.sentiments[currentSession.id] += sentiment;
-    card.netSentiment += sentiment;
+    console.log("No more stars left");
+    socket.emit(`board:star-limit-reached:${boardId}`, { maxStars: MAX_VOTES_USER_VOTE_PER_BOARD });
   }
 }
 
 function newBoardSession(session: Session, boardId: string) {
-  return session.remainingVotes[boardId] === undefined;
+  return session.remainingStars[boardId] === undefined;
 }
 
-function canVote(remainingVotes: number) {
-  return remainingVotes >= 0;
+function canStar(remainingStars: number) {
+  return remainingStars >= 0;
 }
 
 io.on('connection', function (socket) {
@@ -123,47 +115,35 @@ io.on('connection', function (socket) {
   });
 
   socket.on('board:loaded', function (data: { boardId: string, sessionId: string }) {
-    let sessionId: string;
-
-    if (!!data.sessionId && !!sessionStore[data.sessionId]) {
-      sessionId = data.sessionId;
-    } else {
-      sessionId = uuid.v4();
-    }
+    let sessionId = data.sessionId ?? uuid.v4();
 
     if(!sessionStore[sessionId]) {
       sessionStore[sessionId] = {
         id: sessionId,
-        remainingVotes: {},
+        remainingStars: {},
       };
     }
 
     currentSession = sessionStore[sessionId];
-
     if(!data.boardId || !boards[data.boardId]) {
       initializeBoardForUser(data.boardId, sessionId);
     } else if (newBoardSession(sessionStore[sessionId], data.boardId)) {
-      sessionStore[sessionId].remainingVotes[data.boardId] = MAX_VOTES_USER_VOTE_PER_BOARD
+      sessionStore[sessionId].remainingStars[data.boardId] = MAX_VOTES_USER_VOTE_PER_BOARD
     }
 
     emitBoardLoaded(socket, data.boardId, sessionId);
   });
 
-  socket.on('board:updated', function(data: { boardId: string, description: string, title: string }) {
+  socket.on('board:updated', function(data: { boardId: string, title: string }) {
     if(data.title !== undefined) {
       boards[data.boardId].title = data.title;
-    }
-    if(data.description !== undefined) {
-      boards[data.boardId].description = data.description;
     }
 
     socket.emit(`board:updated:${data.boardId}`, {
       title: boards[data.boardId].title,
-      description: boards[data.boardId].description
     });
     socket.broadcast.emit(`board:updated:${data.boardId}`, {
       title: boards[data.boardId].title,
-      description: boards[data.boardId].description
     });
   });
 
@@ -178,9 +158,9 @@ io.on('connection', function (socket) {
     if (column) {
       socket.emit(`column:loaded:${data.id}`, {
         cards: column.cards.map((card) => {
-          // Remove all sentiments other than the current users.
-          card.sentiments = {
-            [currentSession.id]: card.sentiments[currentSession.id]
+          // Remove all stars other than the current users.
+          card.stars = {
+            [currentSession.id]: card.stars[currentSession.id]
           };
           return card;
         }),
@@ -229,7 +209,7 @@ io.on('connection', function (socket) {
     if (columnIndex) {
       const column = boards[data.boardId].columns[columnIndex];
 
-      column.cards.forEach((card) => { reclaimVotesFromDeleteCard(card, data.boardId); });
+      column.cards.forEach((card) => { reclaimStarsFromDeleteCard(card, data.boardId); });
 
       boards[data.boardId].columns.splice(columnIndex, 1);
       socket.broadcast.emit(`column:deleted:${data.boardId}`, {
@@ -250,10 +230,9 @@ io.on('connection', function (socket) {
       column.cards.push({
         id: data.id,
         text: "",
-        sentiments: {},
+        stars: {},
         ownerId: currentSession.id,
-        votesCount: 0,
-        netSentiment: 0,
+        starsCount: 0,
       });
     }
 
@@ -296,7 +275,7 @@ io.on('connection', function (socket) {
       if(card.ownerId === currentSession.id) {
         column.cards.splice(cardIndex, 1);
 
-        reclaimVotesFromDeleteCard(card, data.boardId);
+        reclaimStarsFromDeleteCard(card, data.boardId);
 
         socket.broadcast.emit(`card:deleted:${data.columnId}`, {
           id: data.id
@@ -305,8 +284,8 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("card:voted", function ({ id, vote, boardId, columnId }: { id: string, vote: number, boardId: string, columnId: string }) {
-    console.log("vote for card request");
+  socket.on("card:starred", function ({ id, star, boardId, columnId }: { id: string, star: number, boardId: string, columnId: string }) {
+    console.log("star for card request");
     if(currentSession === undefined) {
       console.error("No session");
       return;
@@ -315,17 +294,17 @@ io.on('connection', function (socket) {
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
-      if (card && canVote(currentSession.remainingVotes[boardId])) {
-        updateRemainingVotes(currentSession, socket, card, boardId, vote);
-        const userSentiment = card.sentiments[currentSession.id];
-        const { netSentiment, votesCount } = card;
+      if (card && canStar(currentSession.remainingStars[boardId])) {
+        updateRemainingStars(currentSession, socket, card, boardId, star);
+        const userStars = card.stars[currentSession.id];
+        const { starsCount } = card;
 
-        socket.emit(`card:voted:${id}`, { netSentiment, votesCount, userSentiment });
-        socket.broadcast.emit(`card:voted:${id}`, {
-          netSentiment, votesCount,
+        socket.emit(`card:starred:${id}`, { starsCount, userStars });
+        socket.broadcast.emit(`card:starred:${id}`, {
+          starsCount,
         });
-        socket.emit(`board:update-remaining-votes:${boardId}`, {
-          remainingVotes: currentSession.remainingVotes[boardId],
+        socket.emit(`board:update-remaining-stars:${boardId}`, {
+          remainingStars: currentSession.remainingStars[boardId],
         });
       }
     }
