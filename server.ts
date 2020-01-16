@@ -69,25 +69,25 @@ function initializeBoardForUser(boardId: string, sessionId: string) {
 }
 
 function updateRemainingStars(
-  currentSession: Session,
+  session: Session,
   socket: SocketIO.Socket,
   card: Card,
   boardId: string,
   star: number,
 ) {
-  if (card.stars[currentSession.id] === undefined) {
-    card.stars[currentSession.id] = 0;
+  if (card.stars[session.id] === undefined) {
+    card.stars[session.id] = 0;
   }
 
   // Check if the star undoes a previous one and adds a remaining star back.
-  if((star < 0 && card.stars[currentSession.id] > 0)) {
-    currentSession.remainingStars[boardId]++;
+  if((star < 0 && card.stars[session.id] > 0)) {
+    session.remainingStars[boardId]++;
     card.starsCount--;
-    card.stars[currentSession.id]--;
-  } else if (star > 0 && currentSession.remainingStars[boardId] > 0){
-    currentSession.remainingStars[boardId]--;
+    card.stars[session.id]--;
+  } else if (star > 0 && session.remainingStars[boardId] > 0){
+    session.remainingStars[boardId]--;
     card.starsCount++;
-    card.stars[currentSession.id]++;
+    card.stars[session.id]++;
   } else {
     console.log("No more stars left");
     socket.emit(`board:star-limit-reached:${boardId}`, { maxStars: MAX_VOTES_USER_VOTE_PER_BOARD });
@@ -103,7 +103,6 @@ function canStar(remainingStars: number) {
 }
 
 io.on('connection', function (socket) {
-  let currentSession: Session;
 
   socket.on('board:show-results', function(data) {
     if (!!boards[data.boardId]) {
@@ -123,7 +122,6 @@ io.on('connection', function (socket) {
       };
     }
 
-    currentSession = sessionStore[sessionId];
     if(!data.boardId || !boards[data.boardId]) {
       initializeBoardForUser(data.boardId, sessionId);
     } else if (newBoardSession(sessionStore[sessionId], data.boardId)) {
@@ -133,7 +131,7 @@ io.on('connection', function (socket) {
     emitBoardLoaded(socket, data.boardId, sessionId);
   });
 
-  socket.on('board:updated', function(data: { boardId: string, title: string }) {
+  socket.on('board:updated', function(data: { boardId: string, title: string, sessionId: string }) {
     if(data.title !== undefined) {
       boards[data.boardId].title = data.title;
     }
@@ -146,9 +144,9 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("column:loaded", function(data: { boardId: string, id: string }) {
+  socket.on("column:loaded", function(data: { boardId: string, id: string, sessionId: string }) {
     console.log("column load request");
-    if (currentSession === undefined) {
+    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -159,7 +157,7 @@ io.on('connection', function (socket) {
         cards: column.cards.map((card) => {
           // Remove all stars other than the current users.
           card.stars = {
-            [currentSession.id]: card.stars[currentSession.id]
+            [data.sessionId]: card.stars[data.sessionId]
           };
           return card;
         }),
@@ -167,9 +165,9 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("column:created", function(data: { boardId: string, id: string, name: string }) {
+  socket.on("column:created", function(data: { boardId: string, id: string, name: string, sessionId: string }) {
     console.log("column create request");
-    if (currentSession === undefined) {
+    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -181,9 +179,9 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("column:updated", function(data: { boardId: string, id: string, name: string }) {
+  socket.on("column:updated", function(data: { boardId: string, id: string, name: string, sessionId: string }) {
     console.log("column update request");
-    if (currentSession === undefined) {
+    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -196,9 +194,9 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("column:deleted", function(data: { boardId: string, id: string }) {
+  socket.on("column:deleted", function(data: { boardId: string, id: string, sessionId: string }) {
     console.log("column delete request");
-    if (currentSession === undefined) {
+    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -217,9 +215,9 @@ io.on('connection', function (socket) {
     }
   })
 
-  socket.on("card:created", function(data: { boardId: string, columnId: string, id: string }) {
+  socket.on("card:created", function(data: { boardId: string, columnId: string, id: string, sessionId: string }) {
     console.log("card create request")
-    if (currentSession === undefined) {
+    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -230,7 +228,7 @@ io.on('connection', function (socket) {
         id: data.id,
         text: "",
         stars: {},
-        ownerId: currentSession.id,
+        ownerId: data.sessionId,
         starsCount: 0,
       });
     }
@@ -240,9 +238,9 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("card:updated", function (data: { boardId: string, columnId: string, id: string, text: string }) {
+  socket.on("card:updated", function (data: { boardId: string, columnId: string, id: string, text: string, sessionId: string }) {
     console.log("card update request");
-    if (currentSession === undefined) {
+    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -250,7 +248,7 @@ io.on('connection', function (socket) {
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === data.id);
-      if (card && card.ownerId === currentSession.id) {
+      if (card && card.ownerId === data.sessionId) {
         card.text = data.text;
         socket.broadcast.emit(`card:updated:${data.id}`, {
           text: data.text,
@@ -259,9 +257,9 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("card:deleted", function (data: { boardId: string, columnId: string, id: string }) {
+  socket.on("card:deleted", function (data: { boardId: string, columnId: string, id: string, sessionId: string }) {
     console.log("card delete request");
-    if(currentSession === undefined) {
+    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -271,7 +269,7 @@ io.on('connection', function (socket) {
       const cardIndex = column.cards.findIndex((card) => card.id === data.id);
       const card = column.cards[cardIndex];
       // Check to see if the request is coming from the card's owner
-      if(card.ownerId === currentSession.id) {
+      if(card.ownerId === data.sessionId) {
         column.cards.splice(cardIndex, 1);
 
         reclaimStarsFromDeleteCard(card, data.boardId);
@@ -283,19 +281,20 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("card:starred", function ({ id, star, boardId, columnId }: { id: string, star: number, boardId: string, columnId: string }) {
+  socket.on("card:starred", function ({ id, star, boardId, columnId, sessionId }: { id: string, star: number, boardId: string, columnId: string, sessionId: string }) {
     console.log("star for card request");
-    if(currentSession === undefined) {
+    if (sessionId === undefined && !sessionStore[sessionId]) {
       console.error("No session");
       return;
     }
+    const session = sessionStore[sessionId];
 
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
-      if (card && canStar(currentSession.remainingStars[boardId])) {
-        updateRemainingStars(currentSession, socket, card, boardId, star);
-        const userStars = card.stars[currentSession.id];
+      if (card && canStar(session.remainingStars[boardId])) {
+        updateRemainingStars(session, socket, card, boardId, star);
+        const userStars = card.stars[session.id];
         const { starsCount } = card;
 
         socket.emit(`card:starred:${id}`, { starsCount, userStars });
@@ -303,7 +302,7 @@ io.on('connection', function (socket) {
           starsCount,
         });
         socket.emit(`board:update-remaining-stars:${boardId}`, {
-          remainingStars: currentSession.remainingStars[boardId],
+          remainingStars: session.remainingStars[boardId],
         });
       }
     }
