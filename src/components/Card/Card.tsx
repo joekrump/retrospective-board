@@ -184,7 +184,7 @@ export class Card extends React.Component<CardProps, CardState> {
                 </span>
             }
             { this.props.showResults ? this.renderResults() : this.renderUserStars() }
-            { this.state.userStars > 0 ? this.renderUndoButton() : null }
+            { !this.props.showResults && this.state.userStars > 0 ? this.renderUndoButton() : null }
           </div>
         </div>
       );
