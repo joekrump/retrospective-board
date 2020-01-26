@@ -223,7 +223,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                   key={card.id}
                   id={card.id}
                   deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
-                  editable={card.editable}
+                  editable={this.props.showResults ? false : card.editable}
                   isEditing={card.isEditing}
                   socket={this.props.socket}
                   columnId={this.props.id}
