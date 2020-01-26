@@ -22,4 +22,4 @@ _This makes it easy for others to access the app over the internet_
 2. Features
 * [ ] GIF support (/rich text?)
 * [ ] Colours for columns
-* [ ] Sort the cards in columns by the number of ⭐️s 
+* [ ] Sort the cards in columns by the number of ⭐️s

@@ -13,6 +13,7 @@ interface CardData {
   starsCount: number;
   userStars: number;
   isEditing: boolean;
+  newCard?: boolean;
 }
 
 interface ColumnProps {
@@ -68,11 +69,13 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       }
     });
 
-    this.props.socket.on(`card:created:${this.props.id}`, (data: {id: string}) => {
+    this.props.socket.on(`card:created:${this.props.id}`, (data: { card: CardData }) => {
       this.addCard({
-        id: data.id,
+        ...data.card,
+        userStars: 0,
         editable: false,
-      } as CardData);
+        isEditing: false,
+      });
     });
 
     this.props.socket.on(`card:deleted:${this.props.id}`, (data: any) => {
@@ -93,10 +96,19 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.props.socket.removeListener(`column:updated:${this.props.id}`);
   }
 
-  addCard(data?: CardData) {
-    let newCards = this.state.cards.slice(0);
-    if (data) {
-      newCards.push(data);
+  addCard(card?: CardData) {
+    let cards = this.state.cards.slice(0);
+    if (!!card) {
+      for(let i = 0; i < cards.length; i++) {
+        if (cards[i].id === card.id) {
+          cards = [
+            ...cards.slice(0, i),
+            ...cards.slice(i + 1),
+          ]
+          break;
+        }
+      }
+      cards.push(card);
     } else {
       let newCard = {
         id: `card-${uuid.v4()}`,
@@ -104,35 +116,40 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
         isEditing: true,
         starsCount: 0,
         userStars: 0,
+        newCard: true,
       };
-      newCards.push(newCard);
-
-      this.props.socket.emit(`card:created`, {
-        boardId: this.props.boardId,
-        columnId: this.props.id,
-        id: newCard.id,
-        sessionId: sessionStorage.getItem("retroSessionId"),
-      });
+      cards = [
+        newCard,
+        ...cards,
+      ];
     }
 
-    this.setState({cards: newCards, lastIndex: this.state.lastIndex + 1});
+    this.setState({cards, lastIndex: this.state.lastIndex + 1});
   }
 
   deleteCard(event: React.MouseEvent, id: string) {
     event.preventDefault();
+    let deletedCard: CardData | undefined;
+    let cards: CardData[] = [];
 
-    let newCards = this.state.cards.filter((card: CardData) => {
-      return card.id !== id;
+    this.state.cards.forEach((card: CardData) => {
+      if(card.id === id) {
+        deletedCard = card;
+      } else {
+        cards.push(card);
+      }
     });
 
-    this.props.socket.emit("card:deleted", {
-      boardId: this.props.boardId,
-      columnId: this.props.id,
-      id,
-      sessionId: sessionStorage.getItem("retroSessionId"),
-    });
+    if (!!deletedCard && !deletedCard.newCard) {
+      this.props.socket.emit("card:deleted", {
+        boardId: this.props.boardId,
+        columnId: this.props.id,
+        id,
+        sessionId: sessionStorage.getItem("retroSessionId"),
+      });
+    }
 
-    this.setState({cards: newCards});
+    this.setState({cards});
   }
 
   toggleIsEditing(event?: React.MouseEvent) {
@@ -194,6 +211,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                 starsCount={card.starsCount}
                 showResults={this.props.showResults}
                 userStars={card.userStars}
+                newCard={card.newCard}
               >
               </Card>
             )

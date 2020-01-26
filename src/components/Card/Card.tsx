@@ -18,6 +18,7 @@ interface CardProps {
   starsCount: number;
   showResults: boolean;
   userStars: number;
+  newCard?: boolean;
 }
 
 interface CardState {
@@ -25,6 +26,7 @@ interface CardState {
   text: string;
   starsCount: number;
   userStars: number;
+  newCard?: boolean;
 }
 
 export class Card extends React.Component<CardProps, CardState> {
@@ -36,6 +38,7 @@ export class Card extends React.Component<CardProps, CardState> {
       text: this.props.text,
       userStars: this.props.userStars,
       starsCount: this.props.starsCount,
+      newCard: this.props.newCard,
     }
 
     this.state = stateToSet;
@@ -80,7 +83,13 @@ export class Card extends React.Component<CardProps, CardState> {
     event.preventDefault();
     this.toggleIsEditing();
 
-    this.props.socket.emit(`card:updated`, {
+    const eventName = !!this.state.newCard ? "card:created" : "card:updated";
+
+    if (!!this.state.newCard) {
+      this.setState({ newCard: false });
+    }
+
+    this.props.socket.emit(eventName, {
       boardId: this.props.boardId,
       columnId: this.props.columnId,
       id: this.props.id,
