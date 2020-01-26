@@ -59,6 +59,7 @@ function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: st
   socket.emit(`board:loaded:${boardId}`, {
     board: boards[boardId],
     sessionId,
+    showResults: boards[boardId].showResults,
     remainingStars: sessionStore[sessionId].remainingStars[boardId],
   });
 }

@@ -23,12 +23,12 @@ export class Main extends React.Component<MainProps, MainState> {
     this.state = {
       columns: [],
       boardTitle: "",
-    }
+    };
   }
 
   componentDidMount() {
     this.props.socket.on(`board:loaded:${this.props.boardId}`, (
-      data: { board: Board, sessionId: string, remainingStars: number },
+      data: { board: Board, sessionId: string, remainingStars: number, showResults: boolean },
     ) => {
       this.setState({
         remainingStars: data.remainingStars,

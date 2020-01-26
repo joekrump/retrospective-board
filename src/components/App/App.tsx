@@ -40,10 +40,10 @@ export class App extends React.Component<{}, AppState> {
 
   componentDidMount() {
     const sessionId = sessionStorage.getItem("retroSessionId");
-
-    this.state.socket.emit("board:loaded", {
-      boardId: this.state.boardId,
-      sessionId,
+    this.state.socket.on(`board:loaded:${this.state.boardId}`, (
+      data: { board: Board, sessionId: string, remainingStars: number, showResults: boolean },
+    ) => {
+      this.setState({ showResults: data.showResults });
     });
     this.state.socket.on(`board:star-limit-reached:${this.state.boardId}`, (data: { maxStars: number }) => {
       this.displayStarLimitAlert(data.maxStars);
@@ -51,6 +51,11 @@ export class App extends React.Component<{}, AppState> {
 
     this.state.socket.on(`board:show-results:${this.state.boardId}`, (data: { showResults: boolean }) => {
       this.setState({showResults: data.showResults})
+    });
+
+    this.state.socket.emit("board:loaded", {
+      boardId: this.state.boardId,
+      sessionId,
     });
   }
 
