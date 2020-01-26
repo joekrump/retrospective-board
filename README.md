@@ -12,7 +12,7 @@ A tool for running retros.
 
 ## Server a build of the app over HTTPS using NGROK
 _This makes it easy for others to access the app over the internet_
-1. `npm run prod`
+1. `npm run start:prod`
 
 ## TODO
 
