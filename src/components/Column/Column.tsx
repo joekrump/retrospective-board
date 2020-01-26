@@ -204,9 +204,14 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
           />
         </div>
         <div className="body-row">
-          <button onClick={() => this.addCard()}>
-            <FontAwesomeIcon icon={faPlusCircle} />
-          </button>
+          {
+            this.props.showResults ?
+              null
+              :
+              <button onClick={() => this.addCard()}>
+                <FontAwesomeIcon icon={faPlusCircle} />
+              </button>
+          }
           {
             this.state.cards.map((card) => {
               if (this.props.showResults && card.isEditing) {
