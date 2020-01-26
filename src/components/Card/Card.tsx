@@ -175,9 +175,14 @@ export class Card extends React.Component<CardProps, CardState> {
           <p className="card--text">{this.state.text}{editLink}</p>
 
           <div className="card--footer">
-            <span className="star-button" onClick={event => this.starUp(event)}>
-              ⭐️
-            </span>
+            {
+              this.props.showResults ?
+                <span className="star">⭐️</span>
+                :
+                <span className="star star-button" onClick={event => this.starUp(event)}>
+                  ⭐️
+                </span>
+            }
             { this.props.showResults ? this.renderResults() : this.renderUserStars() }
             { this.state.userStars > 0 ? this.renderUndoButton() : null }
           </div>
