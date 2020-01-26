@@ -30,7 +30,6 @@ interface ColumnProps {
 
 interface ColumnState {
   cards: CardData[];
-  lastIndex: number;
   name: string | undefined;
   isEditing: boolean;
 }
@@ -43,7 +42,6 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
 
     this.state = {
       cards: [],
-      lastIndex: 0,
       name: this.props.name,
       isEditing: !!this.props.isEditing ? true : false,
     };
@@ -124,7 +122,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       ];
     }
 
-    this.setState({cards, lastIndex: this.state.lastIndex + 1});
+    this.setState({ cards });
   }
 
   deleteCard(event: React.MouseEvent, id: string) {
