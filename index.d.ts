@@ -24,6 +24,7 @@ interface BoardColumn {
   id: string;
   name: string;
   isEditing: boolean;
+  new?: boolean;
 }
 
 interface Session {

@@ -26,12 +26,14 @@ interface ColumnProps {
   maxWidthPercentage: number;
   isEditing?: boolean;
   showResults: boolean;
+  new?: boolean;
 }
 
 interface ColumnState {
   cards: CardData[];
   name: string | undefined;
   isEditing: boolean;
+  newUsavedColumn: boolean;
 }
 
 export class Column extends React.Component<ColumnProps, ColumnState> {
@@ -44,6 +46,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       cards: [],
       name: this.props.name,
       isEditing: !!this.props.isEditing ? true : false,
+      newUsavedColumn: !!this.props.new,
     };
 
     this.nameInput = React.createRef();
@@ -164,12 +167,22 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     this.setState({
       name: this.nameInput?.current?.value
     });
-    this.props.socket.emit("column:updated", {
+
+    const socketEvent = !!this.state.newUsavedColumn ? "column:created" : "column:updated";
+
+    if (!!this.state.newUsavedColumn) {
+      this.setState({
+        newUsavedColumn: false
+      });
+    }
+
+    this.props.socket.emit(socketEvent, {
       boardId: this.props.boardId,
       id: this.props.id,
       name: this.nameInput?.current?.value,
       sessionId: sessionStorage.getItem("retroSessionId"),
     });
+
     this.toggleIsEditing();
   }
 

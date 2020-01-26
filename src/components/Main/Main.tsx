@@ -78,16 +78,9 @@ export class Main extends React.Component<MainProps, MainState> {
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     } else {
-      const newColumn = { id: uuid.v4(), name: "New Column", isEditing: true };
+      const newColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true };
 
       newColumns.push(newColumn);
-
-      this.props.socket.emit("column:created", {
-        boardId: this.props.boardId,
-        id: newColumn.id,
-        name: newColumn.name,
-        sessionId: sessionStorage.getItem("retroSessionId"),
-      });
     }
 
     this.setState({columns: newColumns });
@@ -112,6 +105,7 @@ export class Main extends React.Component<MainProps, MainState> {
           maxWidthPercentage={maxWidthPercentage}
           isEditing={this.state.columns[i].isEditing}
           showResults={this.props.showResults}
+          new={this.state.columns[i].new}
         >
         </Column>
       );

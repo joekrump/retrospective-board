@@ -24,7 +24,7 @@ export class App extends React.Component<{}, AppState> {
 
     if (!!window.location.port && (window.location.port !== "8000")) {
       serverURL = window.location.origin.replace(window.location.port, "8000");
-      boardId = uuid.v4();
+      boardId = "development-board-1";
     } else if (!boardId) {
       boardId = uuid.v4();
       window.location.assign(`/board/${boardId}`);

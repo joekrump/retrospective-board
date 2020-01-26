@@ -173,7 +173,7 @@ io.on('connection', function (socket) {
       return;
     }
     console.log(data);
-    boards[data.boardId].columns.push({id: data.id, name: data.name, cards: []})
+    boards[data.boardId].columns.push({id: data.id, name: data.name, cards: []});
     socket.broadcast.emit(`column:created:${data.boardId}`, {
       id: data.id,
       name: data.name
