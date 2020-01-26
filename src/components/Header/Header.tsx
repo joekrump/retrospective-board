@@ -27,7 +27,7 @@ export class Header extends React.Component<HeaderProps> {
           </div>
           <div id="app-controls">
             <button onClick={(e) => this.toggleShowResults(e)}>
-              { this.props.showResults ? "Hide Results" : "Show Results"}
+              { this.props.showResults ? "Resume Retro" : "Review Results"}
             </button>
           </div>
         </div>
