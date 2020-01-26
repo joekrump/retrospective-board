@@ -208,24 +208,30 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             <FontAwesomeIcon icon={faPlusCircle} />
           </button>
           {
-            this.state.cards.map((card) =>
-              <Card
-                key={card.id}
-                id={card.id}
-                deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
-                editable={card.editable}
-                isEditing={card.isEditing}
-                socket={this.props.socket}
-                columnId={this.props.id}
-                boardId={this.props.boardId}
-                text={card.text ? card.text : ""}
-                starsCount={card.starsCount}
-                showResults={this.props.showResults}
-                userStars={card.userStars}
-                newCard={card.newCard}
-              >
-              </Card>
-            )
+            this.state.cards.map((card) => {
+              if (this.props.showResults && card.isEditing) {
+                return null;
+              }
+
+              return (
+                <Card
+                  key={card.id}
+                  id={card.id}
+                  deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
+                  editable={card.editable}
+                  isEditing={card.isEditing}
+                  socket={this.props.socket}
+                  columnId={this.props.id}
+                  boardId={this.props.boardId}
+                  text={card.text ? card.text : ""}
+                  starsCount={card.starsCount}
+                  showResults={this.props.showResults}
+                  userStars={card.userStars}
+                  newCard={card.newCard}
+                >
+                </Card>
+              );
+            })
           }
         </div>
       </div>
