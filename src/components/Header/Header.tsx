@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Switch } from "../Switch/Switch";
+
 import "./header.css";
 
 interface HeaderProps {
@@ -9,7 +11,7 @@ interface HeaderProps {
 
 export class Header extends React.Component<HeaderProps> {
 
-  toggleShowResults(e: React.MouseEvent) {
+  toggleShowResults(e: React.ChangeEvent) {
     e.preventDefault();
     // emit an event to show results.
     this.props.socket.emit(`board:show-results`, {
@@ -27,9 +29,8 @@ export class Header extends React.Component<HeaderProps> {
           </div>
           { this.props.showResults ? <h1>Reviewing</h1> : null }
           <div id="app-controls">
-            <button onClick={(e) => this.toggleShowResults(e)}>
-              { this.props.showResults ? "Resume Retro" : "Review Results"}
-            </button>
+            <h3>Review</h3>
+            <Switch id="toggle-app-state" isOn={this.props.showResults} handleChange={(e) => this.toggleShowResults(e)}/>
           </div>
         </div>
       </header>
