@@ -1,4 +1,5 @@
 import React from "react";
+import "./switch.css";
 
 interface SwitchProps {
   id: string;
