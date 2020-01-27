@@ -35,6 +35,10 @@
   transform: translateX(-100%);
 }
 
+.switch--checkbox:checked + .switch--label {
+  background-color: #76e00d;
+}
+
 .switch--label:active .switch--button {
   width: 1.3rem;
 }
