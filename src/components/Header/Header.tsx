@@ -29,6 +29,7 @@ export class Header extends React.Component<HeaderProps> {
           </div>
           { this.props.showResults ? <h1>Reviewing</h1> : null }
           <div id="app-controls">
+            <h3>Review</h3>
             <Switch id="toggle-app-state" isOn={this.props.showResults} handleChange={(e) => this.toggleShowResults(e)}/>
           </div>
         </div>
