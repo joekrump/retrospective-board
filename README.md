@@ -2,7 +2,8 @@
 
 A tool for running retros.
 
-<img width="851" alt="Screen Shot 2020-01-27" src="https://user-images.githubusercontent.com/3317231/73196696-e6f8af00-40e4-11ea-8a34-ae98bd1135a7.png">
+<img width="839" alt="Screen Shot 2020-01-27" src="https://user-images.githubusercontent.com/3317231/73196840-2a531d80-40e5-11ea-9f25-2c0d65f65a28.png">
+
 
 
 ## Getting Started
