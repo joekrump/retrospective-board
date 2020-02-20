@@ -7,7 +7,7 @@ if(process.env.NODE_ENV === "production") {
       addr: 8000,
     });
 
-    console.log('Tunnel Created -> ', url);
+    console.log('Tunnel Created -> \x1b[34m%s\x1b[0m', url);
     console.log('Tunnel Inspector ->  http://127.0.0.1:4040');
   })();
 }
