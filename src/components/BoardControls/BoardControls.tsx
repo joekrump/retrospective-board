@@ -9,6 +9,7 @@ interface BoardControlsProps {
   socket: SocketIOClient.Socket;
   boardId: string;
   remainingStars: number | undefined;
+  showResults: boolean;
 };
 
 interface BoardControlsState {
@@ -71,17 +72,22 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
     return (
       <div id="board-controls">
         { boardTitle }
-        <div className="board-actions">
-          <button
-            className="button button--create"
-            onClick={() => this.props.addColumn()}
-          >
-            New Column
-          </button>
-        </div>
-        <strong className="stars-remaining">
-          ⭐️: {this.props.remainingStars}
-        </strong>
+        {
+          this.props.showResults ?
+          null
+          :
+          <div className="board-actions">
+            <button
+              className="button button--create"
+              onClick={() => this.props.addColumn()}
+            >
+              New Column
+              </button>
+            <strong className="stars-remaining">
+              ⭐️: {this.props.remainingStars}
+            </strong>
+          </div>
+        }
       </div>
     );
   }

@@ -138,6 +138,7 @@ export class Main extends React.Component<MainProps, MainState> {
     return (
       <main>
         <BoardControls
+          showResults={this.props.showResults}
           addColumn={() => this.addColumn()}
           title={this.state.boardTitle}
           socket={this.props.socket}
