@@ -20,12 +20,9 @@ export class App extends React.Component<{}, AppState> {
     super(props);
 
     let serverURL = window.location.origin;
-    let boardId = window.location.pathname.split("/").pop() || "";
+    let boardId = window.location.pathname.split("board/").pop() || "";
 
-    if (!!window.location.port && (window.location.port !== "8000")) {
-      serverURL = window.location.origin.replace(window.location.port, "8000");
-      boardId = "development-board-1";
-    } else if (!boardId) {
+    if (!boardId) {
       boardId = uuid.v4();
       window.location.assign(`/board/${boardId}`);
     }
@@ -36,6 +33,23 @@ export class App extends React.Component<{}, AppState> {
       showStarLimitAlert: false,
       showResults: false
     };
+  }
+
+  private setHideStarLimitAlertTimeout(timeoutMS = 3000) {
+    setTimeout(() => {
+      this.setState({
+        showStarLimitAlert: false,
+      });
+    }, timeoutMS);
+  }
+
+  private displayStarLimitAlert(maxStars: number) {
+    this.setState({
+      maxStars,
+      showStarLimitAlert: true,
+    });
+
+    this.setHideStarLimitAlertTimeout();
   }
 
   componentDidMount() {
@@ -59,19 +73,6 @@ export class App extends React.Component<{}, AppState> {
     });
   }
 
-  private displayStarLimitAlert(maxStars: number) {
-    this.setState({
-      maxStars,
-      showStarLimitAlert: true,
-    });
-
-    setTimeout(() => {
-      this.setState({
-        showStarLimitAlert: false,
-      })
-    }, 3000);
-  }
-
   componentWillUnmount() {
     this.state.socket.removeListener(`board:star-limit-reached:${this.state.boardId}`);
     this.state.socket.removeListener(`board:show-results:${this.state.boardId}`);
@@ -81,9 +82,17 @@ export class App extends React.Component<{}, AppState> {
   render() {
     return (
       <>
-        <Header showResults={this.state.showResults} socket={this.state.socket} boardId={this.state.boardId}></Header>
-        <Main socket={this.state.socket} boardId={this.state.boardId} showResults={this.state.showResults}></Main>
-        <div className={"alert alert-star-limit" + (this.state.showStarLimitAlert ? " alert--show" : "")}>
+        <Header
+          showResults={this.state.showResults}
+          socket={this.state.socket}
+          boardId={this.state.boardId}
+        />
+        <Main
+          socket={this.state.socket}
+          boardId={this.state.boardId}
+          showResults={this.state.showResults}
+        />
+        <div className={`alert alert-star-limit ${this.state.showStarLimitAlert ? "alert--show" : ""}`}>
           Your voting limit of {this.state.maxStars} has been reached. Undo previous stars if you want some back.
         </div>
       </>
