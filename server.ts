@@ -15,17 +15,17 @@ const NEW_BOARD = {
   columns: [
     {
       id: uuid.v4(),
-      name: "👏The Good",
+      name: "👏 The Good",
       cards: []
     },
     {
       id: uuid.v4(),
-      name: "😬The Bad",
+      name: "😬 The Bad",
       cards: []
     },
     {
       id: uuid.v4(),
-      name: "⚡️To Improve",
+      name: "⚡️ To Improve",
       cards: []
     }
   ]
