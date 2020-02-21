@@ -80,7 +80,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
           </button>
         </div>
         <strong className="stars-remaining">
-          Remaining ⭐️: {this.props.remainingStars}
+          ⭐️: {this.props.remainingStars}
         </strong>
       </div>
     );
