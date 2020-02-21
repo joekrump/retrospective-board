@@ -15,15 +15,15 @@
 
 /* Simple implementation to give unique background colors to cards in specific columns */
 .column:nth-child(1) .card-container {
-  background-color: #79ba79;
+  border-left: 8px solid #79ba79;
 }
 
 .column:nth-child(2) .card-container {
-  background-color: #3aa1d0;
+  border-left: 8px solid #3aa1d0;
 }
 
 .column:nth-child(3) .card-container {
-  background-color: #b371e3;
+  border-left: 8px solid #b371e3;
 }
 
 .column-edit > input {
