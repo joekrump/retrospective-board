@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faPencilAlt, faUndo, faSave } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 import "./card.css";
@@ -152,7 +152,9 @@ export class Card extends React.Component<CardProps, CardState> {
             value={this.state.text}>
           </textarea>
           <div className="card--footer">
-            <button type="submit">Save</button>
+            <button type="submit" title="Save">
+              <FontAwesomeIcon icon={faSave} />
+            </button>
             <ButtonDelete
               id={this.props.id}
               handleClick={(event, id) => this.props.deleteCard(event, id as string)}

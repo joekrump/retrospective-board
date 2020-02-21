@@ -1,7 +1,7 @@
 header {
   display: grid;
+  padding: 15px 0;
   grid-template-columns: repeat(12, 1fr);
-  height: 8%;
   background: #673ab7;
 }
 

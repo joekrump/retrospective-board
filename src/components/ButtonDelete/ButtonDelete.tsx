@@ -8,5 +8,5 @@ interface ButtonDeleteProps {
 }
 
 export const ButtonDelete = (props: ButtonDeleteProps) => (
-  <FontAwesomeIcon tabIndex={0} className="button--delete" icon={faTrash} onClick={event => props.handleClick(event, props.id)} />
+  <FontAwesomeIcon title="Delete" tabIndex={0} className="button--delete" icon={faTrash} onClick={event => props.handleClick(event, props.id)} />
 );
