@@ -4,6 +4,7 @@ import uuid = require("uuid");
 import { BoardControls } from "../BoardControls/BoardControls";
 
 import "./main.css";
+import { faBorderNone } from "@fortawesome/free-solid-svg-icons";
 
 interface MainProps {
   socket: SocketIOClient.Socket;
@@ -11,10 +12,16 @@ interface MainProps {
   showResults: boolean;
 }
 
+export enum SortDirection {
+  "none",
+  "asc",
+  "desc",
+};
 interface MainState {
   columns: BoardColumn[];
   boardTitle: string;
   remainingStars?: number | undefined;
+  sortDirection: SortDirection;
 }
 
 export class Main extends React.Component<MainProps, MainState> {
@@ -23,6 +30,7 @@ export class Main extends React.Component<MainProps, MainState> {
     this.state = {
       columns: [],
       boardTitle: "",
+      sortDirection: SortDirection.none,
     };
   }
 
@@ -68,6 +76,25 @@ export class Main extends React.Component<MainProps, MainState> {
     this.props.socket.removeListener(`column:created:${this.props.boardId}`);
   }
 
+  sortColumnCardsByStars = () => {
+    let newSortDirection = SortDirection.none;
+
+    switch(this.state.sortDirection) {
+      case SortDirection.none:
+        newSortDirection = SortDirection.desc;
+        break;
+      case SortDirection.asc:
+        newSortDirection = SortDirection.desc;
+        break;
+      case SortDirection.desc:
+        newSortDirection = SortDirection.asc;
+        break;
+      default:
+        break;
+    }
+    this.setState({ sortDirection: newSortDirection });
+  }
+
   addColumn(column?: any) {
     let newColumns = this.state.columns.slice(0);
     if (column) {
@@ -106,6 +133,7 @@ export class Main extends React.Component<MainProps, MainState> {
           isEditing={this.state.columns[i].isEditing}
           showResults={this.props.showResults}
           new={this.state.columns[i].new}
+          sortDirection={this.state.sortDirection}
         >
         </Column>
       );
@@ -138,6 +166,7 @@ export class Main extends React.Component<MainProps, MainState> {
     return (
       <main>
         <BoardControls
+          sortColumnCardsByStars={this.sortColumnCardsByStars}
           showResults={this.props.showResults}
           addColumn={() => this.addColumn()}
           title={this.state.boardTitle}

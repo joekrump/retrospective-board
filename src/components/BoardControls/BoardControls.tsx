@@ -10,6 +10,7 @@ interface BoardControlsProps {
   boardId: string;
   remainingStars: number | undefined;
   showResults: boolean;
+  sortColumnCardsByStars: (e: React.MouseEvent) => void;
 };
 
 interface BoardControlsState {
@@ -74,7 +75,9 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
         { boardTitle }
         {
           this.props.showResults ?
-          null
+            <button onClick={this.props.sortColumnCardsByStars}>
+              Sort by ⭐️s
+            </button>
           :
           <div className="board-actions">
             <button
