@@ -36,14 +36,12 @@ export const ColumnHeader = (props: ColumnHeaderProps) => {
     );
   } else {
     return (
-      <>
-        <h2
-          className="column-header column-header--text"
-          onClick={event => props.onEditToggle(event)}
-        >
-          {props.name}&nbsp;<FontAwesomeIcon className="pencil-icon" icon={faPencilAlt} />
-        </h2>
-      </>
+      <h2
+        className="column-header column-header--text"
+        onClick={event => props.onEditToggle(event)}
+      >
+        {props.name}&nbsp;<FontAwesomeIcon className="pencil-icon" icon={faPencilAlt} />
+      </h2>
     );
   }
 };
