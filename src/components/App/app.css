@@ -44,6 +44,7 @@ h2 {
 button {
   background-color: #f8fbfb;
   border: none;
+  cursor: pointer;
 }
 
 .button {

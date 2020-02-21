@@ -152,7 +152,7 @@ export class Card extends React.Component<CardProps, CardState> {
             value={this.state.text}>
           </textarea>
           <div className="card--footer">
-            <button type="submit" title="Save">
+            <button type="submit" className="button__save" title="Save">
               <FontAwesomeIcon icon={faSave} />
             </button>
             <ButtonDelete
