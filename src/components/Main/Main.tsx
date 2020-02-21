@@ -143,8 +143,7 @@ export class Main extends React.Component<MainProps, MainState> {
           socket={this.props.socket}
           boardId={this.props.boardId}
           remainingStars={this.state.remainingStars}
-        >
-        </BoardControls>
+        />
         <div id="columns">
           {this.renderColumns()}
         </div>
