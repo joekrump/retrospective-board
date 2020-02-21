@@ -1,6 +1,6 @@
 .card-container {
   margin-top: 0.5rem;
-  padding: 0.8rem 0.5rem;
+  padding: 0.8em 0.8em;
   display: flex;
   border: 1px solid #f8fbfb;
   box-shadow: 0px 2px 3px 0px #cbced2;
@@ -9,10 +9,6 @@
   font-size: 12pt;
   background-color: white;
   position: relative;
-}
-
-.card-container textarea {
-  background: none;
 }
 
 .card-container textarea:focus {
@@ -30,7 +26,7 @@
 
 .card-container .card--text,
 .card-container textarea {
-  margin: 1rem 0;
+  margin: 0 0 1rem 0;
   min-height: 40px;
 }
 
@@ -41,6 +37,7 @@
   width: 100%;
   padding: 0;
   border: 0;
+  background: none;
 }
 
 .card-container .star-count,
@@ -48,10 +45,6 @@
   vertical-align: middle;
   margin-right: 10px;
   user-select: none;
-}
-
-.card-container .blur {
-  filter: blur(10px);
 }
 
 .star {
