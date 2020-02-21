@@ -7,7 +7,6 @@ header {
 
 #logo {
   font-family: "Pacifico";
-  color: #fff;
   font-size: 24px;
   display: flex;
   align-items: center;
@@ -19,6 +18,12 @@ header {
   grid-column: 1 / span 12;
   display: flex;
   justify-content: space-between;
+}
+
+#logo,
+#top-header h1,
+#top-header h3 {
+  color: #fff;
 }
 
 #app-controls {
