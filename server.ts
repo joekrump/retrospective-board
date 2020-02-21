@@ -9,23 +9,23 @@ let sessionStore: {
 
 const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
 const NEW_BOARD = {
-  title: "Retro",
+  title: "...",
   showResults: false,
   maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
   columns: [
     {
       id: uuid.v4(),
-      name: "The Good",
+      name: "👏The Good",
       cards: []
     },
     {
       id: uuid.v4(),
-      name: "The Bad",
+      name: "😬The Bad",
       cards: []
     },
     {
       id: uuid.v4(),
-      name: "To Improve",
+      name: "⚡️To Improve",
       cards: []
     }
   ]
