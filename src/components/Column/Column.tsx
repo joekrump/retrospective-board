@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
 import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
@@ -209,8 +209,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             this.props.showResults ?
               null
               :
-              <button onClick={() => this.addCard()}>
-                <FontAwesomeIcon icon={faPlusCircle} />
+              <button className="card--button__add" onClick={() => this.addCard()}>
+                +
               </button>
           }
           {

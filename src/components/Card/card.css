@@ -11,6 +11,14 @@
   position: relative;
 }
 
+.card-container textarea {
+  background: none;
+}
+
+.card-container textarea:focus {
+  outline: none;
+}
+
 .card-container .edit-link {
   display: none;
   margin: 0 5px;

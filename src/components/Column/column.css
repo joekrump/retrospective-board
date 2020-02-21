@@ -1,6 +1,11 @@
 .body-row > button {
   width: 100%;
-  padding: 0.5em 0;
+  padding: 0.2em 0;
+}
+
+.card--button__add {
+  font-weight: 200;
+  font-size: 1.6em;
 }
 
 .column {

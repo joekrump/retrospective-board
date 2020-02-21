@@ -41,6 +41,9 @@ h2 {
   font-size: 1.5em;
   padding: 15px 10px
 }
+button {
+  background-color: #f8fbfb;
+}
 
 .button {
   padding: 5px 10px;
