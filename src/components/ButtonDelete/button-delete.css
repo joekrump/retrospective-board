@@ -1,7 +1,7 @@
 .button--delete {
-  display: inline-flex;
   cursor: pointer;
   align-items: center;
+  font-size: 14pt;
 }
 .button--delete:hover,
 .button--delete:focus {
