@@ -8,6 +8,19 @@
   margin: 20px 10px;
 }
 
+/* Simple implementation to give unique background colors to cards in specific columns */
+.column:nth-child(1) .card-container {
+  background-color: #79ba79;
+}
+
+.column:nth-child(2) .card-container {
+  background-color: #3aa1d0;
+}
+
+.column:nth-child(3) .card-container {
+  background-color: #b371e3;
+}
+
 .column-edit > input {
   /* The same font-size and margin as a h2 element */
   font-size: 1.5em;

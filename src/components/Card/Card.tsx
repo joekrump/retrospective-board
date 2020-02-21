@@ -170,10 +170,8 @@ export class Card extends React.Component<CardProps, CardState> {
         );
       }
 
-      let textAndNonEditable = !this.props.editable && this.state.text === ""
-
       cardContents = (
-        <div className={textAndNonEditable ? "blur" : undefined}>
+        <>
           <p className="card--text">{this.state.text}{editLink}</p>
 
           <div className="card--footer">
@@ -188,7 +186,7 @@ export class Card extends React.Component<CardProps, CardState> {
             { this.props.showResults ? this.renderResults() : this.renderUserStars() }
             { !this.props.showResults && this.state.userStars > 0 ? this.renderUndoButton() : null }
           </div>
-        </div>
+        </>
       );
     }
 
