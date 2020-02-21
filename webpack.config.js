@@ -47,7 +47,7 @@ module.exports = {
     contentBase: path.join(__dirname, 'src'),
     hot: true,
     inline: true,
-    port: 8000,
+    port: 4000,
     watchContentBase: true,
   }
 };

@@ -43,7 +43,9 @@ export class Card extends React.Component<CardProps, CardState> {
   }
 
   componentDidMount() {
+    const sessionId = sessionStorage.getItem("retroSessionId") || "";
     this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
+      alert(data.card.ownerId === sessionId);
       this.setState({
         text: data.text,
       });

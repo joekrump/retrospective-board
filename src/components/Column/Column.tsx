@@ -10,6 +10,7 @@ interface CardData {
   id: string;
   editable: boolean;
   text?: string;
+  ownerId?: string;
   starsCount: number;
   userStars: number;
   isEditing: boolean;
@@ -74,7 +75,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       this.addCard({
         ...data.card,
         userStars: 0,
-        editable: false,
+        editable: data.card.ownerId === sessionId,
         isEditing: false,
       });
     });
@@ -223,7 +224,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
                   key={card.id}
                   id={card.id}
                   deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
-                  editable={this.props.showResults ? false : card.editable}
+                  editable={!!this.props.showResults ? false : card.editable}
                   isEditing={card.isEditing}
                   socket={this.props.socket}
                   columnId={this.props.id}

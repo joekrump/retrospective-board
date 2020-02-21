@@ -15,16 +15,22 @@ interface AppState {
   showResults: boolean;
 }
 
+const LOCAL_DEV_SERVER_PORT = "4000";
+const SERVER_PORT = "8000";
+
 export class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
 
     let serverURL = window.location.origin;
-    let boardId = window.location.pathname.split("board/").pop() || "";
+    let boardId = window.location.pathname.split("/").pop() || "";
 
-    if (!boardId) {
+    if (window.location.port === LOCAL_DEV_SERVER_PORT) {
+      serverURL = window.location.origin.replace(window.location.port, SERVER_PORT);
+      boardId = "dev-board";
+    } else if (!boardId) {
       boardId = uuid.v4();
-      window.location.assign(`/board/${boardId}`);
+       window.location.assign(`/board/${boardId}`);
     }
 
     this.state = {
