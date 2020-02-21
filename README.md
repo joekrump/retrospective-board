@@ -21,5 +21,4 @@ _This makes it easy for others to access the app over the internet_
 1. Features
 * [ ] GIF support (images).
 * [ ] Rich text.
-* [ ] Add color per session that will be added as a boarder on their cards so they can find and edit them more easily.
-* [ ] Sort the cards in columns by the number of ⭐️s when in "Review" mode.
+* [x] Sort the cards in columns by the number of ⭐️s when in "Review" mode (_requires a page refresh at the moment_).
