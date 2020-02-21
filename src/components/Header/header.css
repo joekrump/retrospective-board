@@ -2,7 +2,7 @@ header {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   height: 8%;
-  background: #2196f3;
+  background: #673ab7;
 }
 
 #logo {
