@@ -43,10 +43,12 @@ h2 {
 }
 button {
   background-color: #f8fbfb;
+  border: none;
 }
 
 .button {
   padding: 5px 10px;
+  cursor: pointer;
 }
 
 .button--create {

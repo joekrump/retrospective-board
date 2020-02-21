@@ -1,8 +1,9 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPencilAlt, faArrowDown, faArrowUp } from "@fortawesome/free-solid-svg-icons";
 
 import "./board-controls.css";
+import { SortDirection } from "../Main/Main";
 interface BoardControlsProps {
   addColumn: () => void;
   title: string;
@@ -10,6 +11,7 @@ interface BoardControlsProps {
   boardId: string;
   remainingStars: number | undefined;
   showResults: boolean;
+  sortDirection: SortDirection;
   sortColumnCardsByStars: (e: React.MouseEvent) => void;
 };
 
@@ -75,8 +77,8 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
         { boardTitle }
         {
           this.props.showResults ?
-            <button onClick={this.props.sortColumnCardsByStars}>
-              Sort by ⭐️s
+            <button className="button button__sort" onClick={this.props.sortColumnCardsByStars}>
+              ⭐️s { this.props.sortDirection === SortDirection.asc ? <FontAwesomeIcon icon={faArrowDown} /> : <FontAwesomeIcon icon={faArrowUp} /> }
             </button>
           :
           <div className="board-actions">

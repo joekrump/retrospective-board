@@ -1,7 +1,6 @@
 main {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  height: 88%;
   grid-template-rows: 4% 1fr;
 }
 
