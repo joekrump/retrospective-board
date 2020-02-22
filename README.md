@@ -4,6 +4,12 @@ A tool for running retros.
 
 ![UI Screenshot](https://user-images.githubusercontent.com/3317231/75081553-6dc26100-54c4-11ea-822d-f1ceb63165ae.png)
 
+## Features
+
+1. Anonymous posting: Each user has a session but no personal identifying information is required.
+2. Anonymous voting: You only see your ⭐️s that you've given to cards while in voting mode.
+3. Review mode: When reviewing, you get to see the total number of ⭐️ values given to all cards and can also sort all cards per column in ascending or descending order of ⭐️s.
+
 ## Getting Started
 
 1. `npm install` // Install package dependencies.
