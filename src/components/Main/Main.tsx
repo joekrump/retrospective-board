@@ -1,15 +1,13 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { Column } from "../Column/Column";
 import uuid = require("uuid");
 import { BoardControls } from "../BoardControls/BoardControls";
 
 import "./main.css";
-import { faBorderNone } from "@fortawesome/free-solid-svg-icons";
 
 interface MainProps {
   socket: SocketIOClient.Socket;
   boardId: string;
-  showResults: boolean;
 }
 
 export enum SortDirection {
@@ -17,69 +15,53 @@ export enum SortDirection {
   "asc",
   "desc",
 };
-interface MainState {
-  columns: BoardColumn[];
-  boardTitle: string;
-  remainingStars?: number | undefined;
-  sortDirection: SortDirection;
-}
 
-export class Main extends React.Component<MainProps, MainState> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      columns: [],
-      boardTitle: "",
-      sortDirection: SortDirection.none,
-    };
-  }
+export const Main = (props: MainProps) => {
+  const [columns, updateColumns] = React.useState([] as BoardColumn[]);
+  const [boardTitle, updateBoardTitle] = React.useState("" as string);
+  const [sortDirection, updateSortDirection] = React.useState(SortDirection.none);
+  const [remainingStars, updateRemainingStars] = React.useState();
 
-  componentDidMount() {
-    this.props.socket.on(`board:loaded:${this.props.boardId}`, (
+  useEffect(function onMount() {
+    props.socket.on(`board:loaded:${props.boardId}`, (
       data: { board: Board, sessionId: string, remainingStars: number, showResults: boolean },
     ) => {
-      this.setState({
-        remainingStars: data.remainingStars,
-        boardTitle: data.board.title,
-      });
+      updateBoardTitle(data.board.title);
+      updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
       data.board.columns.forEach((column: {id: string}) => {
-        this.addColumn(column);
+        addColumn(column);
       });
     });
 
-    this.props.socket.on(`board:updated:${this.props.boardId}`, (data: any) => {
-      this.setState({
-        boardTitle: data.title,
-      });
+    props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
+      updateBoardTitle(data.title);
     });
 
-    this.props.socket.on(`board:update-remaining-stars:${this.props.boardId}`, (data: any) => {
-      this.setState({
-        remainingStars: data.remainingStars,
-      });
+    props.socket.on(`board:update-remaining-stars:${props.boardId}`, (data: any) => {
+      updateRemainingStars(data.remainingStars);
     })
 
-    this.props.socket.on(`column:created:${this.props.boardId}`, (data: any) => {
-      this.addColumn(data);
+    props.socket.on(`column:created:${props.boardId}`, (data: any) => {
+      addColumn(data);
     });
 
-    this.props.socket.on(`column:deleted:${this.props.boardId}`, (data: any) => {
-      this.deleteColumn(null, data.id, true);
+    props.socket.on(`column:deleted:${props.boardId}`, (data: any) => {
+      deleteColumn(null, data.id, true);
     });
-  }
 
-  componentWillUnmount() {
-    this.props.socket.removeListener(`board:loaded:${this.props.boardId}`);
-    this.props.socket.removeListener(`board:update-remaining-stars:${this.props.boardId}`);
-    this.props.socket.removeListener(`column:deleted:${this.props.boardId}`);
-    this.props.socket.removeListener(`column:created:${this.props.boardId}`);
-  }
+    return function cleanup() {
+      props.socket.removeListener(`board:loaded:${props.boardId}`);
+      props.socket.removeListener(`board:update-remaining-stars:${props.boardId}`);
+      props.socket.removeListener(`column:deleted:${props.boardId}`);
+      props.socket.removeListener(`column:created:${props.boardId}`);
+    };
+  }, []);
 
-  sortColumnCardsByStars = () => {
+  const sortColumnCardsByStars = () => {
     let newSortDirection = SortDirection.none;
 
-    switch(this.state.sortDirection) {
+    switch(sortDirection as SortDirection) {
       case SortDirection.none:
         newSortDirection = SortDirection.desc;
         break;
@@ -92,15 +74,15 @@ export class Main extends React.Component<MainProps, MainState> {
       default:
         break;
     }
-    this.setState({ sortDirection: newSortDirection });
+    updateSortDirection(newSortDirection);
   }
 
-  addColumn(column?: any) {
-    let newColumns = this.state.columns.slice(0);
+  function addColumn(column?: any) {
+    let newColumns: any[] = columns.slice(0);
     if (column) {
       newColumns.push({ id: column.id, name: column.name, isEditing: false });
-      this.props.socket.emit("column:loaded", {
-        boardId: this.props.boardId,
+      props.socket.emit("column:loaded", {
+        boardId: props.boardId,
         id: column.id,
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
@@ -110,30 +92,29 @@ export class Main extends React.Component<MainProps, MainState> {
       newColumns.push(newColumn);
     }
 
-    this.setState({columns: newColumns });
+    updateColumns(newColumns);
   }
 
-  renderColumns() {
+  function renderColumns() {
     let markup: JSX.Element[] = [];
     const oneHundredPercent = 100;
-    const columnCount = this.state.columns.length;
+    const columnCount = columns.length;
     const maxWidthPercentage = oneHundredPercent / columnCount;
 
     for (let i = 0; i < columnCount; i++) {
-      let name = this.state.columns[i].name;
+      let name = columns[i].name;
       markup.push(
         <Column
-          key={this.state.columns[i].id}
-          id={this.state.columns[i].id}
+          key={columns[i].id}
+          id={columns[i].id}
           name={name}
-          deleteColumn={(event) =>this.deleteColumn(event, this.state.columns[i].id)}
-          socket={this.props.socket}
-          boardId={this.props.boardId}
+          deleteColumn={(event) => deleteColumn(event, columns[i].id)}
+          socket={props.socket}
+          boardId={props.boardId}
           maxWidthPercentage={maxWidthPercentage}
-          isEditing={this.state.columns[i].isEditing}
-          showResults={this.props.showResults}
-          new={this.state.columns[i].new}
-          sortDirection={this.state.sortDirection}
+          isEditing={columns[i].isEditing}
+          new={columns[i].new}
+          sortDirection={sortDirection}
         >
         </Column>
       );
@@ -142,43 +123,40 @@ export class Main extends React.Component<MainProps, MainState> {
     return markup;
   }
 
-  deleteColumn(event: React.MouseEvent | null, id: string, fromSocket: boolean = false) {
+  function deleteColumn(event: React.MouseEvent | null, id: string, fromSocket: boolean = false) {
     if (event) {
       event.preventDefault();
     }
 
-    let newColumns = this.state.columns.filter((column: BoardColumn) => {
+    let newColumns = columns.filter((column: BoardColumn) => {
       return column.id !== id;
     });
 
     if (!fromSocket) {
-      this.props.socket.emit(`column:deleted`, {
-        boardId: this.props.boardId,
+      props.socket.emit(`column:deleted`, {
+        boardId: props.boardId,
         id,
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     }
 
-    this.setState({columns: newColumns});
+    updateColumns(newColumns);
   }
 
-  render() {
-    return (
-      <main>
-        <BoardControls
-          sortColumnCardsByStars={this.sortColumnCardsByStars}
-          showResults={this.props.showResults}
-          addColumn={() => this.addColumn()}
-          title={this.state.boardTitle}
-          socket={this.props.socket}
-          boardId={this.props.boardId}
-          remainingStars={this.state.remainingStars}
-          sortDirection={this.state.sortDirection}
-        />
-        <div id="columns">
-          {this.renderColumns()}
-        </div>
-      </main>
-    );
-  }
+  return (
+    <main>
+      <BoardControls
+        sortColumnCardsByStars={sortColumnCardsByStars}
+        addColumn={() => addColumn()}
+        title={boardTitle}
+        socket={props.socket}
+        boardId={props.boardId}
+        remainingStars={remainingStars}
+        sortDirection={sortDirection}
+      />
+      <div id="columns">
+        {renderColumns()}
+      </div>
+    </main>
+  );
 }

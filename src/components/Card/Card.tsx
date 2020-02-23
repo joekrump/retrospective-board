@@ -16,7 +16,6 @@ interface CardProps {
   boardId: string;
   text: string;
   starsCount: number;
-  showResults: boolean;
   userStars: number;
   newCard?: boolean;
 }
@@ -178,15 +177,16 @@ export class Card extends React.Component<CardProps, CardState> {
 
           <div className="card--footer">
             {
-              this.props.showResults ?
+              false ? // TODO: refactor to use state.mode from overmind state
                 <span className="star">⭐️</span>
                 :
                 <span className="star star-button" onClick={event => this.starUp(event)}>
                   ⭐️
                 </span>
             }
-            { this.props.showResults ? this.renderResults() : this.renderUserStars() }
-            { !this.props.showResults && this.state.userStars > 0 ? this.renderUndoButton() : null }
+            { /* TODO: refactor to use state.mode from overmind state */}
+            { false ? this.renderResults() : this.renderUserStars() }
+            {  true && this.state.userStars > 0 ? this.renderUndoButton() : null }
           </div>
         </>
       );

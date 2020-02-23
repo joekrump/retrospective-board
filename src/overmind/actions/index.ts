@@ -1,5 +1,6 @@
-import { State, AppMode } from "../state";
+import { AppMode } from "../state";
+import { Action } from "overmind";
 
-export function updateMode({ state }: { state: State }, mode: AppMode) {
+export const updateMode: Action<AppMode> = ({ state }, mode: AppMode) => {
   state.mode = mode;
 };

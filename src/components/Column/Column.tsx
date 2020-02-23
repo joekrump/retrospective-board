@@ -27,7 +27,6 @@ interface ColumnProps {
   boardId: string;
   maxWidthPercentage: number;
   isEditing?: boolean;
-  showResults: boolean;
   new?: boolean;
   sortDirection: SortDirection;
 }
@@ -203,7 +202,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     });
 
     return cards.map((card) => {
-      if (this.props.showResults && card.isEditing) {
+      if (false // TODO: refactor to use state.mode from overmind
+        && card.isEditing) {
         return null;
       }
 
@@ -212,14 +212,13 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
           key={card.id}
           id={card.id}
           deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
-          editable={!!this.props.showResults ? false : card.editable}
+          editable={card.editable} // TODO: refactor to use state.mode from overmind state
           isEditing={card.isEditing}
           socket={this.props.socket}
           columnId={this.props.id}
           boardId={this.props.boardId}
           text={card.text ? card.text : ""}
           starsCount={card.starsCount}
-          showResults={this.props.showResults}
           userStars={card.userStars}
           newCard={card.newCard}
         >
@@ -247,7 +246,7 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
         </div>
         <div className="body-row">
           {
-            this.props.showResults ?
+            false ? // TODO: refactor to use state.mode from overmind state
               null
               :
               <button className="card--button__add" onClick={() => this.addCard()}>

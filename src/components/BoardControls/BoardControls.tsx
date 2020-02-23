@@ -10,7 +10,6 @@ interface BoardControlsProps {
   socket: SocketIOClient.Socket;
   boardId: string;
   remainingStars: number | undefined;
-  showResults: boolean;
   sortDirection: SortDirection;
   sortColumnCardsByStars: (e: React.MouseEvent) => void;
 };
@@ -76,7 +75,7 @@ export class BoardControls extends React.Component<BoardControlsProps, BoardCont
       <div id="board-controls">
         { boardTitle }
         {
-          this.props.showResults ?
+          false ? // TODO: refactor to use state.mode from overmind state
             <button className="button button__sort" onClick={this.props.sortColumnCardsByStars}>
               ⭐️s { this.props.sortDirection === SortDirection.asc ? <FontAwesomeIcon icon={faArrowDown} /> : <FontAwesomeIcon icon={faArrowUp} /> }
             </button>

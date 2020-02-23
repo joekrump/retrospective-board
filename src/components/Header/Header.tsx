@@ -4,15 +4,14 @@ import { GitHubLink } from "./GitHubLink";
 import { useOvermind } from "../../overmind";
 
 import "./header.css";
-import { State, AppMode } from "../../overmind/state";
+import { AppMode } from "../../overmind/state";
 interface HeaderProps {
-  showResults: boolean;
   socket: SocketIOClient.Socket;
   boardId: string;
 }
 
 export const Header = (props: HeaderProps) => {
-  let { state, actions } = useOvermind();
+  let { state } = useOvermind();
 
   function toggleShowResults(e: React.ChangeEvent) {
     e.preventDefault();
@@ -31,10 +30,10 @@ export const Header = (props: HeaderProps) => {
     <header>
       <div id="top-header">
         <h2 id="logo">Retro</h2>
-        { props.showResults ? <h1>Reviewing</h1> : null }
+        { isReviewing() ? <h1>Reviewing</h1> : null }
         <div id="app-controls">
           <h4>Review</h4>
-          <Switch id="toggle-app-state" isOn={props.showResults} handleChange={(e) => toggleShowResults(e)}/>
+          <Switch id="toggle-app-state" isOn={isReviewing()} handleChange={(e) => toggleShowResults(e)}/>
           <GitHubLink width={24} height={24} />
         </div>
       </div>
