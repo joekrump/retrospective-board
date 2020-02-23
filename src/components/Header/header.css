@@ -31,3 +31,7 @@ header {
   align-items: center;
   margin-right: 20px;
 }
+
+#app-controls a {
+  margin-left: 10px;
+}

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Switch } from "../Switch/Switch";
-const packageDetails = require("../../../package.json");
-import "./header.css";
+import { GitHubLink } from "./GitHubLink";
 
+import "./header.css";
 interface HeaderProps {
   showResults: boolean;
   socket: SocketIOClient.Socket;
@@ -29,9 +29,9 @@ export class Header extends React.Component<HeaderProps> {
           </div>
           { this.props.showResults ? <h1>Reviewing</h1> : null }
           <div id="app-controls">
-            <a href={packageDetails.homepage} target="_blank">Repo</a>
             <h3>Review</h3>
             <Switch id="toggle-app-state" isOn={this.props.showResults} handleChange={(e) => this.toggleShowResults(e)}/>
+            <GitHubLink width={24} height={24} />
           </div>
         </div>
       </header>
