@@ -1,9 +1,16 @@
 {
-  "name": "standup",
+  "name": "retro",
   "version": "1.0.0",
-  "description": "",
+  "description": "An application for helping run retrospective meetings.",
   "main": "index.js",
-  "author": "",
+  "contributors": [
+    "Joe Krump <krump.joseph@gmail.com>",
+    "John Brennan"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joekrump/retro"
+  },
   "license": "ISC",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
