@@ -187,7 +187,6 @@ export const Column = (props: ColumnProps) => {
       }
     });
 
-    // console.log(cards)
     return cards.map((card: CardData) => {
       if (
         mode === AppMode.review
