@@ -29,9 +29,12 @@ export const Main = (props: MainProps) => {
       updateBoardTitle(data.board.title);
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
-      data.board.columns.forEach((column: {id: string}) => {
-        addColumn(column);
-      });
+
+      updateColumns(
+        data.board.columns.map((column: { id: string; name: string; }) => (
+          { id: column.id, name: column.name, isEditing: false }
+        )),
+      );
     });
 
     props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
@@ -78,21 +81,23 @@ export const Main = (props: MainProps) => {
   }
 
   function addColumn(column?: any) {
-    let newColumns: any[] = columns.slice(0);
+    let boardColumn: BoardColumn;
+
     if (column) {
-      newColumns.push({ id: column.id, name: column.name, isEditing: false });
+      boardColumn = { id: column.id, name: column.name, isEditing: false };
       props.socket.emit("column:loaded", {
         boardId: props.boardId,
         id: column.id,
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     } else {
-      const newColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true };
-
-      newColumns.push(newColumn);
+      boardColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true };
     }
 
-    updateColumns(newColumns);
+    updateColumns([
+      ...columns,
+      boardColumn,
+    ]);
   }
 
   function renderColumns() {

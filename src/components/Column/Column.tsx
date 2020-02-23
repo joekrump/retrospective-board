@@ -57,6 +57,12 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
   componentDidMount() {
     const sessionId = sessionStorage.getItem("retroSessionId") || "";
 
+    this.props.socket.emit("column:loaded", {
+      boardId: this.props.boardId,
+      id: this.props.id,
+      sessionId,
+    });
+
     this.props.socket.on(`column:loaded:${this.props.id}`, (data: any) => {
       for (let i = 0; i < data.cards.length; i++) {
         if (!!data.cards[i].text) {
