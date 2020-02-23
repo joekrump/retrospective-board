@@ -1,4 +1,13 @@
 .app-icon--img {
-  width: 2.0em;
-  height: 2.0em;
+  width: 2.2em;
+  height: 2.2em;
+  background: linear-gradient(
+    180deg,
+    #8ed7ff 52%,
+    #1571a2 68%,
+    #d5da85 69%
+  );
+  padding: 0.2em;
+  border-radius: 2.2em;
+  border: 2px solid white;
 }
