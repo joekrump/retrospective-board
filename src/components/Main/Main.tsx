@@ -120,8 +120,7 @@ export const Main = (props: MainProps) => {
           isEditing={columns[i].isEditing}
           new={columns[i].new}
           sortDirection={sortDirection}
-        >
-        </Column>
+        />
       );
     }
 
