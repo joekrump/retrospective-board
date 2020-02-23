@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt, faUndo, faSave } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 import { useOvermind } from "../../overmind";
+import { AppMode } from "../../overmind/state";
 
 import "./card.css";
-import { AppMode } from "../../overmind/state";
 
 interface CardProps {
   key: string;
