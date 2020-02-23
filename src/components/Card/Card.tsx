@@ -1,9 +1,11 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt, faUndo, faSave } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
+import { useOvermind } from "../../overmind";
 
 import "./card.css";
+import { AppMode } from "../../overmind/state";
 
 interface CardProps {
   key: string;
@@ -20,182 +22,157 @@ interface CardProps {
   newCard?: boolean;
 }
 
-interface CardState {
-  isEditing: boolean;
-  text: string;
-  starsCount: number;
-  userStars: number;
-}
+export const Card = (props: CardProps) => {
+  const [isEditing, updateIsEditing] = useState(props.isEditing);
+  const [text, updateText] = useState(props.text);
+  const [userStars, updateUserStars] = useState(props.userStars);
+  const [starsCount, updateStarsCount] = useState(props.starsCount);
+  const { state: { mode } } = useOvermind();
+  let cardContents;
 
-export class Card extends React.Component<CardProps, CardState> {
-  constructor(props: CardProps) {
-    super(props);
-
-    let stateToSet = {
-      isEditing: this.props.isEditing,
-      text: this.props.text,
-      userStars: this.props.userStars,
-      starsCount: this.props.starsCount,
-    };
-
-    this.state = stateToSet;
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     const sessionId = sessionStorage.getItem("retroSessionId") || "";
-    this.props.socket.on(`card:updated:${this.props.id}`, (data: any) => {
+    props.socket.on(`card:updated:${props.id}`, (data: any) => {
       alert(data.card.ownerId === sessionId);
-      this.setState({
-        text: data.text,
-      });
+      updateText(data.text);
     });
 
-    this.props.socket.on(`card:starred:${this.props.id}`, (
+    props.socket.on(`card:starred:${props.id}`, (
       data: { starsCount: number, userStars: number }
     ) => {
       if(!!data) {
-        this.setState({
-          starsCount: data.starsCount,
-          userStars: data.userStars !== undefined ? data.userStars : this.state.userStars,
-        });
+        updateStarsCount(data.starsCount);
+        updateUserStars(data.userStars !== undefined ? data.userStars : userStars);
       }
     });
-  }
 
-  componentWillUnmount() {
-    this.props.socket.removeListener(`card:updated:${this.props.id}`);
-    this.props.socket.removeListener(`card:starred:${this.props.id}`);
-  }
+    return function cleanup() {
+      props.socket.removeListener(`card:updated:${props.id}`);
+      props.socket.removeListener(`card:starred:${props.id}`);
+    }
+  }, []);
 
-  toggleIsEditing(event?: React.MouseEvent) {
+  function toggleIsEditing(event?: React.MouseEvent) {
     if (!!event) {
       event.preventDefault();
     }
-    let newState = {
-      isEditing: !this.state.isEditing,
-    }
-
-    this.setState(newState);
+    updateIsEditing(!isEditing);
   }
 
-  save(event: React.FormEvent) {
+  function save(event: React.FormEvent) {
     event.preventDefault();
-    this.toggleIsEditing();
+    toggleIsEditing();
 
-    const eventName = !!this.props.newCard ? "card:created" : "card:updated";
+    const eventName = !!props.newCard ? "card:created" : "card:updated";
 
-    this.props.socket.emit(eventName, {
-      boardId: this.props.boardId,
-      columnId: this.props.columnId,
-      id: this.props.id,
-      text: this.state.text,
+    props.socket.emit(eventName, {
+      boardId: props.boardId,
+      columnId: props.columnId,
+      id: props.id,
       sessionId: sessionStorage.getItem("retroSessionId"),
+      text,
     });
   }
 
-  starUp(event: React.MouseEvent) {
+  function starUp(event: React.MouseEvent) {
     event.preventDefault();
 
-    this.props.socket.emit("card:starred", {
-      boardId: this.props.boardId,
-      columnId: this.props.columnId,
-      id: this.props.id,
+    props.socket.emit("card:starred", {
+      boardId: props.boardId,
+      columnId: props.columnId,
+      id: props.id,
       star: 1,
       sessionId: sessionStorage.getItem("retroSessionId"),
     });
   }
 
-  starDown(event: React.MouseEvent) {
+  function starDown(event: React.MouseEvent) {
     event.preventDefault();
 
-    this.props.socket.emit("card:starred", {
-      boardId: this.props.boardId,
-      columnId: this.props.columnId,
-      id: this.props.id,
+    props.socket.emit("card:starred", {
+      boardId: props.boardId,
+      columnId: props.columnId,
+      id: props.id,
       star: -1,
       sessionId: sessionStorage.getItem("retroSessionId"),
     });
   }
 
-  renderUserStars() {
+  function renderUserStars() {
     return (
-      <span className="user-stars">
-        {this.state.userStars > 0 ? this.state.userStars : this.state.userStars}
-      </span>
+      <span className="user-stars">{userStars}</span>
     );
   }
 
-  renderResults() {
+  function renderResults() {
     return (
-      <span className="star-count">{this.state.starsCount}</span>
+      <span className="star-count">{starsCount}</span>
     );
   }
 
-  renderUndoButton() {
+  function renderUndoButton() {
     return (
-      <button onClick={event => this.starDown(event)} className="undo-button">
+      <button onClick={event => starDown(event)} className="undo-button">
         <FontAwesomeIcon icon={faUndo} />
       </button>
     );
   }
 
-  render() {
-    let cardContents;
-
-    if (this.state.isEditing) {
-      cardContents = (
-        <form onSubmit={event => this.save(event)}>
-          <textarea
-            autoFocus={true}
-            onChange={event => this.setState({text: event.target.value})}
-            value={this.state.text}>
-          </textarea>
-          <div className="card--footer">
-            <button type="submit" className="button__save" title="Save">
-              <FontAwesomeIcon icon={faSave} />
-            </button>
-            <ButtonDelete
-              id={this.props.id}
-              handleClick={(event, id) => this.props.deleteCard(event, id as string)}
-            />
-          </div>
-        </form>
-      );
-    } else {
-      let editLink;
-      if (this.props.editable) {
-        editLink = (
-          <a href="" onClick={event => this.toggleIsEditing(event)} className="edit-link">
-            <FontAwesomeIcon icon={faPencilAlt} />
-          </a>
-        );
-      }
-
-      cardContents = (
-        <>
-          <p className="card--text">{this.state.text}{editLink}</p>
-
-          <div className="card--footer">
-            {
-              false ? // TODO: refactor to use state.mode from overmind state
-                <span className="star">⭐️</span>
-                :
-                <span className="star star-button" onClick={event => this.starUp(event)}>
-                  ⭐️
-                </span>
-            }
-            { /* TODO: refactor to use state.mode from overmind state */}
-            { false ? this.renderResults() : this.renderUserStars() }
-            {  true && this.state.userStars > 0 ? this.renderUndoButton() : null }
-          </div>
-        </>
+  if (isEditing) {
+    cardContents = (
+      <form onSubmit={save}>
+        <textarea
+          autoFocus={true}
+          onChange={event => updateText(event.target.value)}
+          value={text}>
+        </textarea>
+        <div className="card--footer">
+          <button type="submit" className="button__save" title="Save">
+            <FontAwesomeIcon icon={faSave} />
+          </button>
+          <ButtonDelete
+            id={props.id}
+            handleClick={(event, id) => props.deleteCard(event, id as string)}
+          />
+        </div>
+      </form>
+    );
+  } else {
+    let editLink;
+    if (props.editable) {
+      editLink = (
+        <a
+          href=""
+          onClick={event => toggleIsEditing(event)}
+          className="edit-link"
+        >
+          <FontAwesomeIcon icon={faPencilAlt} />
+        </a>
       );
     }
 
-    return (
-      <div className="card-container">
-        {cardContents}
-      </div>
+    cardContents = (
+      <>
+        <p className="card--text">{text}{editLink}</p>
+        <div className="card--footer">
+          {
+            mode === AppMode.review ?
+              <span className="star">⭐️</span>
+              :
+              <span className="star star-button" onClick={starUp}>
+                ⭐️
+              </span>
+          }
+          { mode === AppMode.vote ? renderUserStars() : renderResults() }
+          { mode === AppMode.vote && userStars > 0 ? renderUndoButton() : null }
+        </div>
+      </>
     );
   }
+
+  return (
+    <div className="card-container">
+      {cardContents}
+    </div>
+  );
 }

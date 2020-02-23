@@ -209,8 +209,7 @@ export const Column = (props: ColumnProps) => {
           starsCount={card.starsCount}
           userStars={card.userStars}
           newCard={card.newCard}
-        >
-        </Card>
+        />
       );
     })
   }
