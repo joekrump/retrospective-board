@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "An application for helping run retrospective meetings.",
   "main": "index.js",
+  "homepage": "https://github.com/joekrump/retro",
   "contributors": [
     "Joe Krump <krump.joseph@gmail.com>",
     "John Brennan"
