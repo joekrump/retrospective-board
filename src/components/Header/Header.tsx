@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Switch } from "../Switch/Switch";
+import { GitHubLink } from "./GitHubLink";
 
 import "./header.css";
-
 interface HeaderProps {
   showResults: boolean;
   socket: SocketIOClient.Socket;
@@ -24,13 +24,12 @@ export class Header extends React.Component<HeaderProps> {
     return (
       <header>
         <div id="top-header">
-          <div id="logo">
-            <div className="text">Retro</div>
-          </div>
+          <h2 id="logo">Retro</h2>
           { this.props.showResults ? <h1>Reviewing</h1> : null }
           <div id="app-controls">
-            <h3>Review</h3>
+            <h4>Review</h4>
             <Switch id="toggle-app-state" isOn={this.props.showResults} handleChange={(e) => this.toggleShowResults(e)}/>
+            <GitHubLink width={24} height={24} />
           </div>
         </div>
       </header>

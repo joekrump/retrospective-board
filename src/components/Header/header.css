@@ -5,14 +5,6 @@ header {
   background: #673ab7;
 }
 
-#logo {
-  font-family: "Pacifico";
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  margin-left: 20px;
-}
-
 #top-header {
   grid-row: 1 / span 1;
   grid-column: 1 / span 12;
@@ -22,12 +14,22 @@ header {
 
 #logo,
 #top-header h1,
-#top-header h3 {
+#top-header h3,
+#top-header h4 {
   color: #fff;
+  margin: 0;
+}
+
+#logo {
+  margin-left: 20px;
 }
 
 #app-controls {
   display: flex;
   align-items: center;
   margin-right: 20px;
+}
+
+#app-controls a {
+  margin-left: 10px;
 }
