@@ -1,107 +1,87 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import * as io from "socket.io-client";
 import * as uuid from "uuid";
+import { useOvermind } from "../../overmind";
 
 import "./app.css";
 
 import { Header } from "../Header/Header";
 import { Main } from "../Main/Main";
-
-interface AppState {
-  boardId: string;
-  socket: SocketIOClient.Socket;
-  maxStars?: number;
-  showStarLimitAlert: boolean;
-  showResults: boolean;
-}
+import { AppMode } from "../../overmind/state";
 
 const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
 
-export class App extends React.Component<{}, AppState> {
-  constructor(props: {}) {
-    super(props);
+export const App = () => {
+  const { actions: { updateMode} } = useOvermind();
+  let serverURL = window.location.origin;
+  let initialBoardId = window.location.pathname.split("/").pop() || "";
 
-    let serverURL = window.location.origin;
-    let boardId = window.location.pathname.split("/").pop() || "";
-
-    if (window.location.port === LOCAL_DEV_SERVER_PORT) {
-      serverURL = window.location.origin.replace(window.location.port, SERVER_PORT);
-      boardId = "dev-board";
-    } else if (!boardId) {
-      boardId = uuid.v4();
-       window.location.assign(`/board/${boardId}`);
-    }
-
-    this.state = {
-      boardId,
-      socket: io.connect(serverURL),
-      showStarLimitAlert: false,
-      showResults: false
-    };
+  if (window.location.port === LOCAL_DEV_SERVER_PORT) {
+    serverURL = window.location.origin.replace(window.location.port, SERVER_PORT);
+    initialBoardId = "dev-board";
+  } else if (!initialBoardId) {
+    initialBoardId = uuid.v4();
+    window.location.assign(`/board/${initialBoardId}`);
   }
 
-  private setHideStarLimitAlertTimeout(timeoutMS = 3000) {
-    setTimeout(() => {
-      this.setState({
-        showStarLimitAlert: false,
-      });
+  const socket = io.connect(serverURL);
+  const [boardId] = useState(initialBoardId);
+  const [maxStars, setMaxStars] = useState();
+  const [showStarLimitAlert, updateShowStarLimitAlert] = useState(false);
+
+  function setHideStarLimitAlertTimeout(timeoutMS = 3000) {
+    setTimeout(function hideAlert() {
+      updateShowStarLimitAlert(false);
     }, timeoutMS);
   }
 
-  private displayStarLimitAlert(maxStars: number) {
-    this.setState({
-      maxStars,
-      showStarLimitAlert: true,
-    });
-
-    this.setHideStarLimitAlertTimeout();
+  function displayStarLimitAlert(maxStars: number) {
+    setMaxStars(maxStars);
+    updateShowStarLimitAlert(true);
+    setHideStarLimitAlertTimeout();
   }
 
-  componentDidMount() {
+  useEffect(function onMount() {
     const sessionId = sessionStorage.getItem("retroSessionId");
-    this.state.socket.on(`board:loaded:${this.state.boardId}`, (
+    socket.on(`board:loaded:${boardId}`, (
       data: { board: Board, sessionId: string, remainingStars: number, showResults: boolean },
     ) => {
-      this.setState({ showResults: data.showResults });
+      updateMode(data.showResults ? AppMode.review : AppMode.vote);
     });
-    this.state.socket.on(`board:star-limit-reached:${this.state.boardId}`, (data: { maxStars: number }) => {
-      this.displayStarLimitAlert(data.maxStars);
-    });
-
-    this.state.socket.on(`board:show-results:${this.state.boardId}`, (data: { showResults: boolean }) => {
-      this.setState({showResults: data.showResults})
+    socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {
+      displayStarLimitAlert(data.maxStars);
     });
 
-    this.state.socket.emit("board:loaded", {
-      boardId: this.state.boardId,
+    socket.on(`board:show-results:${boardId}`, (data: { showResults: boolean }) => {
+      updateMode(data.showResults ? AppMode.review : AppMode.vote);
+    });
+
+    socket.emit("board:loaded", {
+      boardId,
       sessionId,
     });
-  }
 
-  componentWillUnmount() {
-    this.state.socket.removeListener(`board:star-limit-reached:${this.state.boardId}`);
-    this.state.socket.removeListener(`board:show-results:${this.state.boardId}`);
-    this.state.socket.close();
-  }
+    return function cleanup() {
+      socket.removeListener(`board:star-limit-reached:${boardId}`);
+      socket.removeListener(`board:show-results:${boardId}`);
+      socket.close();
+    };
+  }, []);
 
-  render() {
-    return (
-      <>
-        <Header
-          showResults={this.state.showResults}
-          socket={this.state.socket}
-          boardId={this.state.boardId}
-        />
-        <Main
-          socket={this.state.socket}
-          boardId={this.state.boardId}
-          showResults={this.state.showResults}
-        />
-        <div className={`alert alert-star-limit ${this.state.showStarLimitAlert ? "alert--show" : ""}`}>
-          Your voting limit of {this.state.maxStars} has been reached. Undo previous stars if you want some back.
-        </div>
-      </>
-    );
-  }
+  return (
+    <>
+      <Header
+        socket={socket}
+        boardId={boardId}
+      />
+      <Main
+        socket={socket}
+        boardId={boardId}
+      />
+      <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
+        Your voting limit of {maxStars} has been reached. Undo previous stars if you want some back.
+      </div>
+    </>
+  );
 }
