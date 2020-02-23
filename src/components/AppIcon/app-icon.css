@@ -1,0 +1,14 @@
+.app-icon--img {
+  width: 2.2em;
+  height: 2.2em;
+  /* Make the background look like it is a beach with sand, water, and sky */
+  background: linear-gradient(
+    180deg,
+    #8ed7ff 52%,
+    #1571a2 68%,
+    #f7f7f7 69%
+  );
+  padding: 0.2em;
+  border-radius: 2.2em;
+  border: 2px solid white;
+}

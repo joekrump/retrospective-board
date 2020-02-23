@@ -14,6 +14,7 @@ header {
 
 #logo,
 #top-header h1,
+#top-header h2,
 #top-header h3,
 #top-header h4 {
   color: #fff;
@@ -21,7 +22,14 @@ header {
 }
 
 #logo {
+  display: flex;
+  align-items: center;
   margin-left: 20px;
+}
+
+#logo h2 {
+  font-size: 1.8em;
+  margin-left: 0.6rem;
 }
 
 #app-controls {
