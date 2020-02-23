@@ -2,6 +2,7 @@ import * as React from "react";
 import { Switch } from "../Switch/Switch";
 import { GitHubLink } from "./GitHubLink";
 import { useOvermind } from "../../overmind";
+import { AppIcon } from "../AppIcon/AppIcon";
 
 import "./header.css";
 import { AppMode } from "../../overmind/state";
@@ -27,15 +28,16 @@ export const Header = (props: HeaderProps) => {
   }
 
   return (
-    <header>
-      <div id="top-header">
-        <h2 id="logo">Retro</h2>
-        { isReviewing() ? <h1>Reviewing</h1> : null }
-        <div id="app-controls">
-          <h4>Review</h4>
-          <Switch id="toggle-app-state" isOn={isReviewing()} handleChange={(e) => toggleShowResults(e)}/>
-          <GitHubLink width={24} height={24} />
-        </div>
+    <header id="top-header">
+      <div id="logo">
+        <AppIcon />
+        <h2>Retro</h2>
+      </div>
+      { isReviewing() ? <h1>Reviewing</h1> : null }
+      <div id="app-controls">
+        <h4>Review</h4>
+        <Switch id="toggle-app-state" isOn={isReviewing()} handleChange={(e) => toggleShowResults(e)}/>
+        <GitHubLink width={24} height={24} />
       </div>
     </header>
   );
