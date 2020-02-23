@@ -1,6 +1,4 @@
-import * as React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect } from "react";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
 import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
@@ -38,35 +36,26 @@ interface ColumnState {
   newUsavedColumn: boolean;
 }
 
-export class Column extends React.Component<ColumnProps, ColumnState> {
-  private nameInput: React.RefObject<HTMLInputElement>;
+export const Column = (props: ColumnProps) => {
+  let nameInput = React.createRef<HTMLInputElement>();
+  let [cards, updateCards] = useState([] as CardData[]);
+  let [name, updateName] = useState(props.name);
+  let [isEditing, updateEditingState] = useState(!!props.isEditing);
+  let [newUsavedColumn, updateNewStatus] = useState(props.new);
 
-  constructor(props: ColumnProps) {
-    super(props);
-
-    this.state = {
-      cards: [],
-      name: this.props.name,
-      isEditing: !!this.props.isEditing ? true : false,
-      newUsavedColumn: !!this.props.new,
-    };
-
-    this.nameInput = React.createRef();
-  }
-
-  componentDidMount() {
+  useEffect(function onMount() {
     const sessionId = sessionStorage.getItem("retroSessionId") || "";
 
-    this.props.socket.emit("column:loaded", {
-      boardId: this.props.boardId,
-      id: this.props.id,
+    props.socket.emit("column:loaded", {
+      boardId: props.boardId,
+      id: props.id,
       sessionId,
     });
 
-    this.props.socket.on(`column:loaded:${this.props.id}`, (data: any) => {
+    props.socket.on(`column:loaded:${props.id}`, (data: any) => {
       for (let i = 0; i < data.cards.length; i++) {
         if (!!data.cards[i].text) {
-          this.addCard({
+          addCard({
             id: data.cards[i].id,
             editable: data.cards[i].ownerId === sessionId,
             isEditing: false,
@@ -78,8 +67,8 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       }
     });
 
-    this.props.socket.on(`card:created:${this.props.id}`, (data: { card: CardData }) => {
-      this.addCard({
+    props.socket.on(`card:created:${props.id}`, (data: { card: CardData }) => {
+      addCard({
         ...data.card,
         userStars: 0,
         editable: data.card.ownerId === sessionId,
@@ -87,37 +76,37 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       });
     });
 
-    this.props.socket.on(`card:deleted:${this.props.id}`, (data: any) => {
-      let newCards = this.state.cards.filter((card: CardData) => {
+    props.socket.on(`card:deleted:${props.id}`, (data: any) => {
+      let newCards = cards.filter((card: CardData) => {
         return card.id !== data.id;
       });
-      this.setState({cards: newCards});
+      updateCards(newCards);
     });
 
-    this.props.socket.on(`column:updated:${this.props.id}`, (data: any) => {
-      this.setState({name: data.name});
+    props.socket.on(`column:updated:${props.id}`, (data: any) => {
+      updateName(data.name);
     });
-  }
 
-  componentWillUnmount() {
-    this.props.socket.removeListener(`card:created:${this.props.id}`);
-    this.props.socket.removeListener(`card:deleted:${this.props.id}`);
-    this.props.socket.removeListener(`column:updated:${this.props.id}`);
-  }
+    return function cleanup() {
+      props.socket.removeListener(`card:created:${props.id}`);
+      props.socket.removeListener(`card:deleted:${props.id}`);
+      props.socket.removeListener(`column:updated:${props.id}`);
+    };
+  }, []);
 
-  addCard(card?: CardData) {
-    let cards = this.state.cards.slice(0);
+  function addCard(card?: CardData) {
+    let updatedCards = cards.slice(0);
     if (!!card) {
-      for(let i = 0; i < cards.length; i++) {
-        if (cards[i].id === card.id) {
-          cards = [
-            ...cards.slice(0, i),
-            ...cards.slice(i + 1),
+      for(let i = 0; i < updatedCards.length; i++) {
+        if (updatedCards[i].id === card.id) {
+          updatedCards = [
+            ...updatedCards.slice(0, i),
+            ...updatedCards.slice(i + 1),
           ]
           break;
         }
       }
-      cards.push(card);
+      updatedCards.push(card);
     } else {
       let newCard = {
         id: `card-${uuid.v4()}`,
@@ -133,15 +122,15 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
       ];
     }
 
-    this.setState({ cards });
+    updateCards(cards);
   }
 
-  deleteCard(event: React.MouseEvent, id: string) {
+  function deleteCard(event: React.MouseEvent, id: string) {
     event.preventDefault();
     let deletedCard: CardData | undefined;
     let cards: CardData[] = [];
 
-    this.state.cards.forEach((card: CardData) => {
+    cards.forEach((card: CardData) => {
       if(card.id === id) {
         deletedCard = card;
       } else {
@@ -150,64 +139,59 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     });
 
     if (!!deletedCard && !deletedCard.newCard) {
-      this.props.socket.emit("card:deleted", {
-        boardId: this.props.boardId,
-        columnId: this.props.id,
+      props.socket.emit("card:deleted", {
+        boardId: props.boardId,
+        columnId: props.id,
         id,
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     }
 
-    this.setState({cards});
+    updateCards(cards);
   }
 
-  toggleIsEditing(event?: React.MouseEvent) {
+  function toggleIsEditing(event?: React.MouseEvent) {
     if (event) {
       event.preventDefault();
     }
-    this.setState({
-      isEditing: !this.state.isEditing,
-    });
+    updateEditingState(!isEditing);
   }
 
-  updateColumnName(event: React.FormEvent) {
+  function updateColumnName(event: React.FormEvent) {
     event.preventDefault();
-    this.setState({
-      name: this.nameInput?.current?.value
-    });
 
-    const socketEvent = !!this.state.newUsavedColumn ? "column:created" : "column:updated";
-
-    if (!!this.state.newUsavedColumn) {
-      this.setState({
-        newUsavedColumn: false
-      });
+    if (nameInput?.current?.value) {
+      updateName(nameInput.current.value);
     }
 
-    this.props.socket.emit(socketEvent, {
-      boardId: this.props.boardId,
-      id: this.props.id,
-      name: this.nameInput?.current?.value,
+    const socketEvent = !!newUsavedColumn ? "column:created" : "column:updated";
+
+    if (!!newUsavedColumn) {
+      updateNewStatus(false);
+    }
+
+    props.socket.emit(socketEvent, {
+      boardId: props.boardId,
+      id: props.id,
+      name: nameInput?.current?.value,
       sessionId: sessionStorage.getItem("retroSessionId"),
     });
 
-    this.toggleIsEditing();
+    toggleIsEditing();
   }
 
-  renderCards() {
-    let cards = this.state.cards;
-
-    cards = cards.sort((cardA, cardB) => {
-      if (this.props.sortDirection === SortDirection.none) {
+  function renderCards() {
+    cards.sort((cardA, cardB) => {
+      if (props.sortDirection === SortDirection.none) {
         return 0;
-      } else if (this.props.sortDirection === SortDirection.asc) {
+      } else if (props.sortDirection === SortDirection.asc) {
         return cardA.starsCount - cardB.starsCount
       } else {
         return cardB.starsCount - cardA.starsCount
       }
     });
 
-    return cards.map((card) => {
+    return cards.map((card: CardData) => {
       if (false // TODO: refactor to use state.mode from overmind
         && card.isEditing) {
         return null;
@@ -220,9 +204,9 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
           deleteCard={(event: any, id: string) => this.deleteCard(event, id)}
           editable={card.editable} // TODO: refactor to use state.mode from overmind state
           isEditing={card.isEditing}
-          socket={this.props.socket}
-          columnId={this.props.id}
-          boardId={this.props.boardId}
+          socket={props.socket}
+          columnId={props.id}
+          boardId={props.boardId}
           text={card.text ? card.text : ""}
           starsCount={card.starsCount}
           userStars={card.userStars}
@@ -233,21 +217,20 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
     })
   }
 
-  render() {
     return (
       <div
-        className={"column" + (this.state.isEditing ? " column-edit" : "") }
-        style={{ width: `${this.props.maxWidthPercentage}%`}}
+        className={"column" + (isEditing ? " column-edit" : "") }
+        style={{ width: `${props.maxWidthPercentage}%`}}
       >
         <div className="header-row">
           <ColumnHeader
-            columnId={this.props.id}
-            isEditing={this.state.isEditing}
-            name={this.state.name}
-            nameInputRef={this.nameInput}
-            onEditToggle={(e) => this.toggleIsEditing(e)}
-            onSubmit={(e) => this.updateColumnName(e)}
-            onDeleteClick={(event, id) => this.props.deleteColumn(event, id)}
+            columnId={props.id}
+            isEditing={isEditing}
+            name={name}
+            nameInputRef={nameInput}
+            onEditToggle={(e) => toggleIsEditing(e)}
+            onSubmit={(e) => updateColumnName(e)}
+            onDeleteClick={(event, id) => props.deleteColumn(event, id)}
           />
         </div>
         <div className="body-row">
@@ -255,13 +238,12 @@ export class Column extends React.Component<ColumnProps, ColumnState> {
             false ? // TODO: refactor to use state.mode from overmind state
               null
               :
-              <button className="card--button__add" onClick={() => this.addCard()}>
+              <button className="card--button__add" onClick={() => addCard() }>
                 +
               </button>
           }
-          { this.renderCards() }
+          { renderCards() }
         </div>
       </div>
     );
-  }
 }
