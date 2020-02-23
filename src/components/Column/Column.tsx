@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
 import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
@@ -38,11 +38,10 @@ export const Column = (props: ColumnProps) => {
   let [isEditing, updateEditingState] = useState(!!props.isEditing);
   let [newUsavedColumn, updateNewStatus] = useState(props.new);
   let { state: { mode } } = useOvermind();
+  let cardsRef = useRef(cards);
   const sessionId = sessionStorage.getItem("retroSessionId") || "";
 
   useEffect(function onMount() {
-    let cards: CardData[] = [];
-
     props.socket.emit("column:loaded", {
       boardId: props.boardId,
       id: props.id,
@@ -50,9 +49,11 @@ export const Column = (props: ColumnProps) => {
     });
 
     function handleColumnLoaded (data: any) {
+      let cardsData: CardData[] = [];
+
       for (let i = 0; i < data.cards.length; i++) {
         if (!!data.cards[i].text) {
-          cards.push({
+          cardsData.push({
             id: data.cards[i].id,
             editable: data.cards[i].ownerId === sessionId,
             isEditing: false,
@@ -62,12 +63,11 @@ export const Column = (props: ColumnProps) => {
           } as CardData);
         }
       }
-
-      updateCards(cards);
+      updateCards(cardsData);
     }
 
     function handleCardDeleted (data: any) {
-      cards = cards.filter((card: CardData) => {
+      const cards = cardsRef.current.filter((card: CardData) => {
         return card.id !== data.id;
       });
 
@@ -75,7 +75,7 @@ export const Column = (props: ColumnProps) => {
     }
 
     function handleCardCreated(data: { card: CardData }) {
-      cards.filter((card) => {
+      const cards = cardsRef.current.filter((card) => {
         return (card.id !== data.card.id);
       });
 
@@ -102,7 +102,11 @@ export const Column = (props: ColumnProps) => {
       props.socket.removeListener(`card:created:${props.id}`);
       props.socket.removeListener(`column:updated:${props.id}`);
     };
-  }, [updateCards]);
+  }, []);
+
+  useEffect(() => {
+    cardsRef.current = cards;
+  }, [cards]);
 
   function addCard() {
     let updatedCards: CardData[] = [];
@@ -116,7 +120,7 @@ export const Column = (props: ColumnProps) => {
     };
     updatedCards = [
       card,
-      ...cards,
+      ...cardsRef.current,
     ];
     updateCards(updatedCards);
   }
@@ -211,8 +215,12 @@ export const Column = (props: ColumnProps) => {
           newCard={card.newCard}
         />
       );
-    })
+    });
   }
+
+  let memoizedCards = useMemo(() => {
+    return renderCards();
+  }, [cards]);
 
   return (
     <div
@@ -239,7 +247,7 @@ export const Column = (props: ColumnProps) => {
               +
             </button>
         }
-        { renderCards() }
+        { memoizedCards }
       </div>
     </div>
   );
