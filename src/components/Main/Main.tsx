@@ -19,8 +19,8 @@ export enum SortDirection {
 export const Main = (props: MainProps) => {
   const [columns, updateColumns] = React.useState([] as BoardColumn[]);
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
-  const [sortDirection, updateSortDirection] = React.useState(SortDirection.none);
-  const [remainingStars, updateRemainingStars] = React.useState();
+  const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
+  const [remainingStars, updateRemainingStars] = React.useState(null as unknown as number);
 
   useEffect(function onMount() {
     props.socket.on(`board:loaded:${props.boardId}`, (
@@ -65,9 +65,6 @@ export const Main = (props: MainProps) => {
     let newSortDirection = SortDirection.none;
 
     switch(sortDirection as SortDirection) {
-      case SortDirection.none:
-        newSortDirection = SortDirection.desc;
-        break;
       case SortDirection.asc:
         newSortDirection = SortDirection.desc;
         break;

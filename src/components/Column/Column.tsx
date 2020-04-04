@@ -182,15 +182,15 @@ export const Column = (props: ColumnProps) => {
   }
 
   function renderCards() {
-    cards.sort((cardA, cardB) => {
-      if (props.sortDirection === SortDirection.none) {
-        return 0;
-      } else if (props.sortDirection === SortDirection.asc) {
-        return cardA.starsCount - cardB.starsCount
-      } else {
-        return cardB.starsCount - cardA.starsCount
-      }
-    });
+    if (mode === AppMode.review) {
+      cards.sort((cardA, cardB) => {
+        if (props.sortDirection === SortDirection.asc) {
+          return cardA.starsCount - cardB.starsCount
+        } else {
+          return cardB.starsCount - cardA.starsCount
+        }
+      });
+    }
 
     return cards.map((card: CardData) => {
       if (
@@ -221,7 +221,7 @@ export const Column = (props: ColumnProps) => {
 
   let memoizedCards = useMemo(() => {
     return renderCards();
-  }, [cards]);
+  }, [cards, props.sortDirection, mode]);
 
   return (
     <div
