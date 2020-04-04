@@ -21,8 +21,3 @@ A tool for running retros.
 ## Server a build of the app over HTTPS using NGROK
 _This makes it easy for others to access the app over the internet_
 1. `npm run prod`
-
-## TODO
-
-1. Features
-* [ ] WIP - Sort the cards in columns by the number of ⭐️s when in "Review" mode (_requires a page refresh at the moment_).
