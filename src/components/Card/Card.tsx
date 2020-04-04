@@ -43,7 +43,9 @@ export const Card = (props: CardProps) => {
     ) => {
       if(!!data) {
         updateStarsCount(data.starsCount);
-        updateUserStars(data.userStars !== undefined ? data.userStars : userStars);
+        if(data.userStars !== undefined) {
+          updateUserStars(data.userStars);
+        }
       }
     });
 
