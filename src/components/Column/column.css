@@ -26,6 +26,14 @@
   border-left: 8px solid #b371e3;
 }
 
+.column:nth-child(3n + 4) .card-container {
+  border-left: 8px solid #faa02a;
+}
+
+.column:nth-child(3n + 5) .card-container {
+  border-left: 8px solid #dd2ab6;
+}
+
 .column-edit > input {
   /* The same font-size and margin as a h2 element */
   font-size: 1.5em;
