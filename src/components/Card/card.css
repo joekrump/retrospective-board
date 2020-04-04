@@ -25,14 +25,18 @@
   margin: 0 5px;
 }
 
-.card--text:hover > .edit-link {
+.card-container:hover .edit-link {
   display: inline-block;
 }
 
-.card-container .card--text,
+.card-container .card--content,
 .card-container textarea {
   margin: 0 0 1rem 0;
   min-height: 40px;
+}
+
+.card-container .card--content img {
+  width: 100%;
 }
 
 .card-container textarea {
