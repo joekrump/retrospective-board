@@ -105,15 +105,21 @@ function canStar(remainingStars: number) {
 
 io.on('connection', function (socket) {
 
-  socket.on('board:show-results', function(data) {
+  socket.on('board:show-results', function(data: { boardId: string, sessionId: string }) {
     if (!!boards[data.boardId]) {
       boards[data.boardId].showResults = !boards[data.boardId].showResults;
+
+      boards[data.boardId].columns.forEach((column) => {
+        socket.emit(`column:loaded:${column.id}`, column);
+        socket.broadcast.emit(`column:loaded:${column.id}`, column);
+      });
+
       socket.emit(`board:show-results:${data.boardId}`, { showResults: boards[data.boardId].showResults });
       socket.broadcast.emit(`board:show-results:${data.boardId}`, { showResults: boards[data.boardId].showResults });
     }
   });
 
-  socket.on('board:loaded', function (data: { boardId: string, sessionId: string }) {
+  socket.on('board:loaded', function (data: { boardId: string, sessionId?: string }) {
     let sessionId = data.sessionId ?? uuid.v4();
 
     if(!sessionStore[sessionId]) {
