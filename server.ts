@@ -111,6 +111,7 @@ io.on('connection', function (socket) {
 
       boards[data.boardId].columns.forEach((column) => {
         socket.emit(`column:loaded:${column.id}`, column);
+        socket.broadcast.emit(`column:loaded:${column.id}`, column);
       });
 
       socket.emit(`board:show-results:${data.boardId}`, { showResults: boards[data.boardId].showResults });
