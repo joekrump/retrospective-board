@@ -7,8 +7,9 @@ import { SortDirection } from "../Main/Main";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
 
-interface CardData {
+export interface CardData {
   id: string;
+  columnId?: string;
   editable: boolean;
   text?: string;
   ownerId?: string;

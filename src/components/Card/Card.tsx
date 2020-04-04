@@ -4,6 +4,7 @@ import { faPencilAlt, faUndo, faSave } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
+import ReactMarkdown from "react-markdown";
 
 import "./card.css";
 
@@ -153,7 +154,22 @@ export const Card = (props: CardProps) => {
 
     cardContents = (
       <>
-        <p className="card--text">{text}{editLink}</p>
+        <ReactMarkdown
+          className="card--content"
+          source={text}
+          allowedTypes={[
+            "paragraph",
+            "text",
+            "root",
+            "emphasis",
+            "strong",
+            "image",
+            "link",
+            "inlineCode",
+            "code",
+          ]}
+        >
+        </ReactMarkdown>
         <div className="card--footer">
           {
             mode === AppMode.review ?
@@ -165,6 +181,7 @@ export const Card = (props: CardProps) => {
           }
           { mode === AppMode.vote ? renderUserStars() : renderResults() }
           { mode === AppMode.vote && userStars > 0 ? renderUndoButton() : null }
+          { editLink }
         </div>
       </>
     );
