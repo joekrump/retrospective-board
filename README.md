@@ -15,12 +15,12 @@ A tool for running retros.
 ## Getting Started
 
 1. `npm install` // Install package dependencies.
-1. `npm run start:dev-client` // Starts webpack dev server for the client-side code running on **localhost:4000**.
-1. `npm run start:dev-server` // Starts the express server running locally.
+1. `npm run dev:client` // Starts webpack dev server for the client-side code running on **localhost:4000**.
+1. `npm run dev:server` // Starts the express server running locally.
 
 ## Server a build of the app over HTTPS using NGROK
 _This makes it easy for others to access the app over the internet_
-1. `npm run start:prod`
+1. `npm run prod`
 
 ## TODO
 
