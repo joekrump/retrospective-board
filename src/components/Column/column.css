@@ -1,16 +1,6 @@
-:root {
-  --button--create-card--background-color: #f8fbfb;
-  --button--create-card--background-color__hover: #ffffff;
-}
-
 .body-row > button {
   width: 100%;
   padding: 0 0 0.2em 0;
-  background-color: var(--button--create-card--background-color);
-}
-
-.body-row > button:hover {
-  background-color: var(--button--create-card--background-color__hover);
 }
 
 .card--button__add {
@@ -25,7 +15,7 @@
 
 /* Simple implementation to give unique background colors to cards in specific columns */
 .column:nth-child(5n + 1) .card-container {
-  border-left: 8px solid #79ba79;
+  border-left: 8px solid var(--green);
 }
 
 .column:nth-child(5n + 2) .card-container {

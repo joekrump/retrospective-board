@@ -1,5 +1,9 @@
 :root {
   --app--background-color: #e6e6e6;
+  --green: #51be51;
+  --text-color-primary: #363636;
+  --button--background-color: #f8fbfb;
+  --button--background-color__hover: #ffffff;
 }
 
 html, body, #react-root {
@@ -18,6 +22,7 @@ input,
 textarea {
   font-family: -apple-system, BlinkMacSystemFont,"Segoe UI","Roboto", "Droid Sans","Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.0rem;
+  color: var(--text-color-primary);
 }
 
 footer {
@@ -48,10 +53,16 @@ h2 {
   font-size: 1.5em;
   padding: 15px 10px
 }
+
 button {
-  background-color: #f8fbfb;
+  background-color: var(--button--background-color);
   border: none;
   cursor: pointer;
+}
+
+button:hover,
+button:focus {
+  background-color: var(--button--background-color__hover)
 }
 
 .button {

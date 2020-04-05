@@ -83,7 +83,7 @@
 }
 
 .button__save:hover {
-  color: #007B23;
+  color: var(--green);
 }
 
 .card--footer {
