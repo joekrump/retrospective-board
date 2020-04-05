@@ -2,7 +2,7 @@ import * as React from "react";
 import { Switch } from "../Switch/Switch";
 import { GitHubLink } from "./GitHubLink";
 import { useOvermind } from "../../overmind";
-import { AppIcon } from "../AppIcon/AppIcon";
+import { AppLogo } from "../AppLogo/AppLogo";
 
 import "./header.css";
 import { AppMode } from "../../overmind/state";
@@ -30,7 +30,7 @@ export const Header = (props: HeaderProps) => {
   return (
     <header id="top-header">
       <div id="logo">
-        <AppIcon />
+        <AppLogo />
         <h2>Retro</h2>
       </div>
       { isReviewing() ? <h1>Reviewing</h1> : null }
