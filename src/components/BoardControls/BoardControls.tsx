@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt, faArrowDown, faArrowUp } from "@fortawesome/free-solid-svg-icons";
 
 import "./board-controls.css";
 import { SortDirection } from "../Main/Main";
@@ -50,8 +48,8 @@ export const BoardControls = (props: BoardControlsProps) => {
     );
   } else {
     titleContent = (
-      <h1 className="board-title--text">
-        {props.title} <FontAwesomeIcon icon={faPencilAlt} className="pencil-icon" onClick={() => editTitle()} />
+      <h1 className="board-title--text" onClick={() => editTitle()}>
+        {props.title}
       </h1>
     );
   }
@@ -64,7 +62,7 @@ export const BoardControls = (props: BoardControlsProps) => {
       {
         mode === AppMode.review ?
           <button className="button button__sort" onClick={props.sortColumnCardsByStars}>
-            ⭐️s { props.sortDirection === SortDirection.asc ? <FontAwesomeIcon icon={faArrowDown} /> : <FontAwesomeIcon icon={faArrowUp} /> }
+            ⭐️ { props.sortDirection === SortDirection.asc ? <span className="gg-sort-za" /> : <span className="gg-sort-az" /> }
           </button>
         :
         <div className="board-actions">

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt, faUndo, faSave } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
@@ -116,7 +114,7 @@ export const Card = (props: CardProps) => {
   function renderUndoButton() {
     return (
       <button onClick={event => starDown(event)} className="undo-button">
-        <FontAwesomeIcon icon={faUndo} />
+        <span className="gg-undo"></span>
       </button>
     );
   }
@@ -131,7 +129,7 @@ export const Card = (props: CardProps) => {
         </textarea>
         <div className="card--footer">
           <button type="submit" className="button__save" title="Save">
-            <FontAwesomeIcon icon={faSave} />
+            <span className="gg-check"></span>
           </button>
           <ButtonDelete
             id={props.id}
@@ -149,7 +147,7 @@ export const Card = (props: CardProps) => {
           onClick={event => toggleIsEditing(event)}
           className="edit-link"
         >
-          <FontAwesomeIcon icon={faPencilAlt} />
+          <span className="gg-pen" role="img" data-icon="edit" title="Edit"></span>
         </a>
       );
     }
@@ -173,16 +171,18 @@ export const Card = (props: CardProps) => {
         >
         </ReactMarkdown>
         <div className="card--footer">
-          {
+          <div className="starring">
+            {
             mode === AppMode.review ?
               <span className="star">⭐️</span>
               :
               <span className="star star-button" onClick={starUp}>
                 ⭐️
               </span>
-          }
-          { mode === AppMode.vote ? renderUserStars() : renderResults() }
-          { mode === AppMode.vote && userStars > 0 ? renderUndoButton() : null }
+            }
+            { mode === AppMode.vote ? renderUserStars() : renderResults() }
+            { mode === AppMode.vote && userStars > 0 ? renderUndoButton() : null }
+          </div>
           { editLink }
         </div>
       </>
@@ -190,7 +190,7 @@ export const Card = (props: CardProps) => {
   }
 
   return (
-    <div className="card-container">
+    <div className={isEditing ? "card-container card-container--editing" : "card-container"}>
       {cardContents}
     </div>
   );

@@ -22,11 +22,16 @@
 
 .card-container .edit-link {
   display: none;
-  margin: 0 5px;
+  padding-bottom: 5px;
+  margin: 0 5px 0 10px;
 }
 
 .card-container:hover .edit-link {
-  display: inline-block;
+  display: flex;
+}
+
+.edit-link .gg-pen {
+  margin: auto;
 }
 
 .card-container .card--content,
@@ -81,12 +86,19 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+}
+
+.card--footer .starring {
+  display: flex;
+  align-items: center;
 }
 
 .card--footer button[type="submit"] {
   font-size: 14pt;
+  padding: 0;
 }
 
-.button--delete {
-  margin-left: 5px;
+.card--footer .button--delete {
+  margin-left: 10px;
 }
