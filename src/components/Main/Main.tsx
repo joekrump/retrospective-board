@@ -123,7 +123,7 @@ export const Main = (props: MainProps) => {
 
     if (mode !== AppMode.review) {
       markup.push(
-        <div className="column">
+        <div className="column" key="add-new-column">
           <div className="add-column--button-filler">
 
           </div>
