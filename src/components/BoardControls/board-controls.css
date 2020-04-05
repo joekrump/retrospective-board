@@ -20,6 +20,11 @@
   margin: auto;
 }
 
+#board-title {
+  display: flex;
+  align-items: center;
+}
+
 .board-title--text {
   display: block;
   margin: 0;
@@ -27,6 +32,12 @@
   font-size: 1.4rem;
   font-weight: 600;
   border: none;
+  background-color: var(--app--background-color);
+}
+
+.board-title--actions {
+  display: flex;
+  margin-left: 5px;
 }
 
 .board-actions {

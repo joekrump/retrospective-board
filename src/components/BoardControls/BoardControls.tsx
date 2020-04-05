@@ -40,8 +40,12 @@ export const BoardControls = (props: BoardControlsProps) => {
       <>
         <input className="board-title--text" type="text" autoFocus={true} defaultValue={props.title} ref={titleInput}></input>
         <div className="board-title--actions">
-          <button onClick={saveTitle}>Save</button>
-          <a href="" onClick={event => editTitle(event)}>cancel</a>
+          <button onClick={saveTitle} title="Save">
+            <span className="gg-check"></span>
+          </button>
+          <button title="Cancel" onClick={event => editTitle(event)}>
+            <span className="gg-close"></span>
+          </button>
         </div>
       </>
     );
