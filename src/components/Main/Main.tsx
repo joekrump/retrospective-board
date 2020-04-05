@@ -149,6 +149,7 @@ export const Main = (props: MainProps) => {
     for (let i = 0; i < columns.length; i++) {
       if (columns[i].id === id) {
         actions.deleteColumn(columns[i]);
+        break;
       }
     }
 
