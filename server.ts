@@ -4,7 +4,9 @@ import uuid from "uuid";
 
 let boards: {[key: string]: Board} = {};
 let sessionStore: {
-  [id: string]: Session;
+  [boardId: string]: {
+    [id: string]: Session
+  };
 } = {};
 
 const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
@@ -41,17 +43,13 @@ app.get("/board/:boardId", function(_req, res) {
   res.sendFile(__dirname + "/public/index.html");
 });
 
-function createNewBoard(boardId?: string) {
-  if(!boardId) {
-    boardId = uuid.v4();
-  }
+function createNewBoard(boardId: string) {
   boards[boardId] = NEW_BOARD;
-  return boardId;
 }
 
 function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
   Object.keys(card.stars).forEach(sessionId => {
-    sessionStore[sessionId].remainingStars[boardId] += Math.abs(card.stars[sessionId]);
+    sessionStore[boardId][sessionId].remainingStars += Math.abs(card.stars[sessionId]);
   });
 }
 
@@ -60,13 +58,8 @@ function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: st
     board: boards[boardId],
     sessionId,
     showResults: boards[boardId].showResults,
-    remainingStars: sessionStore[sessionId].remainingStars[boardId],
+    remainingStars: sessionStore[boardId][sessionId].remainingStars,
   });
-}
-
-function initializeBoardForUser(boardId: string, sessionId: string) {
-  boardId = createNewBoard(boardId);
-  sessionStore[sessionId].remainingStars[boardId] = MAX_VOTES_USER_VOTE_PER_BOARD;
 }
 
 function updateRemainingStars(
@@ -82,11 +75,11 @@ function updateRemainingStars(
 
   // Check if the star undoes a previous one and adds a remaining star back.
   if((star < 0 && card.stars[session.id] > 0)) {
-    session.remainingStars[boardId]++;
+    session.remainingStars++;
     card.starsCount--;
     card.stars[session.id]--;
-  } else if (star > 0 && session.remainingStars[boardId] > 0){
-    session.remainingStars[boardId]--;
+  } else if (star > 0 && session.remainingStars > 0){
+    session.remainingStars--;
     card.starsCount++;
     card.stars[session.id]++;
   } else {
@@ -95,12 +88,24 @@ function updateRemainingStars(
   }
 }
 
-function newBoardSession(session: Session, boardId: string) {
-  return session.remainingStars[boardId] === undefined;
-}
-
 function canStar(remainingStars: number) {
   return remainingStars >= 0;
+}
+
+function emitUpdateRemainingStars(
+  socket: SocketIO.Socket,
+  boardId: string,
+  sessionId: string,
+) {
+  socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
+    remainingStars: sessionStore[boardId][sessionId].remainingStars,
+  });
+
+  Object.keys(sessionStore[boardId]).forEach((boardSessionId) => {
+    socket.broadcast.emit(`board:update-remaining-stars:${boardId}:${boardSessionId}`, {
+      remainingStars: sessionStore[boardId][boardSessionId].remainingStars,
+    });
+  });
 }
 
 io.on('connection', function (socket) {
@@ -120,22 +125,24 @@ io.on('connection', function (socket) {
   });
 
   socket.on('board:loaded', function (data: { boardId: string, sessionId?: string }) {
-    let sessionId = data.sessionId ?? uuid.v4();
+    const sessionId = data.sessionId ?? uuid.v4();
+    const boardId = data.boardId ?? uuid.v4();
 
-    if(!sessionStore[sessionId]) {
-      sessionStore[sessionId] = {
-        id: sessionId,
-        remainingStars: {},
+    const newSession = {
+      id: sessionId,
+      remainingStars: MAX_VOTES_USER_VOTE_PER_BOARD,
+    };
+
+    if(!sessionStore[boardId]) {
+      createNewBoard(boardId)
+      sessionStore[boardId] = {
+        [sessionId]: newSession,
       };
+    } else if (!sessionStore[boardId][sessionId]) {
+      sessionStore[boardId][sessionId] = newSession
     }
 
-    if(!data.boardId || !boards[data.boardId]) {
-      initializeBoardForUser(data.boardId, sessionId);
-    } else if (newBoardSession(sessionStore[sessionId], data.boardId)) {
-      sessionStore[sessionId].remainingStars[data.boardId] = MAX_VOTES_USER_VOTE_PER_BOARD
-    }
-
-    emitBoardLoaded(socket, data.boardId, sessionId);
+    emitBoardLoaded(socket, boardId, sessionId);
   });
 
   socket.on('board:updated', function(data: { boardId: string, title: string, sessionId: string }) {
@@ -153,7 +160,7 @@ io.on('connection', function (socket) {
 
   socket.on("column:loaded", function(data: { boardId: string, id: string, sessionId: string }) {
     console.log("column load request");
-    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
+    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -174,7 +181,7 @@ io.on('connection', function (socket) {
 
   socket.on("column:created", function(data: { boardId: string, id: string, name: string, sessionId: string }) {
     console.log("column create request");
-    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
+    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -188,7 +195,7 @@ io.on('connection', function (socket) {
 
   socket.on("column:updated", function(data: { boardId: string, id: string, name: string, sessionId: string }) {
     console.log("column update request");
-    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
+    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -201,30 +208,32 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("column:deleted", function(data: { boardId: string, id: string, sessionId: string }) {
+  socket.on("column:deleted", function({ boardId, sessionId, id }: { boardId: string, id: string, sessionId: string }) {
     console.log("column delete request");
-    if (data?.sessionId === undefined && !sessionStore[data.sessionId]) {
+    if (sessionId === undefined && !sessionStore[boardId][sessionId]) {
       console.error("No session");
       return;
     }
 
-    console.log(data);
-    let columnIndex = boards[data.boardId].columns.findIndex((column) => column.id === data.id);
-    if (columnIndex) {
-      const column = boards[data.boardId].columns[columnIndex];
+    let columnIndex = boards[boardId]?.columns.findIndex((column) => column.id === id);
 
-      column?.cards?.forEach((card) => { reclaimStarsFromDeleteCard(card, data.boardId); });
+    if (columnIndex !== -1) {
+      const column = boards[boardId].columns[columnIndex];
 
-      boards[data.boardId]?.columns.splice(columnIndex, 1);
-      socket.broadcast.emit(`column:deleted:${data.boardId}`, {
-        id: data.id
-      });
+      column?.cards?.forEach((card) => { reclaimStarsFromDeleteCard(card, boardId); });
+
+      emitUpdateRemainingStars(socket, boardId, sessionId);
+
+      boards[boardId]?.columns.splice(columnIndex, 1);
+      socket.broadcast.emit(`column:deleted:${boardId}`, { id });
+    } else  {
+      console.error("No column found");
     }
   })
 
   socket.on("card:created", function(data: { boardId: string, columnId: string, id: string, text: string, sessionId: string }) {
     console.log("card create request")
-    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
+    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -251,7 +260,7 @@ io.on('connection', function (socket) {
 
   socket.on("card:updated", function (data: { boardId: string, columnId: string, id: string, text: string, sessionId: string }) {
     console.log("card update request");
-    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
+    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -270,7 +279,7 @@ io.on('connection', function (socket) {
 
   socket.on("card:deleted", function (data: { boardId: string, columnId: string, id: string, sessionId: string }) {
     console.log("card delete request");
-    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
+    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -284,6 +293,7 @@ io.on('connection', function (socket) {
         column.cards.splice(cardIndex, 1);
 
         reclaimStarsFromDeleteCard(card, data.boardId);
+        emitUpdateRemainingStars(socket, data.boardId, data.sessionId);
 
         socket.broadcast.emit(`card:deleted:${data.columnId}`, {
           id: data.id
@@ -294,16 +304,16 @@ io.on('connection', function (socket) {
 
   socket.on("card:starred", function ({ id, star, boardId, columnId, sessionId }: { id: string, star: number, boardId: string, columnId: string, sessionId: string }) {
     console.log("star for card request");
-    if (sessionId === undefined && !sessionStore[sessionId]) {
+    if (sessionId === undefined && !sessionStore[boardId][sessionId]) {
       console.error("No session");
       return;
     }
-    const session = sessionStore[sessionId];
+    const session = sessionStore[boardId][sessionId];
 
     const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
       const card = column.cards.find((card) => card.id === id);
-      if (card && canStar(session.remainingStars[boardId])) {
+      if (card && canStar(session.remainingStars)) {
         updateRemainingStars(session, socket, card, boardId, star);
         const userStars = card.stars[session.id];
         const { starsCount } = card;
@@ -312,8 +322,8 @@ io.on('connection', function (socket) {
         socket.broadcast.emit(`card:starred:${id}`, {
           starsCount,
         });
-        socket.emit(`board:update-remaining-stars:${boardId}`, {
-          remainingStars: session.remainingStars[boardId],
+        socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
+          remainingStars: session.remainingStars,
         });
       }
     }

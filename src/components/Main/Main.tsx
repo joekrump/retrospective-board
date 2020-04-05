@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Column } from "../Column/Column";
 import uuid = require("uuid");
 import { BoardControls } from "../BoardControls/BoardControls";
+import { useOvermind } from "../../overmind";
 
 import "./main.css";
 
@@ -17,7 +18,7 @@ export enum SortDirection {
 };
 
 export const Main = (props: MainProps) => {
-  const [columns, updateColumns] = React.useState([] as BoardColumn[]);
+  const { state: { columns }, actions } = useOvermind();
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
   const [remainingStars, updateRemainingStars] = React.useState(null as unknown as number);
@@ -30,20 +31,20 @@ export const Main = (props: MainProps) => {
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
 
-      updateColumns(
-        data.board.columns.map((column: { id: string; name: string; }) => (
-          { id: column.id, name: column.name, isEditing: false }
-        )),
-      );
+      const initialColumns = data.board.columns.map((column: { id: string; name: string; }) => ({
+        ...column,
+        isEditing: false
+      }));
+      actions.setColumns(initialColumns);
+
+      props.socket.on(`board:update-remaining-stars:${props.boardId}:${data.sessionId}`, (data: any) => {
+        updateRemainingStars(data.remainingStars);
+      });
     });
 
     props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
       updateBoardTitle(data.title);
     });
-
-    props.socket.on(`board:update-remaining-stars:${props.boardId}`, (data: any) => {
-      updateRemainingStars(data.remainingStars);
-    })
 
     props.socket.on(`column:created:${props.boardId}`, (data: any) => {
       addColumn(data);
@@ -59,7 +60,7 @@ export const Main = (props: MainProps) => {
       props.socket.removeListener(`column:deleted:${props.boardId}`);
       props.socket.removeListener(`column:created:${props.boardId}`);
     };
-  }, []);
+  }, [columns]);
 
   const sortColumnCardsByStars = () => {
     let newSortDirection = SortDirection.none;
@@ -91,10 +92,7 @@ export const Main = (props: MainProps) => {
       boardColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true };
     }
 
-    updateColumns([
-      ...columns,
-      boardColumn,
-    ]);
+    actions.addColumn(boardColumn);
   }
 
   function renderColumns() {
@@ -144,9 +142,11 @@ export const Main = (props: MainProps) => {
       event.preventDefault();
     }
 
-    let newColumns = columns.filter((column: BoardColumn) => {
-      return column.id !== id;
-    });
+    for (let i = 0; i < columns.length; i++) {
+      if (columns[i].id === id) {
+        actions.deleteColumn(columns[i]);
+      }
+    }
 
     if (!fromSocket) {
       props.socket.emit(`column:deleted`, {
@@ -155,9 +155,11 @@ export const Main = (props: MainProps) => {
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     }
-
-    updateColumns(newColumns);
   }
+
+  const memoizedColumns = useMemo(() => {
+    return renderColumns();
+  }, [columns]);
 
   return (
     <main>
@@ -170,7 +172,7 @@ export const Main = (props: MainProps) => {
         sortDirection={sortDirection}
       />
       <div id="columns">
-        {renderColumns()}
+        { memoizedColumns }
       </div>
     </main>
   );

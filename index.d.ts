@@ -29,7 +29,5 @@ interface BoardColumn {
 
 interface Session {
   id: string;
-  remainingStars: {
-    [boardId: string]: number;
-  }
+  remainingStars: number;
 }
