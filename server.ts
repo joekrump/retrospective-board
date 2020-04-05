@@ -293,6 +293,7 @@ io.on('connection', function (socket) {
         column.cards.splice(cardIndex, 1);
 
         reclaimStarsFromDeleteCard(card, data.boardId);
+        emitUpdateRemainingStars(socket, data.boardId, data.sessionId);
 
         socket.broadcast.emit(`card:deleted:${data.columnId}`, {
           id: data.id
