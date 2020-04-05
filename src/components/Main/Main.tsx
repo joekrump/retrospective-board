@@ -42,6 +42,7 @@ export const Main = (props: MainProps) => {
     });
 
     props.socket.on(`board:update-remaining-stars:${props.boardId}`, (data: any) => {
+      console.log("UPDATE REMAINING STARS")
       updateRemainingStars(data.remainingStars);
     })
 
