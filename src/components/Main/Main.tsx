@@ -5,6 +5,7 @@ import { BoardControls } from "../BoardControls/BoardControls";
 import { useOvermind } from "../../overmind";
 
 import "./main.css";
+import { AppMode } from "../../overmind/state";
 
 interface MainProps {
   socket: SocketIOClient.Socket;
@@ -22,6 +23,7 @@ export const Main = (props: MainProps) => {
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
   const [remainingStars, updateRemainingStars] = React.useState(null as unknown as number);
+  let { state: { mode } } = useOvermind();
 
   useEffect(function onMount() {
     props.socket.on(`board:loaded:${props.boardId}`, (
@@ -119,20 +121,22 @@ export const Main = (props: MainProps) => {
       );
     }
 
-    markup.push(
-      <div className="column" key="add-new-column">
-        <div className="add-column--button-filler">
+    if (mode !== AppMode.review) {
+      markup.push(
+        <div className="column">
+          <div className="add-column--button-filler">
 
+          </div>
+          <button
+            title="Add Column"
+            className="button button--add-column"
+            onClick={() => addColumn()}
+          >
+            +
+          </button>
         </div>
-        <button
-          title="Add Column"
-          className="button button--add-column"
-          onClick={() => addColumn()}
-        >
-          +
-        </button>
-      </div>
-    );
+      );
+    }
 
     return markup;
   }
