@@ -121,6 +121,21 @@ export const Main = (props: MainProps) => {
       );
     }
 
+    markup.push(
+      <div className="column">
+        <div className="add-column--button-filler">
+
+        </div>
+        <button
+          title="Add Column"
+          className="button button--add-column"
+          onClick={() => addColumn()}
+        >
+          +
+        </button>
+      </div>
+    );
+
     return markup;
   }
 
@@ -148,7 +163,6 @@ export const Main = (props: MainProps) => {
     <main>
       <BoardControls
         sortColumnCardsByStars={sortColumnCardsByStars}
-        addColumn={() => addColumn()}
         title={boardTitle}
         socket={props.socket}
         boardId={props.boardId}

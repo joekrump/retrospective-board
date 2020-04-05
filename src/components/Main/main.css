@@ -15,3 +15,22 @@ main {
   padding-top: 20px;
   margin: 0 10px;
 }
+
+.add-column--button-filler {
+  height: 1.5em;
+  margin: 1.0rem 0;
+}
+
+.button--add-column {
+  display: flex;
+  align-items: center;
+  color: white;
+  background-color: #007B23;
+  font-size: 1.6em;
+  padding: 0 0.4em 0.2em 0.4em;
+  font-weight: 200;
+}
+
+.button--add-column:hover {
+  background-color: #1F8F3F;
+}

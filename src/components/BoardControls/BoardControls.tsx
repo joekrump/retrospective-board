@@ -5,7 +5,6 @@ import { SortDirection } from "../Main/Main";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
 interface BoardControlsProps {
-  addColumn: () => void;
   title: string;
   socket: SocketIOClient.Socket;
   boardId: string;
@@ -66,12 +65,6 @@ export const BoardControls = (props: BoardControlsProps) => {
           </button>
         :
         <div className="board-actions">
-          <button
-            className="button button--create"
-            onClick={() => props.addColumn()}
-          >
-            New Column
-            </button>
           <strong className="stars-remaining">
             ⭐️: {props.remainingStars}
           </strong>
