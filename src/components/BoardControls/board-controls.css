@@ -9,13 +9,15 @@
   grid-column: 1 / span 12
 }
 
-#board-title .pencil-icon {
-  display: none;
-  cursor: pointer;
+.button__sort {
+  display: flex;
+  justify-content: space-between;
 }
 
-#board-title:hover .pencil-icon {
+.button__sort .gg-sort-za,
+.button__sort .gg-sort-az {
   display: inline-block;
+  margin: auto;
 }
 
 .board-title--text {

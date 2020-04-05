@@ -1,6 +1,4 @@
 import React, { FormEvent, RefObject, MouseEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 
 import "./column-header.css";
@@ -29,9 +27,17 @@ export const ColumnHeader = (props: ColumnHeaderProps) => {
           ref={props.nameInputRef}
           autoFocus={true}
         />
-        <button type="submit">Save</button>
-        <button type="button" onClick={event => props.onEditToggle(event)}>Cancel</button>
-        <ButtonDelete id={props.columnId} handleClick={(e, id) => props.onDeleteClick(e, id)}/>
+        <div className="column-header--controls">
+          <div className="column--header--controls--primary">
+            <button type="submit">
+              <span className="gg-check"></span>
+            </button>
+            <button type="button" onClick={event => props.onEditToggle(event)}>
+              <span className="gg-close"></span>
+            </button>
+          </div>
+          <ButtonDelete id={props.columnId} handleClick={(e, id) => props.onDeleteClick(e, id)}/>
+        </div>
       </form>
     );
   } else {
@@ -40,7 +46,7 @@ export const ColumnHeader = (props: ColumnHeaderProps) => {
         className="column-header column-header--text"
         onClick={event => props.onEditToggle(event)}
       >
-        {props.name}&nbsp;<FontAwesomeIcon className="pencil-icon" icon={faPencilAlt} />
+        {props.name}
       </h2>
     );
   }

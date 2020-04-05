@@ -4,6 +4,10 @@
   width: 100%;
 }
 
+.column-header input {
+  background-color: #e6e6e6;
+}
+
 .column-header--text {
   display: block;
   padding: 0;
@@ -17,13 +21,23 @@
   margin-bottom: 0.5rem;
 }
 
-.column-header > .pencil-icon {
-  display: none;
-}
-.column-header:hover > .pencil-icon {
-  display: inline-block;
+.column-header--controls button,
+.column-header--controls .button--delete {
+  flex: 0 0 auto;
+  padding: 0 2px;
+  margin-right: 5px;
 }
 
-.column-header > button {
-  flex: 0 0 auto;
+.column-header--controls .button--delete {
+  padding: 0 6px;
+}
+
+.column-header--controls,
+.column--header--controls--primary {
+  display: flex;
+  align-items: center;
+}
+
+.column-header--controls {
+  justify-content: space-between;
 }

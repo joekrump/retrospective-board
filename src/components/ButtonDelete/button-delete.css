@@ -3,6 +3,10 @@
   align-items: center;
   font-size: 14pt;
 }
+
+.button--delete .gg-trash {
+  display: inline-block;
+}
 .button--delete:hover,
 .button--delete:focus {
   color: #c41414;

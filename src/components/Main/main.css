@@ -1,7 +1,11 @@
+/* CSS Icons from https://css.gg */
+@import url('https://css.gg/c?=|check|close|pen|sort-az|sort-za|trash|undo');
+
 main {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-template-rows: 4% 1fr;
+  --ggs: 1;
 }
 
 #columns {
