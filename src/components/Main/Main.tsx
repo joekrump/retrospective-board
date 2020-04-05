@@ -35,16 +35,16 @@ export const Main = (props: MainProps) => {
           { id: column.id, name: column.name, isEditing: false }
         )),
       );
+
+      props.socket.on(`board:update-remaining-stars:${props.boardId}:${data.sessionId}`, (data: any) => {
+        console.log("UPDATE REMAINING STARS")
+        updateRemainingStars(data.remainingStars);
+      });
     });
 
     props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
       updateBoardTitle(data.title);
     });
-
-    props.socket.on(`board:update-remaining-stars:${props.boardId}`, (data: any) => {
-      console.log("UPDATE REMAINING STARS")
-      updateRemainingStars(data.remainingStars);
-    })
 
     props.socket.on(`column:created:${props.boardId}`, (data: any) => {
       addColumn(data);

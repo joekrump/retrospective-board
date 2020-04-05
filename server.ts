@@ -101,6 +101,22 @@ function canStar(remainingStars: number) {
   return remainingStars >= 0;
 }
 
+function emitUpdateRemainingStars(
+  socket: SocketIO.Socket,
+  boardId: string,
+  sessionId: string,
+) {
+  socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
+    remainingStars: sessionStore[boardId][sessionId].remainingStars,
+  });
+
+  Object.keys(sessionStore[boardId]).forEach((boardSessionId) => {
+    socket.broadcast.emit(`board:update-remaining-stars:${boardId}:${boardSessionId}`, {
+      remainingStars: sessionStore[boardId][boardSessionId].remainingStars,
+    });
+  });
+}
+
 io.on('connection', function (socket) {
 
   socket.on('board:show-results', function(data: { boardId: string, sessionId: string }) {
@@ -209,18 +225,19 @@ io.on('connection', function (socket) {
       return;
     }
 
-    let columnIndex = boards[boardId].columns.findIndex((column) => column.id === id);
-    if (columnIndex) {
+    let columnIndex = boards[boardId]?.columns.findIndex((column) => column.id === id);
+
+    if (columnIndex !== -1) {
       const column = boards[boardId].columns[columnIndex];
 
       column?.cards?.forEach((card) => { reclaimStarsFromDeleteCard(card, boardId); });
 
-      socket.emit(`board:update-remaining-stars:${boardId}`, {
-        remainingStars: sessionStore[boardId][sessionId].remainingStars,
-      });
+      emitUpdateRemainingStars(socket, boardId, sessionId);
 
       boards[boardId]?.columns.splice(columnIndex, 1);
       socket.broadcast.emit(`column:deleted:${boardId}`, { id });
+    } else  {
+      console.error("No column found");
     }
   })
 
@@ -314,7 +331,7 @@ io.on('connection', function (socket) {
         socket.broadcast.emit(`card:starred:${id}`, {
           starsCount,
         });
-        socket.emit(`board:update-remaining-stars:${boardId}`, {
+        socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
           remainingStars: session.remainingStars,
         });
       }
