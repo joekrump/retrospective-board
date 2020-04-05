@@ -27,7 +27,7 @@ export const App = () => {
 
   const socket = io.connect(serverURL);
   const [boardId] = useState(initialBoardId);
-  const [maxStars, setMaxStars] = useState();
+  const [maxStars, setMaxStars] = useState(null as unknown as number);
   const [showStarLimitAlert, updateShowStarLimitAlert] = useState(false);
 
   function setHideStarLimitAlertTimeout(timeoutMS = 3000) {

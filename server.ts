@@ -43,12 +43,8 @@ app.get("/board/:boardId", function(_req, res) {
   res.sendFile(__dirname + "/public/index.html");
 });
 
-function createNewBoard(boardId?: string) {
-  if(!boardId) {
-    boardId = uuid.v4();
-  }
+function createNewBoard(boardId: string) {
   boards[boardId] = NEW_BOARD;
-  return boardId;
 }
 
 function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
@@ -64,11 +60,6 @@ function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: st
     showResults: boards[boardId].showResults,
     remainingStars: sessionStore[boardId][sessionId].remainingStars,
   });
-}
-
-function initializeBoardForUser(boardId: string, sessionId: string) {
-  boardId = createNewBoard(boardId);
-  sessionStore[boardId][sessionId].remainingStars = MAX_VOTES_USER_VOTE_PER_BOARD;
 }
 
 function updateRemainingStars(
@@ -134,25 +125,24 @@ io.on('connection', function (socket) {
   });
 
   socket.on('board:loaded', function (data: { boardId: string, sessionId?: string }) {
-    let sessionId = data.sessionId ?? uuid.v4();
+    const sessionId = data.sessionId ?? uuid.v4();
+    const boardId = data.boardId ?? uuid.v4();
+
     const newSession = {
       id: sessionId,
       remainingStars: MAX_VOTES_USER_VOTE_PER_BOARD,
     };
 
-    if(!sessionStore[data.boardId]) {
-      sessionStore[data.boardId] = {
+    if(!sessionStore[boardId]) {
+      createNewBoard(boardId)
+      sessionStore[boardId] = {
         [sessionId]: newSession,
       };
-    } else if (!sessionStore[data.boardId][sessionId]) {
-      sessionStore[data.boardId][sessionId] = newSession
+    } else if (!sessionStore[boardId][sessionId]) {
+      sessionStore[boardId][sessionId] = newSession
     }
 
-    if(!data.boardId || !boards[data.boardId]) {
-      initializeBoardForUser(data.boardId, sessionId);
-    }
-
-    emitBoardLoaded(socket, data.boardId, sessionId);
+    emitBoardLoaded(socket, boardId, sessionId);
   });
 
   socket.on('board:updated', function(data: { boardId: string, title: string, sessionId: string }) {
