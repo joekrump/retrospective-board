@@ -203,7 +203,7 @@ io.on('connection', function (socket) {
 
   socket.on("column:deleted", function(data: { boardId: string, id: string, sessionId: string }) {
     console.log("column delete request");
-    if (data.sessionId === undefined && !sessionStore[data.sessionId]) {
+    if (data?.sessionId === undefined && !sessionStore[data.sessionId]) {
       console.error("No session");
       return;
     }
@@ -213,9 +213,9 @@ io.on('connection', function (socket) {
     if (columnIndex) {
       const column = boards[data.boardId].columns[columnIndex];
 
-      column.cards.forEach((card) => { reclaimStarsFromDeleteCard(card, data.boardId); });
+      column?.cards?.forEach((card) => { reclaimStarsFromDeleteCard(card, data.boardId); });
 
-      boards[data.boardId].columns.splice(columnIndex, 1);
+      boards[data.boardId]?.columns.splice(columnIndex, 1);
       socket.broadcast.emit(`column:deleted:${data.boardId}`, {
         id: data.id
       });
