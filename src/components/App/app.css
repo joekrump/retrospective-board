@@ -1,6 +1,10 @@
+:root {
+  --app--background-color: #e6e6e6;
+}
+
 html, body, #react-root {
   height: 100%;
-  background-color: #e6e6e6;
+  background-color: var(--app--background-color);
 }
 
 body {
@@ -53,11 +57,4 @@ button {
 .button {
   padding: 5px 10px;
   cursor: pointer;
-}
-
-.button--create {
-  color: #e6e6e6;
-  border: 1px solid #e6e6e6;
-  background-color: #007B23;
-  font-weight: 700;
 }

@@ -5,7 +5,7 @@
 }
 
 .column-header input {
-  background-color: #e6e6e6;
+  background-color: var(--app--background-color);
 }
 
 .column-header--text {
@@ -13,6 +13,7 @@
   padding: 0;
   border: 0;
   font-size: 1.5em;
+  height: 1.0em;
   font-weight: 600;
   width: 100%;
 }
