@@ -31,7 +31,7 @@
     "tsc": "tsc",
     "prod": "NODE_ENV=production concurrently --kill-others \"npm run watch\" \"ts-node-dev --respawn --transpileOnly server.ts\" \"ts-node-dev --transpileOnly ngrok.ts\"",
     "dev:client": "webpack-dev-server --mode development --open",
-    "dev:server": "ts-node-dev --respawn --transpileOnly server.ts",
+    "dev:server": "ts-node-dev --respawn --transpile-only server.ts",
     "watch": "webpack --watch"
   },
   "devDependencies": {
@@ -48,7 +48,7 @@
     "style-loader": "^1.2.1",
     "svg-url-loader": "^3.0.3",
     "ts-loader": "^6.2.2",
-    "ts-node-dev": "^1.0.0-pre.52",
+    "ts-node-dev": "^1.1.1",
     "typescript": "^3.9.7",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
