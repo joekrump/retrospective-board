@@ -185,7 +185,7 @@ io.on('connection', function (socket) {
       console.error("No session");
       return;
     }
-    console.log(data);
+
     boards[data.boardId].columns.push({id: data.id, name: data.name, cards: []});
     socket.broadcast.emit(`column:created:${data.boardId}`, {
       id: data.id,
@@ -231,6 +231,55 @@ io.on('connection', function (socket) {
     }
   })
 
+  socket.on("card:moved", function(data: { boardId: string, fromColumnId: string, toColumnId: string, cardId: string, sessionId: string }) {
+    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
+      console.error("No session");
+      return;
+    }
+    console.log("***MOVED***")
+    console.log(data)
+
+    const card = getCard(data.cardId, data.fromColumnId, data.boardId, data.sessionId);
+
+    console.log(card);
+    socket.emit(`card:created:${data.toColumnId}`, {
+      card,
+    });
+
+    socket.broadcast.emit(`card:created:${data.toColumnId}`, {
+      card,
+    });
+
+    socket.emit(`card:deleted:${data.fromColumnId}`, {
+      id: data.cardId,
+    });
+
+    socket.broadcast.emit(`card:deleted:${data.fromColumnId}`, {
+      id: data.cardId
+    });
+  });
+
+  function addCardToColumn(card: { id: string, text: string, columnId: string, boardId: string, }, sessionId: string) {
+    const column = boards[card.boardId].columns.find((column) => column.id === card.columnId);
+    if (column) {
+      let newCard = {
+        id: card.id,
+        text: card.text,
+        stars: {},
+        ownerId: sessionId,
+        starsCount: 0,
+      };
+      column.cards.push(newCard);
+
+      socket.emit(`card:created:${card.columnId}`, {
+        card,
+      });
+      socket.broadcast.emit(`card:created:${card.columnId}`, {
+        card,
+      });
+    }
+  }
+
   socket.on("card:created", function(data: { boardId: string, columnId: string, id: string, text: string, sessionId: string }) {
     console.log("card create request")
     if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
@@ -238,24 +287,7 @@ io.on('connection', function (socket) {
       return;
     }
 
-    const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
-    if (column) {
-      let card = {
-        id: data.id,
-        text: data.text,
-        stars: {},
-        ownerId: data.sessionId,
-        starsCount: 0,
-      };
-      column.cards.push(card);
-
-      socket.emit(`card:created:${data.columnId}`, {
-        card,
-      });
-      socket.broadcast.emit(`card:created:${data.columnId}`, {
-        card,
-      });
-    }
+    addCardToColumn(data, data.sessionId);
   });
 
   socket.on("card:updated", function (data: { boardId: string, columnId: string, id: string, text: string, sessionId: string }) {
@@ -264,18 +296,29 @@ io.on('connection', function (socket) {
       console.error("No session");
       return;
     }
-    console.log(data);
-    const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
-    if (column) {
-      const card = column.cards.find((card) => card.id === data.id);
-      if (card && card.ownerId === data.sessionId) {
-        card.text = data.text;
-        socket.broadcast.emit(`card:updated:${data.id}`, {
-          text: data.text,
-        });
-      }
+
+    const card = getCard(data.id, data.columnId, data.boardId, data.sessionId);
+
+    if (card !== null) {
+      card.text = data.text;
+      socket.broadcast.emit(`card:updated:${data.id}`, {
+        text: data.text,
+      });
     }
   });
+
+  function getCard(cardId: string, columnId: string, boardId: string, sessionId: string) {
+    const column = boards[boardId].columns.find((column) => column.id === columnId);
+    if (column) {
+      const card = column.cards.find((card) => card.id === cardId);
+      if (card && card.ownerId === sessionId) {
+        return card;
+      } else {
+        return null;
+      }
+    }
+    return null;
+  }
 
   socket.on("card:deleted", function (data: { boardId: string, columnId: string, id: string, sessionId: string }) {
     console.log("card delete request");

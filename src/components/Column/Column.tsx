@@ -56,16 +56,17 @@ export const Column = (props: ColumnProps) => {
     if (innerRef.current !== null) {
       const transferredData = JSON.parse(e.dataTransfer?.getData("text/json") ?? "");
 
-      // props.socket.emit("card:deleted", {
-      //   boardId: props.boardId,
-      //   columnId: transferredData.columnId,
-      //   id: transferredData.id,
-      //   sessionId: sessionStorage.getItem("retroSessionId"),
-      // });
-
       innerRef.current?.classList.remove("over");
 
       addCard(transferredData)
+
+      props.socket.emit("card:moved", {
+        boardId: props.boardId,
+        fromColumnId: transferredData.columnId,
+        toColumnId: props.id,
+        sessionId,
+        cardId: transferredData.id,
+      });
     }
 
     return false;
@@ -174,8 +175,6 @@ export const Column = (props: ColumnProps) => {
         userStars: 0,
         newCard: true,
       };
-    } else {
-      card.columnId = props.id;
     }
 
     updatedCards = [
