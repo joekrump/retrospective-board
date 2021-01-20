@@ -49,16 +49,28 @@ export const Column = (props: ColumnProps) => {
     }
     return false;
   }
+
   function handleDrop(e: DragEvent) {
     e.stopPropagation(); // stops the browser from redirecting.
 
     if (innerRef.current !== null) {
       const transferredData = JSON.parse(e.dataTransfer?.getData("text/json") ?? "");
+
+      props.socket.emit("card:deleted", {
+        boardId: props.boardId,
+        columnId: transferredData.columnId,
+        id: transferredData.id,
+        sessionId: sessionStorage.getItem("retroSessionId"),
+      });
+
+      console.log(transferredData);
+
       addCard(transferredData)
     }
 
     return false;
   }
+
   function handleDragEnter() {
     innerRef.current?.classList.add("over");
   }
@@ -150,15 +162,20 @@ export const Column = (props: ColumnProps) => {
     cardsRef.current = cards;
   }, [cards]);
 
-  function addCard(card: CardData = {
-    id: `card-${uuid.v4()}`,
-    editable: true,
-    isEditing: true,
-    starsCount: 0,
-    userStars: 0,
-    newCard: true,
-  }) {
+  function addCard(card?: CardData) {
     let updatedCards: CardData[] = [];
+
+    if (card === undefined) {
+      card = {
+        id: `card-${uuid.v4()}`,
+        editable: true,
+        isEditing: true,
+        starsCount: 0,
+        userStars: 0,
+        newCard: true,
+      };
+    }
+
     updatedCards = [
       card,
       ...cardsRef.current,

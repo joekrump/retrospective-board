@@ -42,12 +42,9 @@ export const Card = (props: CardProps) => {
           id,
           columnId,
           editable,
-          text,
-          starsCount,
-          userStars,
-          isEditing,
           newCard
         } = props;
+        console.log(isEditing)
         e.dataTransfer?.setData('text/json', JSON.stringify({
           id,
           columnId,
@@ -66,13 +63,12 @@ export const Card = (props: CardProps) => {
   function handleDragEnd() {
     if (innerRef.current !== null) {
       innerRef.current.style.opacity = "1";
-      // innerRef.current.classList.remove("over");
     }
   }
 
   useEffect(() => {
     const cardRef = innerRef.current;
-    const sessionId = sessionStorage.getItem("retroSessionId") || "";
+
     props.socket.on(`card:updated:${props.id}`, (data: any) => {
       updateText(data.text);
     });

@@ -289,7 +289,7 @@ io.on('connection', function (socket) {
       const cardIndex = column.cards.findIndex((card) => card.id === data.id);
       const card = column.cards[cardIndex];
       // Check to see if the request is coming from the card's owner
-      if(card.ownerId === data.sessionId) {
+      if(card?.ownerId === data?.sessionId) {
         column.cards.splice(cardIndex, 1);
 
         reclaimStarsFromDeleteCard(card, data.boardId);
