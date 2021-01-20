@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, RefObject } from "react";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
@@ -27,12 +27,47 @@ export const Card = (props: CardProps) => {
   const [userStars, updateUserStars] = useState(props.userStars);
   const [starsCount, updateStarsCount] = useState(props.starsCount);
   const { state: { mode } } = useOvermind();
+  const innerRef: RefObject<HTMLDivElement> = useRef(null);
   let cardContents;
 
+  function handleDragStart(e: DragEvent) {
+    if (innerRef.current !== null) {
+      innerRef.current.style.opacity = "0.4";
+    }
+
+    if (e.dataTransfer !== null) {
+      e.dataTransfer.effectAllowed = "move";
+      if (innerRef.current !== null) {
+        const {
+          id,
+          columnId,
+          editable,
+          newCard
+        } = props;
+
+        e.dataTransfer?.setData('text/json', JSON.stringify({
+          id,
+          columnId,
+          editable,
+          text,
+          starsCount,
+          userStars,
+          isEditing,
+          newCard,
+          ownerId: sessionStorage.getItem("retroSessionId") ?? "",
+        }));
+      }
+    }
+  }
+
+  function handleDragEnd() {
+    if (innerRef.current !== null) {
+      innerRef.current.style.opacity = "1";
+    }
+  }
+
   useEffect(() => {
-    const sessionId = sessionStorage.getItem("retroSessionId") || "";
     props.socket.on(`card:updated:${props.id}`, (data: any) => {
-      alert(data.card.ownerId === sessionId);
       updateText(data.text);
     });
 
@@ -52,6 +87,22 @@ export const Card = (props: CardProps) => {
       props.socket.removeListener(`card:starred:${props.id}`);
     }
   }, []);
+
+  useEffect(() => {
+    const cardRef = innerRef.current;
+
+    if (cardRef !== null) {
+      cardRef.addEventListener("dragstart", (e) => handleDragStart(e), false);
+      cardRef.addEventListener("dragend", () => handleDragEnd(), false);
+    }
+
+    return function cleanup() {
+      if (cardRef !== null) {
+        cardRef.removeEventListener("dragstart", (e) => handleDragStart(e));
+        cardRef.removeEventListener("dragend", () => handleDragEnd());
+      }
+    }
+  }, [text, isEditing, props.columnId, props.newCard, starsCount, userStars])
 
   function toggleIsEditing(event?: React.MouseEvent) {
     if (!!event) {
@@ -189,8 +240,13 @@ export const Card = (props: CardProps) => {
     );
   }
 
+  const draggable = !props.newCard && props.editable;
+
   return (
-    <div className={isEditing ? "card-container card-container--editing" : "card-container"}>
+    <div
+      ref={innerRef}
+      draggable={draggable ? "true" : "false"}
+      className={`card-container ${draggable ? "draggable" : ""} ${isEditing ? "card-container--editing" : ""}`}>
       {cardContents}
     </div>
   );

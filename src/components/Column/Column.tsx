@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, RefObject } from "react";
 import { Card } from "../Card/Card";
 import * as uuid from "uuid";
 import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
@@ -41,8 +41,51 @@ export const Column = (props: ColumnProps) => {
   let { state: { mode } } = useOvermind();
   let cardsRef = useRef(cards);
   const sessionId = sessionStorage.getItem("retroSessionId") || "";
+  const innerRef: RefObject<HTMLDivElement> = useRef(null);
+
+  function handleDragOver(e: DragEvent) {
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
+    return false;
+  }
+
+  function handleDrop(e: DragEvent) {
+    e.stopPropagation(); // stops the browser from redirecting.
+
+    if (innerRef.current !== null) {
+      const droppedCard = JSON.parse(e.dataTransfer?.getData("text/json") ?? "");
+
+      if (droppedCard.columnId === props.id) {
+        return false;
+      }
+
+      innerRef.current?.classList.remove("over");
+
+      addCard(droppedCard)
+
+      props.socket.emit("card:moved", {
+        boardId: props.boardId,
+        fromColumnId: droppedCard.columnId,
+        toColumnId: props.id,
+        sessionId,
+        cardId: droppedCard.id,
+      });
+    }
+
+    return false;
+  }
+
+  function handleDragEnter() {
+    innerRef.current?.classList.add("over");
+  }
+
+  function handleDragLeave() {
+    innerRef.current?.classList.remove("over");
+  }
 
   useEffect(function onMount() {
+    const columnRef = innerRef.current;
     props.socket.emit("column:loaded", {
       boardId: props.boardId,
       id: props.id,
@@ -97,11 +140,26 @@ export const Column = (props: ColumnProps) => {
       updateName(data.name);
     });
 
+    if (columnRef !== null) {
+      console.log(columnRef)
+      columnRef.addEventListener("dragover", handleDragOver, false);
+      columnRef.addEventListener("dragenter", () => handleDragEnter(), false);
+      columnRef.addEventListener("dragleave", () => handleDragLeave(), false);
+      columnRef.addEventListener("drop", (e) => handleDrop(e), false);
+    }
+
     return function cleanup() {
       props.socket.removeListener(`column:loaded:${props.id}`);
       props.socket.removeListener(`card:deleted:${props.id}`);
       props.socket.removeListener(`card:created:${props.id}`);
       props.socket.removeListener(`column:updated:${props.id}`);
+
+      if (columnRef !== null) {
+        columnRef.removeEventListener("dragover", handleDragOver);
+        columnRef.removeEventListener("dragenter", () => handleDragEnter());
+        columnRef.removeEventListener("dragleave", () => handleDragLeave());
+        columnRef.removeEventListener("drop", (e) => handleDrop(e));
+      }
     };
   }, []);
 
@@ -109,16 +167,20 @@ export const Column = (props: ColumnProps) => {
     cardsRef.current = cards;
   }, [cards]);
 
-  function addCard() {
+  function addCard(card?: CardData) {
     let updatedCards: CardData[] = [];
-    let card = {
-      id: `card-${uuid.v4()}`,
-      editable: true,
-      isEditing: true,
-      starsCount: 0,
-      userStars: 0,
-      newCard: true,
-    };
+
+    if (card === undefined) {
+      card = {
+        id: `card-${uuid.v4()}`,
+        editable: true,
+        isEditing: true,
+        starsCount: 0,
+        userStars: 0,
+        newCard: true,
+      };
+    }
+
     updatedCards = [
       card,
       ...cardsRef.current,
@@ -248,7 +310,9 @@ export const Column = (props: ColumnProps) => {
               +
             </button>
         }
-        { memoizedCards }
+        <div ref={innerRef} className="card--list">
+          { memoizedCards }
+        </div>
       </div>
     </div>
   );
