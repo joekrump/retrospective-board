@@ -102,7 +102,7 @@ export const Card = (props: CardProps) => {
         cardRef.removeEventListener("dragend", () => handleDragEnd());
       }
     }
-  }, [text, isEditing, props.columnId, props.newCard])
+  }, [text, isEditing, props.columnId, props.newCard, starsCount, userStars])
 
   function toggleIsEditing(event?: React.MouseEvent) {
     if (!!event) {
