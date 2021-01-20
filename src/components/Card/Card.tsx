@@ -240,11 +240,13 @@ export const Card = (props: CardProps) => {
     );
   }
 
+  const draggable = !props.newCard && props.editable;
+
   return (
     <div
       ref={innerRef}
-      draggable={props.newCard ? "false" : "true"}
-      className={isEditing ? "card-container card-container--editing" : "card-container"}>
+      draggable={draggable ? "true" : "false"}
+      className={`card-container ${draggable ? "draggable" : ""} ${isEditing ? "card-container--editing" : ""}`}>
       {cardContents}
     </div>
   );

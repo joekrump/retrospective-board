@@ -16,10 +16,6 @@
   border-radius: 8px;
 }
 
-[draggable] {
-  user-select: none;
-}
-
 .card-container textarea:focus {
   outline: none;
 }
@@ -44,8 +40,9 @@
   min-height: 3em;
 }
 
-.card-container .card--content {
+.draggable .card--content {
   cursor: move;
+  user-select: none;
 }
 
 .card-container .card--content p {
