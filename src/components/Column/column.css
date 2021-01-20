@@ -9,8 +9,28 @@
 }
 
 .column {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   margin: 20px 10px;
+  background-color: black;
+}
+.column .body-row {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+.column .card--list {
+  background-color: red;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+.column.over .card--list {
+  background-color: blue;
+  border: 3px dotted orange;
 }
 
 /* Simple implementation to give unique background colors to cards in specific columns */

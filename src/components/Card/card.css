@@ -16,6 +16,10 @@
   border-radius: 8px;
 }
 
+[draggable] {
+  user-select: none;
+}
+
 .card-container textarea:focus {
   outline: none;
 }
@@ -38,6 +42,10 @@
 .card-container textarea {
   margin: 0 0 1em 0;
   min-height: 3em;
+}
+
+.card-container .card--content {
+  cursor: move;
 }
 
 .card-container .card--content p {
