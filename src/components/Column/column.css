@@ -28,7 +28,7 @@
   flex-direction: column;
 }
 
-.column.over .card--list {
+.column .card--list.over {
   background-color: blue;
   border: 3px dotted orange;
 }

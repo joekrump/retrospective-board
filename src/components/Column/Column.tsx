@@ -65,6 +65,8 @@ export const Column = (props: ColumnProps) => {
 
       console.log(transferredData);
 
+      innerRef.current?.classList.remove("over");
+
       addCard(transferredData)
     }
 
