@@ -44,7 +44,7 @@ export const Card = (props: CardProps) => {
           editable,
           newCard
         } = props;
-        console.log(isEditing)
+
         e.dataTransfer?.setData('text/json', JSON.stringify({
           id,
           columnId,
@@ -67,16 +67,9 @@ export const Card = (props: CardProps) => {
   }
 
   useEffect(() => {
-    const cardRef = innerRef.current;
-
     props.socket.on(`card:updated:${props.id}`, (data: any) => {
       updateText(data.text);
     });
-
-    if (cardRef !== null) {
-      cardRef.addEventListener("dragstart", (e) => handleDragStart(e), false);
-      cardRef.addEventListener("dragend", () => handleDragEnd(), false);
-    }
 
     props.socket.on(`card:starred:${props.id}`, (
       data: { starsCount: number, userStars: number }
@@ -92,12 +85,24 @@ export const Card = (props: CardProps) => {
     return function cleanup() {
       props.socket.removeListener(`card:updated:${props.id}`);
       props.socket.removeListener(`card:starred:${props.id}`);
+    }
+  }, []);
+
+  useEffect(() => {
+    const cardRef = innerRef.current;
+
+    if (cardRef !== null) {
+      cardRef.addEventListener("dragstart", (e) => handleDragStart(e), false);
+      cardRef.addEventListener("dragend", () => handleDragEnd(), false);
+    }
+
+    return function cleanup() {
       if (cardRef !== null) {
         cardRef.removeEventListener("dragstart", (e) => handleDragStart(e));
         cardRef.removeEventListener("dragend", () => handleDragEnd());
       }
     }
-  }, []);
+  }, [text, isEditing, props.columnId, props.newCard])
 
   function toggleIsEditing(event?: React.MouseEvent) {
     if (!!event) {
