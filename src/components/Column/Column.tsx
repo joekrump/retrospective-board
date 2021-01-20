@@ -54,18 +54,22 @@ export const Column = (props: ColumnProps) => {
     e.stopPropagation(); // stops the browser from redirecting.
 
     if (innerRef.current !== null) {
-      const transferredData = JSON.parse(e.dataTransfer?.getData("text/json") ?? "");
+      const droppedCard = JSON.parse(e.dataTransfer?.getData("text/json") ?? "");
+
+      if (droppedCard.columnId === props.id) {
+        return false;
+      }
 
       innerRef.current?.classList.remove("over");
 
-      addCard(transferredData)
+      addCard(droppedCard)
 
       props.socket.emit("card:moved", {
         boardId: props.boardId,
-        fromColumnId: transferredData.columnId,
+        fromColumnId: droppedCard.columnId,
         toColumnId: props.id,
         sessionId,
-        cardId: transferredData.id,
+        cardId: droppedCard.id,
       });
     }
 
