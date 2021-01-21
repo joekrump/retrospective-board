@@ -28,7 +28,6 @@
     "uuid": "^3.4.0"
   },
   "scripts": {
-    "tsc": "tsc",
     "prod": "NODE_ENV=production concurrently --kill-others \"npm run watch\" \"ts-node-dev --respawn --transpile-only server.ts\" \"ts-node-dev --transpile-only ngrok.ts\"",
     "dev:client": "webpack-dev-server --mode development --open",
     "dev:server": "ts-node-dev --respawn --transpile-only server.ts",
