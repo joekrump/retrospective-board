@@ -3,9 +3,10 @@
   padding: 0 0 0.2em 0;
 }
 
-.card--button__add {
+.body-row .card--button__add {
   font-weight: 200;
   font-size: 1.6em;
+  padding-bottom: 0;
 }
 
 .column {

@@ -29,7 +29,7 @@ main {
   color: white;
   background-color: var(--green);
   font-size: 1.6em;
-  padding: 0 0.4em 0.2em 0.4em;
+  padding: 0 0.4em;
   font-weight: 200;
 }
 
