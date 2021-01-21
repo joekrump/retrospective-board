@@ -2,7 +2,7 @@
 
 A tool for running retros.
 
-![UI Screenshot](https://user-images.githubusercontent.com/3317231/78468413-bdec3000-76cc-11ea-829f-322a593e0e0d.png)
+![UI Screenshot](https://user-images.githubusercontent.com/3317231/105420017-849d9600-5bf4-11eb-9341-287ec029073e.gif)
 
 ## Features
 
