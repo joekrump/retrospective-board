@@ -21,9 +21,8 @@ A tool for running retros.
 
 ## Serve the app from your computer to others over HTTPS via NGROK
 
-1. `npm run prod`
+1. `npm run start:prod`
 
 ## Development
 
-1. `npm run dev:client` - Start webpack dev server for the client-side code running on **localhost:4000**.
-1. `npm run dev:server` - Start Node server running locally.
+1. `npm run start:dev`
