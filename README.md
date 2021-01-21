@@ -21,8 +21,8 @@ A tool for running retros.
 
 ## Serve the app from your computer to others over HTTPS via NGROK
 
-1. `npm run start:prod`
+1. `npm run prod`
 
 ## Development
 
-1. `npm run start:dev`
+1. `npm run dev`

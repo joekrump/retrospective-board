@@ -28,9 +28,9 @@
     "uuid": "^3.4.0"
   },
   "scripts": {
-    "start:dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "start:prod": "NODE_ENV=production concurrently --kill-others \"ts-node-dev --respawn --transpile-only server.ts\" \"ts-node-dev --transpile-only --respawn ngrok.ts\"",
-    "prestart:prod": "npm run build",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "prod": "NODE_ENV=production concurrently --kill-others \"ts-node-dev --respawn --transpile-only server.ts\" \"ts-node-dev --transpile-only --respawn ngrok.ts\"",
+    "preprod": "npm run build",
     "build": "webpack --mode production",
     "dev:client": "webpack-dev-server --mode development --open",
     "dev:server": "ts-node-dev --respawn --transpile-only server.ts"
