@@ -29,7 +29,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "prod": "NODE_ENV=production concurrently --kill-others \"npm run watch\" \"ts-node-dev --respawn --transpileOnly server.ts\" \"ts-node-dev --transpileOnly ngrok.ts\"",
+    "prod": "NODE_ENV=production concurrently --kill-others \"npm run watch\" \"ts-node-dev --respawn --transpile-only server.ts\" \"ts-node-dev --transpile-only ngrok.ts\"",
     "dev:client": "webpack-dev-server --mode development --open",
     "dev:server": "ts-node-dev --respawn --transpile-only server.ts",
     "watch": "webpack --watch"
