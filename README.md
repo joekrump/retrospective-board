@@ -7,10 +7,10 @@ A tool for running retros.
 ## Features
 
 1. Drag and drop cards between columns.
-1. Anonimity
-  - Each user has a session but no personal identifying information is required.
-  - You only see your ⭐️s that you've given to cards while in voting mode.
-3. Review mode
+2. **Anonymity**
+   - Each user has a session but no personal identifying information is required.
+   - You only see your ⭐️s that you've given to cards while in voting mode.
+3. **Review mode**
    - See the total number of ⭐️ values given to each card
    - Quickly identify the cards with the most ⭐️s using sorting.
 4. Markdown syntax support for `**bold**, _italic_, [image](src)`, and `inline_code`.
