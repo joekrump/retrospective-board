@@ -164,7 +164,7 @@ export const Main = (props: MainProps) => {
 
   const memoizedColumns = useMemo(() => {
     return renderColumns();
-  }, [columns]);
+  }, [columns, mode]);
 
   return (
     <main>
