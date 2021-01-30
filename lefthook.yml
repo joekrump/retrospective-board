@@ -5,7 +5,7 @@ pre-push:
   commands:
     packages-audit:
       tags: frontend security
-      run: npm run audit
+      run: npm audit
 
 # pre-commit:
 #   parallel: true
