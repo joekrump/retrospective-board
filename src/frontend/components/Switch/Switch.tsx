@@ -18,6 +18,7 @@ const Switch = ({ id, handleChange, isOn }: SwitchProps) => {
         onChange={handleChange}
       />
       <label
+        data-cy="review-switch"
         className="switch--label"
         htmlFor={id}
       >
