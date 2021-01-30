@@ -36,9 +36,11 @@ const NEW_BOARD = {
 
 let app = express();
 let server = require("http").Server(app);
-let io = SocketIO(server);
+let io = SocketIO(server, {
+  origins: process.env.NODE_ENV !== "production" ? ["http://localhost:4000"] : [],
+});
 server.listen(8000);
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 app.get("/board/:boardId", function(_req, res) {
   res.sendFile(__dirname + "/public/index.html");
