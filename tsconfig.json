@@ -1,5 +1,5 @@
 {
-  "include": ["src/frontend/**/*", "__types__/**/*.ts"],
+  "include": ["src/frontend/**/*"],
   "exclude": ["node_modules", "config"],
   "compilerOptions": {
     "target": "ES2017",
