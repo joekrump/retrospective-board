@@ -1,0 +1,9 @@
+{
+  "baseUrl": "http://localhost:4000",
+  "pluginsFile": false,
+  "supportFile": false,
+  "fixturesFolder": false,
+  "video": false,
+  "testFiles": "**/*.e2e.ts",
+  "integrationFolder": "./__tests__/cypress"
+}
