@@ -7,9 +7,9 @@ pre-push:
       tags: frontend security
       run: npm run audit
 
-pre-commit:
-  parallel: true
-  commands:
-    eslint:
-      glob: "*.{js,ts}"
-      run: npm run eslint {staged_files}
+# pre-commit:
+#   parallel: true
+#   commands:
+#     eslint:
+#       glob: "*.{js,ts}"
+#       run: npm run lint {staged_files}
