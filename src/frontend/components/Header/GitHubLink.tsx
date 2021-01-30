@@ -1,5 +1,5 @@
 import React from "react";
-const packageDetails = require("../../../package.json");
+const packageDetails = require("../../../../package.json");
 const githubLogo = require("./github_light.png").default;
 
 type Props = {

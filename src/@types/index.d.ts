@@ -1,4 +1,4 @@
-interface Card {
+export interface Card {
   id: string;
   text: string;
   stars: {
@@ -8,26 +8,26 @@ interface Card {
   ownerId: string;
 }
 
-interface Column {
+export interface Column {
   name: string;
   id: string;
   cards: Card[];
 }
 
-interface Board {
+export interface Board {
   title: string;
   showResults: boolean;
   columns: Column[];
 }
 
-interface BoardColumn {
+export interface BoardColumn {
   id: string;
   name: string;
   isEditing: boolean;
   new?: boolean;
 }
 
-interface Session {
+export interface Session {
   id: string;
   remainingStars: number;
 }

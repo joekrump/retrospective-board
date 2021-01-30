@@ -1,5 +1,6 @@
 import { AppMode } from "../state";
 import { Action, mutate } from "overmind";
+import { BoardColumn } from "../../../@types";
 
 export const updateMode: Action<AppMode> = ({ state }, mode: AppMode) => {
   state.mode = mode;

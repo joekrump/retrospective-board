@@ -1,6 +1,7 @@
 import express from "express";
 import SocketIO from "socket.io";
 import uuid from "uuid";
+import { Board, Card, Session } from "./src/@types";
 
 let boards: {[key: string]: Board} = {};
 let sessionStore: {
