@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo } from "react";
 import { Column } from "../Column/Column";
-import uuid = require("uuid");
+import * as uuid from "uuid";
 import { BoardControls } from "../BoardControls/BoardControls";
 import { useOvermind } from "../../overmind";
 
 import "./main.css";
 import { AppMode } from "../../overmind/state";
+import { Board, BoardColumn } from "../../../@types";
 
 interface MainProps {
   socket: SocketIOClient.Socket;

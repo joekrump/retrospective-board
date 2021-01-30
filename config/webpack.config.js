@@ -2,7 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: './src/frontend/index.tsx',
   devtool: "source-map",
   resolve: { extensions: ['.ts', '.js', '.tsx', '.svg', '.css'] },
   module: {
@@ -41,18 +41,18 @@ module.exports = {
   },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, './public'),
+    path: path.resolve(__dirname, '../public'),
     publicPath: "/",
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./src/index.html",
+      template: "./src/frontend/index.html",
       filename: "index.html"
     })
   ],
   devServer: {
     compress: true,
-    contentBase: path.join(__dirname, 'src'),
+    contentBase: path.join(__dirname, 'src/frontend'),
     hot: true,
     inline: true,
     port: 4000,

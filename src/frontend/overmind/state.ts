@@ -1,3 +1,5 @@
+import { BoardColumn } from "../../@types";
+
 export enum AppMode {
   "vote",
   "review",

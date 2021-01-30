@@ -8,6 +8,7 @@ import "./app.css";
 import { Header } from "../Header/Header";
 import { Main } from "../Main/Main";
 import { AppMode } from "../../overmind/state";
+import { Board } from "../../../@types";
 
 const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
