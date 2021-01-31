@@ -1,13 +1,21 @@
 describe("Participating in an active retro", () => {
+  before(() => {
+    cy.visit("/");
+  });
 
   it("allows a new card to be added to a column", () => {
-    // TODO: tests to add:
+    cy.get(".column [data-cy=add-card-button]")
+      .first()
+      .click();
+    cy.get("[data-cy=card-contents-textarea]")
+      .click()
+      .type("**Bold content** _italic content_ ![doggo image](https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg)");
+    cy.get("[data-cy=save-card-button]").click();
 
-    // The card can contain bold text (markdown format)
-
-    // The card can contain italisized text (markdown format)
-
-    // The card can contain an image (markdown format)
+    cy.get(".column").first().get(".card--list > .card-container:last-child > .card--content")
+      .should("contain.html", "<strong>Bold content</strong>")
+      .should("contain.html", "<em>italic content</em>")
+      .should("contain.html", "<img alt=\"doggo image\" src=\"https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg\">");
   });
 
   it("allows a card to be dragged and dropped to a new column by its owner", () => {

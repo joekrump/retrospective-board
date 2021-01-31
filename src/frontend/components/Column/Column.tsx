@@ -306,7 +306,7 @@ export const Column = (props: ColumnProps) => {
           mode === AppMode.review ?
             null
             :
-            <button className="card--button__add" onClick={() => addCard() }>
+            <button className="card--button__add" data-cy="add-card-button" onClick={() => addCard() }>
               +
             </button>
         }
