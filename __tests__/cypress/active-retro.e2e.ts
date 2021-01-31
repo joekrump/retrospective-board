@@ -4,7 +4,7 @@ describe("Participating in an active retro", () => {
     cy.wait(1);
   });
 
-  it("allows a card to added, edited, and have its column changed", () => {
+  it("allows a card to added, edited, deleted, and have its column changed", () => {
     cy.get(".column [data-cy=add-card-button]")
       .first()
       .click()
