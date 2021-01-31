@@ -32,6 +32,7 @@
     "prod": "NODE_ENV=production concurrently --kill-others \"ts-node-dev --respawn --transpile-only server.ts\" \"ts-node-dev --transpile-only --respawn ngrok.ts\"",
     "preprod": "npm run build",
     "build": "webpack --mode production --config ./config/webpack.config.js",
+    "start": "npm run dev",
     "dev:client": "webpack-dev-server --mode development --open --config ./config/webpack.config.js",
     "dev:server": "ts-node-dev --respawn --transpile-only server.ts",
     "test:run": "cypress run",
