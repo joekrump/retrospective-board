@@ -32,6 +32,12 @@ describe("Participating in an active retro", () => {
     cy.get(".column").first().get(".card--list > .card-container:last-child > .card--content").should("contain", "more TEXT!")
 
     cy.get("[data-cy=save-card-button]").should("not.exist");
+
+    // TODO:
+    // 1. Test that anyone who is not the owner of the card cannot edit it.
+    //
+    // 2. Test that drag and drop works
+    // Example: https://github.com/cypress-io/cypress-example-recipes/blob/d5d97b09bb99ba96dd86c98ab03eb8d60574c8f6/examples/testing-dom__drag-drop/cypress/integration/drag_n_drop_spec.js
   });
 
   it("allows users to add and remove stars from cards", () => {
@@ -47,10 +53,10 @@ describe("Participating in an active retro", () => {
   });
 
   it("columns can be added and edited", () => {
-
+    // FIXME: add tests
   });
 
   it("allows the title of the retro to be updated", () => {
-
+    // FIXME: add tests
   });
 });
