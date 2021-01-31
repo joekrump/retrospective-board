@@ -5,6 +5,7 @@ describe("Participating in an active retro", () => {
   });
 
   it("allows a card to added, edited, deleted, and have its column changed", () => {
+    // Create
     cy.get(".column [data-cy=add-card-button]")
       .first()
       .click()
@@ -20,7 +21,8 @@ describe("Participating in an active retro", () => {
       .and("contain.html", "<em>italic content</em>")
       .and("contain.html", "<img alt=\"doggo image\" src=\"https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg\">");
 
-    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]")
+    // Edit
+    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
       .click()
     cy.get("[data-cy=card-contents-textarea]")
       .click()
@@ -32,6 +34,12 @@ describe("Participating in an active retro", () => {
     cy.get(".column").first().get(".card--list > .card-container:last-child > .card--content").should("contain", "more TEXT!")
 
     cy.get("[data-cy=save-card-button]").should("not.exist");
+
+    // Delete
+    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
+      .click()
+    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=delete-card-button]")
+      .click()
 
     // TODO:
     // 1. Test that anyone who is not the owner of the card cannot edit it.
