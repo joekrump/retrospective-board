@@ -25,4 +25,5 @@ A tool for running retros.
 
 ## Development
 
-1. `npm run dev`
+- `npm start` - Start the app
+- `npm run test` - Run tests
