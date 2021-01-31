@@ -40,6 +40,7 @@ describe("Participating in an active retro", () => {
       .click()
     cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=delete-card-button]")
       .click()
+    cy.get(".column").first().get(".card--list .card-container").should("have.length", 0)
 
     // TODO:
     // 1. Test that anyone who is not the owner of the card cannot edit it.
