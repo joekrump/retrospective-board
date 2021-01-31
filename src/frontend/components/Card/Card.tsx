@@ -121,7 +121,7 @@ export const Card = (props: CardProps) => {
       boardId: props.boardId,
       columnId: props.columnId,
       id: props.id,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      ownerId: sessionStorage.getItem("retroSessionId"),
       text,
     });
   }

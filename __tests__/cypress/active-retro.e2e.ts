@@ -1,33 +1,37 @@
 describe("Participating in an active retro", () => {
   before(() => {
     cy.visit("/");
+    cy.wait(1);
   });
 
-  it("allows a new card to be added to a column", () => {
+  it("allows a card to added, edited, and have its column changed", () => {
     cy.get(".column [data-cy=add-card-button]")
       .first()
-      .click();
-    cy.get("[data-cy=card-contents-textarea]")
+      .click()
+
+    cy.get("#columns > div:nth-child(1) [data-cy=card-contents-textarea]")
       .click()
       .type("**Bold content** _italic content_ ![doggo image](https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg)");
-    cy.get("[data-cy=save-card-button]").click();
+    cy.get("[data-cy=save-card-button]")
+      .click();
 
     cy.get(".column").first().get(".card--list > .card-container:last-child > .card--content")
       .should("contain.html", "<strong>Bold content</strong>")
-      .should("contain.html", "<em>italic content</em>")
-      .should("contain.html", "<img alt=\"doggo image\" src=\"https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg\">");
-  });
+      .and("contain.html", "<em>italic content</em>")
+      .and("contain.html", "<img alt=\"doggo image\" src=\"https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg\">");
 
-  it("allows a card to be dragged and dropped to a new column by its owner", () => {
+    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]")
+      .click()
+    cy.get("[data-cy=card-contents-textarea]")
+      .click()
+      .type("more TEXT!");
 
-  });
+    cy.get("[data-cy=save-card-button]")
+      .click();
 
-  it("allows a card to be edited by its owner", () => {
+    cy.get(".column").first().get(".card--list > .card-container:last-child > .card--content").should("contain", "more TEXT!")
 
-  });
-
-  it("prevents a card being edited by anyone other than its owner", () => {
-
+    cy.get("[data-cy=save-card-button]").should("not.exist");
   });
 
   it("allows users to add and remove stars from cards", () => {

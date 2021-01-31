@@ -167,7 +167,7 @@ io.on('connection', function (socket) {
       console.error("No session");
       return;
     }
-    console.log(data);
+
     const column = boards[data.boardId].columns.find((column) => column.id === data.id);
     if (column) {
       socket.emit(`column:loaded:${data.id}`, {
@@ -271,35 +271,35 @@ io.on('connection', function (socket) {
     }
   });
 
-  function addCardToColumn(card: { id: string, text: string, columnId: string, boardId: string, }, sessionId: string) {
-    const column = boards[card.boardId].columns.find((column) => column.id === card.columnId);
+  function addCardToColumn(cardData: { id: string, ownerId: string, text: string, columnId: string, boardId: string, }) {
+    const column = boards[cardData.boardId].columns.find((column) => column.id === cardData.columnId);
     if (column) {
-      let newCard = {
-        id: card.id,
-        text: card.text,
+      let newCard: Card = {
+        id: cardData.id,
+        text: cardData.text,
         stars: {},
-        ownerId: sessionId,
+        ownerId: cardData.ownerId,
         starsCount: 0,
       };
       column.cards.push(newCard);
 
-      socket.emit(`card:created:${card.columnId}`, {
-        card,
+      socket.emit(`card:created:${cardData.columnId}`, {
+        card: cardData,
       });
-      socket.broadcast.emit(`card:created:${card.columnId}`, {
-        card,
+      socket.broadcast.emit(`card:created:${cardData.columnId}`, {
+        card: cardData,
       });
     }
   }
 
-  socket.on("card:created", function(data: { boardId: string, columnId: string, id: string, text: string, sessionId: string }) {
+  socket.on("card:created", function(data: { boardId: string, columnId: string, id: string, text: string, ownerId: string }) {
     console.log("card create request")
-    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
+    if (data.ownerId === undefined && !sessionStore[data.boardId][data.ownerId]) {
       console.error("No session");
       return;
     }
 
-    addCardToColumn(data, data.sessionId);
+    addCardToColumn(data);
   });
 
   socket.on("card:updated", function (data: { boardId: string, columnId: string, id: string, text: string, sessionId: string }) {
@@ -346,7 +346,7 @@ io.on('connection', function (socket) {
       console.error("No session");
       return;
     }
-    console.log(data);
+
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
       const cardIndex = column.cards.findIndex((card) => card.id === data.id);
