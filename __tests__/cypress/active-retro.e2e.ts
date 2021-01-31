@@ -22,19 +22,19 @@ describe("Participating in an active retro", () => {
 
   });
 
-  it("allows stars to be added to a card", () => {
+  it("allows users to add and remove stars from cards", () => {
+    // Star count on a card should not go less than 0.
+    // Clicking on the star icon on a card adds 1 star
 
+    // Clicking on the undo icon on a card removes 1 star that had been added by the user
+
+    // A user cannot remove stars added by a different user.
+
+    // Star pool for a user (remaining number of stars) should start at 10.
+    // Star pool for a user should not go below 0.
   });
 
-  it("allows for stars to be removed from a card", () => {
-
-  });
-
-  it("allows a new columnn to be added", () => {
-
-  });
-
-  it("allows an existing column to have its name updated", () => {
+  it("columns can be added and edited", () => {
 
   });
 
