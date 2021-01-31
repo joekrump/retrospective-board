@@ -1,3 +1,15 @@
+export interface CardData {
+  id: string;
+  columnId?: string;
+  editable: boolean;
+  text?: string;
+  ownerId: string;
+  starsCount: number;
+  userStars: number;
+  isEditing: boolean;
+  newCard?: boolean;
+}
+
 export interface Card {
   id: string;
   text: string;

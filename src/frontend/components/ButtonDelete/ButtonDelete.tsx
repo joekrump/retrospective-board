@@ -6,7 +6,13 @@ interface ButtonDeleteProps {
 }
 
 export const ButtonDelete = (props: ButtonDeleteProps) => (
-  <button title="Delete" tabIndex={0} className="button--delete" onClick={event => props.handleClick(event, props.id)} >
+  <button
+    title="Delete"
+    tabIndex={0}
+    className="button--delete"
+    onClick={event => props.handleClick(event, props.id)}
+    data-cy="delete-card-button"
+  >
     <span className="gg-trash"></span>
   </button>
 );

@@ -1,6 +1,3 @@
-/* CSS Icons from https://css.gg */
-@import url('https://css.gg/css?=check|close|pen|sort-az|sort-za|trash|undo');
-
 main {
   display: grid;
   height: 90vh;

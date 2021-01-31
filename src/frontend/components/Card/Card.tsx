@@ -121,7 +121,7 @@ export const Card = (props: CardProps) => {
       boardId: props.boardId,
       columnId: props.columnId,
       id: props.id,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      ownerId: sessionStorage.getItem("retroSessionId"),
       text,
     });
   }
@@ -164,7 +164,7 @@ export const Card = (props: CardProps) => {
 
   function renderUndoButton() {
     return (
-      <button onClick={event => starDown(event)} className="undo-button">
+      <button onClick={event => starDown(event)} className="undo-button" data-cy="undo-star-button">
         <span className="gg-undo"></span>
       </button>
     );
@@ -174,12 +174,13 @@ export const Card = (props: CardProps) => {
     cardContents = (
       <form onSubmit={save}>
         <textarea
+          data-cy="card-contents-textarea"
           autoFocus={true}
           onChange={event => updateText(event.target.value)}
           value={text}>
         </textarea>
         <div className="card--footer">
-          <button type="submit" className="button__save" title="Save">
+          <button type="submit" className="button__save" title="Save" data-cy="save-card-button">
             <span className="gg-check"></span>
           </button>
           <ButtonDelete
@@ -194,6 +195,7 @@ export const Card = (props: CardProps) => {
     if (props.editable) {
       editLink = (
         <a
+          data-cy="edit-card-button"
           href=""
           onClick={event => toggleIsEditing(event)}
           className="edit-link"
@@ -227,7 +229,7 @@ export const Card = (props: CardProps) => {
             mode === AppMode.review ?
               <span className="star">⭐️</span>
               :
-              <span className="star star-button" onClick={starUp}>
+              <span className="star star-button" onClick={starUp} data-cy="add-star-button">
                 ⭐️
               </span>
             }

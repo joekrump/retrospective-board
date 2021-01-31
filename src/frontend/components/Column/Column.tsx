@@ -6,18 +6,7 @@ import "./column.css";
 import { SortDirection } from "../Main/Main";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
-
-export interface CardData {
-  id: string;
-  columnId?: string;
-  editable: boolean;
-  text?: string;
-  ownerId?: string;
-  starsCount: number;
-  userStars: number;
-  isEditing: boolean;
-  newCard?: boolean;
-}
+import { CardData } from "../../../@types";
 
 interface ColumnProps {
   key: string;
@@ -141,7 +130,6 @@ export const Column = (props: ColumnProps) => {
     });
 
     if (columnRef !== null) {
-      console.log(columnRef)
       columnRef.addEventListener("dragover", handleDragOver, false);
       columnRef.addEventListener("dragenter", () => handleDragEnter(), false);
       columnRef.addEventListener("dragleave", () => handleDragLeave(), false);
@@ -175,6 +163,7 @@ export const Column = (props: ColumnProps) => {
         id: `card-${uuid.v4()}`,
         editable: true,
         isEditing: true,
+        ownerId: "",
         starsCount: 0,
         userStars: 0,
         newCard: true,
@@ -306,7 +295,7 @@ export const Column = (props: ColumnProps) => {
           mode === AppMode.review ?
             null
             :
-            <button className="card--button__add" onClick={() => addCard() }>
+            <button className="card--button__add" data-cy="add-card-button" onClick={() => addCard() }>
               +
             </button>
         }
