@@ -34,8 +34,8 @@
     "build": "webpack --mode production --config ./config/webpack.config.js",
     "dev:client": "webpack-dev-server --mode development --open --config ./config/webpack.config.js",
     "dev:server": "ts-node-dev --respawn --transpile-only server.ts",
-    "cy:run": "cypress run",
-    "cy:open": "cypress open"
+    "test:run": "cypress run",
+    "test": "cypress open"
   },
   "devDependencies": {
     "@arkweid/lefthook": "^0.7.2",
