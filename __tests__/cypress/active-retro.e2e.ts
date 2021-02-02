@@ -42,10 +42,17 @@ describe("Participating in an active retro", () => {
       .click()
     cy.get(".column").first().get(".card--list .card-container").should("have.length", 0)
 
-    // TODO:
-    // 1. Test that anyone who is not the owner of the card cannot edit it.
+    // Test that anyone who is not the owner of the card cannot edit it.
+    const originalOwnerSessionId = sessionStorage.getItem("retroSessionId");
+    const dummySessionId = "111111";
+    // Replace the sessionId with some dummy value.
+    sessionStorage.setItem("retroSessionId", dummySessionId);
+    cy.visit("/");
+    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]").should("not.exist");
+    // Restore the original sessionId
+    sessionStorage.setItem("retroSessionId", originalOwnerSessionId);
     //
-    // 2. Test that drag and drop works
+    // Test that drag and drop works
     // Example: https://github.com/cypress-io/cypress-example-recipes/blob/d5d97b09bb99ba96dd86c98ab03eb8d60574c8f6/examples/testing-dom__drag-drop/cypress/integration/drag_n_drop_spec.js
   });
 
