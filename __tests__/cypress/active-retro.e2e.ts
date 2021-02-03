@@ -8,18 +8,6 @@ describe("Participating in an active retro", () => {
     };
   }
 
-  function moveCardToColumn (
-    card: Cypress.Chainable<JQuery<HTMLElement>>,
-    column: Cypress.Chainable<JQuery<HTMLElement>>) {
-    const dataTransfer = new DataTransfer;
-
-    card.trigger("dragstart", { force: true, dataTransfer }).wait(1000);;
-    column.find(".card--list")
-      .trigger("dragenter", { force: true, dataTransfer })
-      .wait(2000)
-      .trigger("drop", { force: true, dataTransfer });
-  }
-
   before(() => {
     cy.visit("/");
     cy.wait(1000);
@@ -64,17 +52,16 @@ describe("Participating in an active retro", () => {
     undoPreviousSessionChange();
 
     // Test that drag and drop works
-    moveCardToColumn(
-      cy.get(".column").first().get(".card--list .card-container:last-child"),
-      cy.get(".column:nth-child(2)")
-    );
+    const cardSelector = ".column:nth-child(1) .card--list .card-container:last-child";
+    const columnDropTargetSelector = "#columns > div:nth-child(2) > div.body-row > div";
+    cy.dragAndDrop(cardSelector, columnDropTargetSelector);
 
     // Delete
-    // cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
-    //   .click()
-    // cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=delete-card-button]")
-    //   .click()
-    // cy.get(".column").first().get(".card--list .card-container").should("have.length", 0)
+    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
+      .click()
+    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=delete-card-button]")
+      .click()
+    cy.get(".column:nth-child(2) .card--list .card-container").should("have.length", 0)
   });
 
   it("allows users to add and remove stars from cards", () => {
