@@ -27,3 +27,5 @@ A tool for running retros.
 
 - `npm start` - Start the app
 - `npm run test` - Run tests
+
+This app uses [OvermindJS](https://overmindjs.org/) as the state management library. If you use VS Code, install [the dev tool extension](https://marketplace.visualstudio.com/items?itemName=christianalfoni.overmind-devtools-vscode)
