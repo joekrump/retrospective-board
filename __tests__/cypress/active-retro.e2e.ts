@@ -15,23 +15,23 @@ describe("Participating in an active retro", () => {
 
   it("allows a card to added, edited, deleted, and have its column changed", () => {
     // Create
-    cy.get(".column [data-cy=add-card-button]")
-      .first()
+    cy.get(".column:nth-child(1) [data-cy=add-card-button]")
       .click()
 
-    cy.get("#columns > div:nth-child(1) [data-cy=card-contents-textarea]")
+    cy.get(".column:nth-child(1) [data-cy=card-contents-textarea]")
       .click()
       .type("**Bold content** _italic content_ ![doggo image](https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg)");
     cy.get("[data-cy=save-card-button]")
       .click();
 
-    cy.get(".column").first().get(".card--list > .card-container:last-child > .card--content")
+    cy.get(".column:nth-child(1) .card--list > .card-container:last-child > .card--content")
       .should("contain.html", "<strong>Bold content</strong>")
       .and("contain.html", "<em>italic content</em>")
       .and("contain.html", "<img alt=\"doggo image\" src=\"https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg\">");
 
     // Edit
-    cy.get(".column").first().find(".card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
+    cy.get(".column:nth-child(1) .card--list .card-container:last-child [data-cy=edit-card-button]")
+      .invoke("show")
       .click()
     cy.get("[data-cy=card-contents-textarea]")
       .click()
@@ -40,28 +40,43 @@ describe("Participating in an active retro", () => {
     cy.get("[data-cy=save-card-button]")
       .click();
 
-    cy.get(".column").first().get(".card--list > .card-container:last-child > .card--content").should("contain", "more TEXT!")
+    cy.get(".column:nth-child(1) .card--list > .card-container:last-child > .card--content")
+      .should("contain", "more TEXT!")
 
-    cy.get("[data-cy=save-card-button]").should("not.exist");
+    cy.get("[data-cy=save-card-button]")
+      .should("not.exist");
 
     // Test that anyone who is not the owner of the card cannot edit it.
     const dummySessionId = "111111";
     const undoPreviousSessionChange = loginAsSession(dummySessionId);
     cy.visit("/");
-    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]").should("not.exist");
+    cy.get(".column:nth-child(1) .card--list .card-container:last-child [data-cy=edit-card-button]")
+      .should("not.exist");
+
     undoPreviousSessionChange();
 
     // Test that drag and drop works
+    cy.get(".column:nth-child(2) .card--list .card-container")
+    .should("have.length", 0)
+    cy.get(".column:nth-child(1) .card--list .card-container")
+    .should("have.length", 1)
+
     const cardSelector = ".column:nth-child(1) .card--list .card-container:last-child";
-    const columnDropTargetSelector = "#columns > div:nth-child(2) > div.body-row > div";
-    cy.dragAndDrop(cardSelector, columnDropTargetSelector);
+    const columnDropTargetSelector = ".column:nth-child(2) .card--list";
+    cy.dragAndDrop(cardSelector, columnDropTargetSelector)
+      .get(".column:nth-child(2) .card--list .card-container")
+      .should("have.length", 1)
+      .get(".column:nth-child(1) .card--list .card-container")
+      .should("have.length", 0)
 
     // Delete
-    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
+    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=edit-card-button]")
+      .invoke("show")
       .click()
     cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=delete-card-button]")
       .click()
-    cy.get(".column:nth-child(2) .card--list .card-container").should("have.length", 0)
+    cy.get(".column:nth-child(2) .card--list .card-container")
+      .should("have.length", 0)
   });
 
   it("allows users to add and remove stars from cards", () => {
