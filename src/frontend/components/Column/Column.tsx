@@ -27,7 +27,7 @@ export const Column = (props: ColumnProps) => {
   let [name, updateName] = useState(props.name);
   let [isEditing, updateEditingState] = useState(!!props.isEditing);
   let [newUsavedColumn, updateNewStatus] = useState(props.new);
-  let { state: { mode } } = useOvermind();
+  let { state: { mode, cardBeingDragged }, actions: { updateCardBeingDragged } } = useOvermind();
   let cardsRef = useRef(cards);
   const sessionId = sessionStorage.getItem("retroSessionId") || "";
   const innerRef: RefObject<HTMLDivElement> = useRef(null);
@@ -41,15 +41,14 @@ export const Column = (props: ColumnProps) => {
 
   function handleDrop(e: DragEvent) {
     e.stopPropagation(); // stops the browser from redirecting.
-
     if (innerRef.current !== null) {
-      const droppedCard = JSON.parse(e.dataTransfer?.getData("text/json") ?? "");
-
-      if (droppedCard.columnId === props.id) {
-        return false;
-      }
+      const droppedCard = cardBeingDragged;
 
       innerRef.current?.classList.remove("over");
+
+      if (droppedCard === null || droppedCard.columnId === props.id) {
+        return false;
+      }
 
       addCard(droppedCard)
 
@@ -60,6 +59,7 @@ export const Column = (props: ColumnProps) => {
         sessionId,
         cardId: droppedCard.id,
       });
+      updateCardBeingDragged(null);
     }
 
     return false;
@@ -133,7 +133,6 @@ export const Column = (props: ColumnProps) => {
       columnRef.addEventListener("dragover", handleDragOver, false);
       columnRef.addEventListener("dragenter", () => handleDragEnter(), false);
       columnRef.addEventListener("dragleave", () => handleDragLeave(), false);
-      columnRef.addEventListener("drop", (e) => handleDrop(e), false);
     }
 
     return function cleanup() {
@@ -150,6 +149,13 @@ export const Column = (props: ColumnProps) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    innerRef?.current?.addEventListener("drop", (e) => handleDrop(e), false);
+    return function cleanup() {
+      innerRef?.current?.removeEventListener("drop", (e) => handleDrop(e));
+    }
+  }, [cardBeingDragged]);
 
   useEffect(() => {
     cardsRef.current = cards;

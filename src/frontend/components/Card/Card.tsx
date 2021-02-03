@@ -26,7 +26,7 @@ export const Card = (props: CardProps) => {
   const [text, updateText] = useState(props.text);
   const [userStars, updateUserStars] = useState(props.userStars);
   const [starsCount, updateStarsCount] = useState(props.starsCount);
-  const { state: { mode } } = useOvermind();
+  const { state: { mode }, actions: { updateCardBeingDragged } } = useOvermind();
   const innerRef: RefObject<HTMLDivElement> = useRef(null);
   let cardContents;
 
@@ -35,29 +35,30 @@ export const Card = (props: CardProps) => {
       innerRef.current.style.opacity = "0.4";
     }
 
-    if (e.dataTransfer !== null) {
+    if (e.dataTransfer !== undefined && e.dataTransfer !== null) {
       e.dataTransfer.effectAllowed = "move";
-      if (innerRef.current !== null) {
-        const {
-          id,
-          columnId,
-          editable,
-          newCard
-        } = props;
-
-        e.dataTransfer?.setData('text/json', JSON.stringify({
-          id,
-          columnId,
-          editable,
-          text,
-          starsCount,
-          userStars,
-          isEditing,
-          newCard,
-          ownerId: sessionStorage.getItem("retroSessionId") ?? "",
-        }));
-      }
     }
+
+    // if (innerRef.current !== null) {
+    const {
+      id,
+      columnId,
+      editable,
+      newCard
+    } = props;
+
+    updateCardBeingDragged({
+      id,
+      columnId,
+      editable,
+      text,
+      starsCount,
+      userStars,
+      isEditing,
+      newCard,
+      ownerId: sessionStorage.getItem("retroSessionId") ?? "",
+    });
+    // }
   }
 
   function handleDragEnd() {
