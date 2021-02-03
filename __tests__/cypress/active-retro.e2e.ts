@@ -8,18 +8,6 @@ describe("Participating in an active retro", () => {
     };
   }
 
-  function moveCardToColumn (
-    card: Cypress.Chainable<JQuery<HTMLElement>>,
-    column: Cypress.Chainable<JQuery<HTMLElement>>) {
-    const dataTransfer = new DataTransfer;
-
-    card.trigger("dragstart", { force: true, dataTransfer }).wait(1000);;
-    column.find(".card--list")
-      .trigger("dragenter", { force: true, dataTransfer })
-      .wait(2000)
-      .trigger("drop", { force: true, dataTransfer });
-  }
-
   before(() => {
     cy.visit("/");
     cy.wait(1000);
