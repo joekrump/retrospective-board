@@ -6,6 +6,10 @@ export const updateMode: Action<AppMode> = ({ state }, mode: AppMode) => {
   state.mode = mode;
 };
 
+export const updateCardBeingDragged: Action<any> = ({ state }, cardData: any) => {
+  state.cardBeingDragged = cardData;
+}
+
 export const addColumn = mutate(function setColumns({ state }, column: BoardColumn) {
   state.columns = [
     ...state.columns,

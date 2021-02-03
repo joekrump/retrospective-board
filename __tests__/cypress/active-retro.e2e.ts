@@ -1,7 +1,16 @@
 describe("Participating in an active retro", () => {
+
+  function loginAsSession(sessionId: string): Function {
+    const previousSessionId = sessionStorage.getItem("retroSessionId");
+    sessionStorage.setItem("retroSessionId", sessionId);
+    return function logInAsPreviousSession() {
+      sessionStorage.setItem("retroSessionId", previousSessionId);
+    };
+  }
+
   before(() => {
     cy.visit("/");
-    cy.wait(1);
+    cy.wait(1000);
   });
 
   it("allows a card to added, edited, deleted, and have its column changed", () => {
@@ -22,7 +31,7 @@ describe("Participating in an active retro", () => {
       .and("contain.html", "<img alt=\"doggo image\" src=\"https://cdn2.thedogapi.com/images/rkZRggqVX_1280.jpg\">");
 
     // Edit
-    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
+    cy.get(".column").first().find(".card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
       .click()
     cy.get("[data-cy=card-contents-textarea]")
       .click()
@@ -35,18 +44,24 @@ describe("Participating in an active retro", () => {
 
     cy.get("[data-cy=save-card-button]").should("not.exist");
 
-    // Delete
-    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
-      .click()
-    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=delete-card-button]")
-      .click()
-    cy.get(".column").first().get(".card--list .card-container").should("have.length", 0)
+    // Test that anyone who is not the owner of the card cannot edit it.
+    const dummySessionId = "111111";
+    const undoPreviousSessionChange = loginAsSession(dummySessionId);
+    cy.visit("/");
+    cy.get(".column").first().get(".card--list .card-container:last-child [data-cy=edit-card-button]").should("not.exist");
+    undoPreviousSessionChange();
 
-    // TODO:
-    // 1. Test that anyone who is not the owner of the card cannot edit it.
-    //
-    // 2. Test that drag and drop works
-    // Example: https://github.com/cypress-io/cypress-example-recipes/blob/d5d97b09bb99ba96dd86c98ab03eb8d60574c8f6/examples/testing-dom__drag-drop/cypress/integration/drag_n_drop_spec.js
+    // Test that drag and drop works
+    const cardSelector = ".column:nth-child(1) .card--list .card-container:last-child";
+    const columnDropTargetSelector = "#columns > div:nth-child(2) > div.body-row > div";
+    cy.dragAndDrop(cardSelector, columnDropTargetSelector);
+
+    // Delete
+    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=edit-card-button]").invoke("show")
+      .click()
+    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=delete-card-button]")
+      .click()
+    cy.get(".column:nth-child(2) .card--list .card-container").should("have.length", 0)
   });
 
   it("allows users to add and remove stars from cards", () => {
