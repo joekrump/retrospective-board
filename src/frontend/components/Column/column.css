@@ -30,7 +30,8 @@
 
 .column .card--list.over {
   border: 3px dotted #999;
-  background-color: #ddd
+  background-color: #ddd;
+  box-shadow: inset 0 0 5px #777;
 }
 
 /* Simple implementation to give unique background colors to cards in specific columns */
