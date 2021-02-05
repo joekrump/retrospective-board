@@ -43,7 +43,6 @@ export const Column = (props: ColumnProps) => {
     e.stopPropagation(); // stops the browser from redirecting.
     if (innerRef.current !== null) {
       const droppedCard = cardBeingDragged;
-
       innerRef.current?.classList.remove("over");
 
       if (droppedCard === null || droppedCard.columnId === props.id) {
@@ -145,15 +144,15 @@ export const Column = (props: ColumnProps) => {
         columnRef.removeEventListener("dragover", handleDragOver);
         columnRef.removeEventListener("dragenter", () => handleDragEnter());
         columnRef.removeEventListener("dragleave", () => handleDragLeave());
-        columnRef.removeEventListener("drop", (e) => handleDrop(e));
       }
     };
   }, []);
 
   useEffect(() => {
-    innerRef?.current?.addEventListener("drop", (e) => handleDrop(e), false);
+    innerRef?.current?.removeEventListener("drop", handleDrop);
+    innerRef?.current?.addEventListener("drop", handleDrop, false);
     return function cleanup() {
-      innerRef?.current?.removeEventListener("drop", (e) => handleDrop(e));
+      innerRef?.current?.removeEventListener("drop", handleDrop);
     }
   }, [cardBeingDragged]);
 
