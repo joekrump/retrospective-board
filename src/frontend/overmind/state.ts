@@ -13,6 +13,22 @@ export type State = {
 
 export const state: State = {
   mode: AppMode.vote,
-  columns: [],
+  columns: [
+    {
+      id: "3",
+      isEditing: false,
+      name: "Loading...",
+    },
+    {
+      id: "2",
+      isEditing: false,
+      name: "Loading...",
+    },
+    {
+      id: "1",
+      isEditing: false,
+      name: "Loading...",
+    }
+    ],
   cardBeingDragged: null,
 };
