@@ -296,7 +296,7 @@ export const Column = (props: ColumnProps) => {
           onDeleteClick={(event, id) => props.deleteColumn(event, id)}
         />
       </div>
-      <div className="body-row">
+      <div className="column--content">
         {
           mode === AppMode.review ?
             null
