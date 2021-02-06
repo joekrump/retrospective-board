@@ -121,8 +121,8 @@ export const Card = (props: CardProps) => {
     props.socket.emit(eventName, {
       boardId: props.boardId,
       columnId: props.columnId,
-      id: props.id,
-      ownerId: sessionStorage.getItem("retroSessionId"),
+      cardId: props.id,
+      sessionId: sessionStorage.getItem("retroSessionId"),
       text,
     });
   }
