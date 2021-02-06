@@ -45,8 +45,11 @@
 
 .card-container .card--content,
 .card-container textarea {
-  margin: 0 0 1em 0;
-  min-height: 3em;
+  margin: 0;
+}
+
+.card-container textarea {
+  min-height: 8rem;
 }
 
 .draggable .card--content {
@@ -101,11 +104,11 @@
 }
 
 .card--footer {
-  height: 2em;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  padding-top: 0.5rem;
 }
 
 .card--footer .starring {
