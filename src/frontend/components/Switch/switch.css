@@ -36,7 +36,7 @@
 }
 
 .switch--checkbox:checked + .switch--label {
-  background-color: #76e00d;
+  background-color: var(--green);
 }
 
 .switch--label:active .switch--button {
