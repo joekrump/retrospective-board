@@ -168,7 +168,7 @@ io.on('connection', function (socket) {
       return;
     }
 
-    const column = boards[data.boardId].columns.find((column) => column.id === data.id);
+    const column = boards[data.boardId]?.columns.find((column) => column.id === data.id);
     if (column) {
       socket.emit(`column:loaded:${data.id}`, {
         cards: column.cards.map((card) => {
@@ -248,25 +248,21 @@ io.on('connection', function (socket) {
         // TODO: A refinement could be for this event to receive an index where the card should be slotted in.
         // This would require the order of cards in a column to be kept track of on the client as well.
         // Keeping track of the order of cards would bring the added benefit of being able to re-order cards in a column
+        // give the card a new ID
         toColumn.cards.push(cardInfo.card);
+        cardInfo.column.cards.splice(cardInfo.cardIndex, 1);
       }
 
-      cardInfo.column.cards.splice(cardInfo.cardIndex, 1);
-
-      socket.emit(`card:created:${data.toColumnId}`, {
-        card: cardInfo.card,
+      socket.broadcast.emit(`card:moved-from:${data.fromColumnId}`, {
+        cardId: data.cardId,
       });
 
-      socket.broadcast.emit(`card:created:${data.toColumnId}`, {
-        card: cardInfo.card,
+      socket.emit(`card:moved-from:${data.fromColumnId}`, {
+        cardId: data.cardId,
       });
 
-      socket.emit(`card:deleted:${data.fromColumnId}`, {
-        id: data.cardId,
-      });
-
-      socket.broadcast.emit(`card:deleted:${data.fromColumnId}`, {
-        id: data.cardId
+      socket.broadcast.emit(`card:moved-to:${data.toColumnId}`, {
+        cardId: data.cardId,
       });
     }
   });
@@ -284,10 +280,16 @@ io.on('connection', function (socket) {
       column.cards.push(newCard);
 
       socket.emit(`card:created:${cardData.columnId}`, {
-        card: cardData,
+        card: {
+          ...cardData,
+          userStars: 0,
+        },
       });
       socket.broadcast.emit(`card:created:${cardData.columnId}`, {
-        card: cardData,
+        card: {
+          ...cardData,
+          userStars: 0
+        }
       });
     }
   }
@@ -367,6 +369,8 @@ io.on('connection', function (socket) {
 
   socket.on("card:starred", function ({ id, star, boardId, columnId, sessionId }: { id: string, star: number, boardId: string, columnId: string, sessionId: string }) {
     console.log("star for card request");
+    console.log("columnId", columnId)
+    console.log("cardId", id)
     if (sessionId === undefined && !sessionStore[boardId][sessionId]) {
       console.error("No session");
       return;
@@ -381,14 +385,23 @@ io.on('connection', function (socket) {
         const userStars = card.stars[session.id];
         const { starsCount } = card;
 
+        console.log("EMIT ", `card:starred:${id}`)
         socket.emit(`card:starred:${id}`, { starsCount, userStars });
+
+        console.log("broadcast EMIT ", `card:starred:${id}`)
         socket.broadcast.emit(`card:starred:${id}`, {
           starsCount,
         });
         socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
           remainingStars: session.remainingStars,
         });
+      } else {
+        console.log("cannot star")
+        console.log("card", card)
+        console.log("column", column)
       }
+    } else {
+      console.log("no column")
     }
   });
 });
