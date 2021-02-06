@@ -277,32 +277,45 @@ io.on('connection', function (socket) {
     column.cardIds.push(cardId);
   }
 
-  socket.on("card:moved", function(data: { boardId: string, fromColumnId: string, toColumnId: string, cardId: string, sessionId: string }) {
-    const session = getSession(data.boardId, data.sessionId);
+  socket.on("card:moved", function({
+    boardId,
+    fromColumnId,
+    toColumnId,
+    cardId,
+    sessionId,
+  }: {
+    boardId: string,
+    fromColumnId: string,
+    toColumnId: string,
+    cardId: string,
+    sessionId: string,
+  }) {
+    console.log("card move request")
+    const session = getSession(boardId, sessionId);
 
     if (session === null) { return; }
 
-    const toColumn = boards[data.boardId].columns.find((column) => column.id === data.toColumnId);
-    const fromColumn = boards[data.boardId].columns.find((column) => column.id === data.fromColumnId);
+    const toColumn = boards[boardId].columns.find((column) => column.id === toColumnId);
+    const fromColumn = boards[boardId].columns.find((column) => column.id === fromColumnId);
 
     if (toColumn !== undefined) {
-      moveCardToColumn(boards[data.boardId], toColumn, data.cardId);
+      moveCardToColumn(boards[boardId], toColumn, cardId);
     }
 
     if (fromColumn !== undefined) {
-      removeCardFromColumn(fromColumn, data.cardId);
+      removeCardFromColumn(fromColumn, cardId);
     }
 
-    socket.emit("card:moved", {
-      cardId: data.cardId,
-      fromColumnId: data.fromColumnId,
-      toColumnId: data.toColumnId,
+    socket.emit(`card:moved:${boardId}`, {
+      cardId,
+      fromColumnId,
+      toColumnId,
     });
 
-    socket.broadcast.emit("card:moved", {
-      cardId: data.cardId,
-      fromColumnId: data.fromColumnId,
-      toColumnId: data.toColumnId,
+    socket.broadcast.emit(`card:moved:${boardId}`, {
+      cardId,
+      fromColumnId,
+      toColumnId,
     });
   });
 

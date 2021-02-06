@@ -57,11 +57,14 @@ export const Main = (props: MainProps) => {
       deleteColumn(null, data.id, true);
     });
 
+    props.socket.on(`card:moved:${props.boardId}`, handleCardMoved);
+
     return function cleanup() {
       props.socket.removeListener(`board:loaded:${props.boardId}`);
       props.socket.removeListener(`board:update-remaining-stars:${props.boardId}`);
       props.socket.removeListener(`column:deleted:${props.boardId}`);
       props.socket.removeListener(`column:created:${props.boardId}`);
+      props.socket.removeListener(`card:moved:${props.boardId}`);
     };
   }, [columns]);
 
@@ -108,6 +111,7 @@ export const Main = (props: MainProps) => {
     toColumnId: string
   }) {
     // TODO: move card by adding it to the Map of cards for this column, stored in overmind state.
+    console.log("CARD MOVED!!!")
   }
 
   function renderColumns() {
