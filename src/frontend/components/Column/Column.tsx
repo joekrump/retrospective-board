@@ -211,7 +211,9 @@ export const Column = (props: ColumnProps) => {
     if (event) {
       event.preventDefault();
     }
-    updateEditingState(!isEditing);
+    if (mode !== AppMode.review) {
+      updateEditingState(!isEditing);
+    }
   }
 
   function updateColumnName(event: React.FormEvent) {
