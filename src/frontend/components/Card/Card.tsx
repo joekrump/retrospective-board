@@ -230,9 +230,9 @@ export const Card = (props: CardProps) => {
             mode === AppMode.review ?
               <span className="star">⭐️</span>
               :
-              <span className="star star-button" onClick={starUp} data-cy="add-star-button">
+              <button className="star star-button" onClick={starUp} data-cy="add-star-button">
                 ⭐️
-              </span>
+              </button>
             }
             { mode === AppMode.vote ? renderUserStars() : renderResults() }
             { mode === AppMode.vote && userStars > 0 ? renderUndoButton() : null }
