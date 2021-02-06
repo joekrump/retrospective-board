@@ -253,14 +253,16 @@ io.on('connection', function (socket) {
         cardInfo.column.cards.splice(cardInfo.cardIndex, 1);
       }
 
-      socket.broadcast.emit(`card:moved-from:${data.fromColumnId}`, {
-        cardId: data.cardId,
-      });
-
       socket.emit(`card:moved-from:${data.fromColumnId}`, {
         cardId: data.cardId,
       });
+      socket.emit(`card:moved-to:${data.fromColumnId}`, {
+        cardId: data.cardId,
+      });
 
+      socket.broadcast.emit(`card:moved-from:${data.fromColumnId}`, {
+        cardId: data.cardId,
+      });
       socket.broadcast.emit(`card:moved-to:${data.toColumnId}`, {
         cardId: data.cardId,
       });

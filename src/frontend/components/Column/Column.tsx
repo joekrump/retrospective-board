@@ -107,11 +107,11 @@ export const Column = (props: ColumnProps) => {
     }
 
     function handleCardMovedTo(data: { cardId: number }) {
-
+      // TODO: move card by adding it to the Map of cards for this column, stored in overmind state.
     }
 
     function handleCardMovedFrom(data: { cardId: number }) {
-
+      // TODO: move card by removing it from the Map of cards for this column, stored in overmind state.
     }
 
     function handleCardCreated(data: { card: CardData }) {
