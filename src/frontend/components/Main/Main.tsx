@@ -48,6 +48,8 @@ export const Main = (props: MainProps) => {
       });
     });
 
+    // TODO: add handlers and listeners for card creation and deletion
+
     props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
       updateBoardTitle(data.title);
     });

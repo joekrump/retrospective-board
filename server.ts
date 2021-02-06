@@ -347,10 +347,10 @@ io.on('connection', function (socket) {
       boards[boardId].cards[cardId] = newCard;
       column.cardIds.push(cardId);
 
-      socket.emit(`card:created:${columnId}`, {
+      socket.emit(`card:created:${boardId}`, {
         card: newCard
       });
-      socket.broadcast.emit(`card:created:${columnId}`, {
+      socket.broadcast.emit(`card:created:${boardId}`, {
         card: newCard,
       });
     }
@@ -398,7 +398,7 @@ io.on('connection', function (socket) {
         reclaimStarsFromDeleteCard(card, data.boardId);
         emitUpdateRemainingStars(socket, data.boardId, data.sessionId);
 
-        socket.broadcast.emit(`card:deleted:${data.columnId}`, {
+        socket.broadcast.emit(`card:deleted:${data.boardId}`, {
           id: data.id
         });
       }
