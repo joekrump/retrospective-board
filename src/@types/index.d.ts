@@ -16,6 +16,7 @@ export interface Card {
   stars: {
     [sessionId: string]: number;
   };
+  columnId: string;
   starsCount: number;
   ownerId: string;
 }

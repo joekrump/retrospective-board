@@ -251,66 +251,71 @@ io.on('connection', function (socket) {
     } else  {
       console.error("No column found");
     }
-  })
+  });
+
+  function removeCardFromColumn(column, cardId) {
+    const index = column.cardIds.indexOf(cardId);
+    column.cardIds.splice(index, 1);
+  }
+
+  function moveCardToColumn(board, column, cardId) {
+    // TODO: A refinement could be for this event to receive an index where the card should be slotted in.
+    // This would require the order of cards in a column to be kept track of on the client as well.
+    // Keeping track of the order of cards would bring the added benefit of being able to re-order cards in a column
+    board.cards[cardId].columnId = column.id;
+    column.cardIds.push(cardId);
+  }
 
   socket.on("card:moved", function(data: { boardId: string, fromColumnId: string, toColumnId: string, cardId: string, sessionId: string }) {
-    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
-      console.error("No session");
+    const session = getSession(data.boardId, data.sessionId);
+    if (session === null) {
       return;
     }
 
-    const cardInfo = getCardInfo(data.cardId, data.fromColumnId, data.boardId, data.sessionId);
+    const toColumn = boards[data.boardId].columns.find((column) => column.id === data.toColumnId);
+    const fromColumn = boards[data.boardId].columns.find((column) => column.id === data.fromColumnId);
 
-    if (cardInfo !== null) {
-      const toColumn = boards[data.boardId].columns.find((column) => column.id === data.toColumnId);
-      if (toColumn !== undefined) {
-        // TODO: A refinement could be for this event to receive an index where the card should be slotted in.
-        // This would require the order of cards in a column to be kept track of on the client as well.
-        // Keeping track of the order of cards would bring the added benefit of being able to re-order cards in a column
-        // give the card a new ID
-        toColumn.cards.push(cardInfo.card);
-        cardInfo.column.cards.splice(cardInfo.cardIndex, 1);
-      }
-
-      socket.emit(`card:moved-from:${data.fromColumnId}`, {
-        cardId: data.cardId,
-      });
-      socket.emit(`card:moved-to:${data.fromColumnId}`, {
-        cardId: data.cardId,
-      });
-
-      socket.broadcast.emit(`card:moved-from:${data.fromColumnId}`, {
-        cardId: data.cardId,
-      });
-      socket.broadcast.emit(`card:moved-to:${data.toColumnId}`, {
-        cardId: data.cardId,
-      });
+    if (toColumn !== undefined) {
+      moveCardToColumn(boards[data.boardId], toColumn, data.cardId);
     }
+
+    if (fromColumn !== undefined) {
+      removeCardFromColumn(fromColumn, data.cardId);
+    }
+
+    socket.emit("card:moved", {
+      cardId: data.cardId,
+      fromColumnId: data.fromColumnId,
+      toColumnId: data.toColumnId,
+    });
+
+    socket.broadcast.emit("card:moved", {
+      cardId: data.cardId,
+      fromColumnId: data.fromColumnId,
+      toColumnId: data.toColumnId,
+    });
   });
 
-  function addCardToColumn(cardData: { id: string, ownerId: string, text: string, columnId: string, boardId: string, }) {
+  function addNewCardToColumn(cardData: { id: string, ownerId: string, text: string, columnId: string, boardId: string, }) {
     const column = boards[cardData.boardId].columns.find((column) => column.id === cardData.columnId);
     if (column) {
-      let newCard: Card = {
+      const newCard: Card = {
         id: cardData.id,
         text: cardData.text,
         stars: {},
         ownerId: cardData.ownerId,
         starsCount: 0,
+        columnId: column.id,
       };
-      column.cards.push(newCard);
+
+      boards[cardData.boardId].cards[cardData.id] = newCard;
+      column.cardIds.push(cardData.id);
 
       socket.emit(`card:created:${cardData.columnId}`, {
-        card: {
-          ...cardData,
-          userStars: 0,
-        },
+        card: cardData,
       });
       socket.broadcast.emit(`card:created:${cardData.columnId}`, {
-        card: {
-          ...cardData,
-          userStars: 0
-        }
+        card: cardData,
       });
     }
   }
@@ -322,7 +327,7 @@ io.on('connection', function (socket) {
       return;
     }
 
-    addCardToColumn(data);
+    addNewCardToColumn(data);
   });
 
   socket.on("card:updated", function (data: { boardId: string, columnId: string, id: string, text: string, sessionId: string }) {
@@ -341,27 +346,6 @@ io.on('connection', function (socket) {
       });
     }
   });
-
-  function getCardInfo(cardId: string, columnId: string, boardId: string, sessionId: string) {
-    const column = boards[boardId].columns.find((column) => column.id === columnId);
-    if (column) {
-      let cardIndex = 0;
-      const card = column.cards.find((card, index) => {
-        cardIndex = index;
-        return card.id === cardId;
-      });
-      if (card && card.ownerId === sessionId) {
-        return {
-          card,
-          cardIndex,
-          column,
-        };
-      } else {
-        return null;
-      }
-    }
-    return null;
-  }
 
   socket.on("card:deleted", function (data: { boardId: string, columnId: string, id: string, sessionId: string }) {
     console.log("card delete request");
@@ -403,10 +387,7 @@ io.on('connection', function (socket) {
       const userStars = card.stars[session.id];
       const { starsCount } = card;
 
-      console.log("EMIT ", `card:starred:${id}`)
       socket.emit(`card:starred:${id}`, { starsCount, userStars });
-
-      console.log("broadcast EMIT ", `card:starred:${id}`)
       socket.broadcast.emit(`card:starred:${id}`, {
         starsCount,
       });
