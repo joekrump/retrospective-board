@@ -23,19 +23,21 @@ export interface Card {
 export interface Column {
   name: string;
   id: string;
-  cards: Card[];
+  cardIds: string[];
 }
 
 export interface Board {
   title: string;
   showResults: boolean;
   columns: Column[];
+  cards: { [id: string]: Card };
 }
 
 export interface BoardColumn {
   id: string;
   name: string;
   isEditing: boolean;
+  cardIds: string[],
   new?: boolean;
 }
 

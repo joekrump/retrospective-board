@@ -6,7 +6,7 @@ import { useOvermind } from "../../overmind";
 
 import "./main.css";
 import { AppMode } from "../../overmind/state";
-import { Board, BoardColumn } from "../../../@types";
+import { Board, BoardColumn, Column as IColumn } from "../../../@types";
 
 interface MainProps {
   socket: SocketIOClient.Socket;
@@ -34,7 +34,7 @@ export const Main = (props: MainProps) => {
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
 
-      const initialColumns = data.board.columns.map((column: { id: string; name: string; }) => ({
+      const initialColumns = data.board.columns.map((column: IColumn) => ({
         ...column,
         isEditing: false
       }));
@@ -85,14 +85,14 @@ export const Main = (props: MainProps) => {
     let boardColumn: BoardColumn;
 
     if (column) {
-      boardColumn = { id: column.id, name: column.name, isEditing: false };
+      boardColumn = { id: column.id, name: column.name, isEditing: false, cardIds: [] };
       props.socket.emit("column:loaded", {
         boardId: props.boardId,
         id: column.id,
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     } else {
-      boardColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true };
+      boardColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true, cardIds: [] };
     }
 
     actions.addColumn(boardColumn);
