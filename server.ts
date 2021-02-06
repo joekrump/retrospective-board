@@ -15,21 +15,22 @@ const NEW_BOARD = {
   title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`,
   showResults: false,
   maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
+  cards: {},
   columns: [
     {
       id: uuid.v4(),
       name: "👏 The Good",
-      cards: []
+      cardIds: []
     },
     {
       id: uuid.v4(),
       name: "😬 The Bad",
-      cards: []
+      cardIds: []
     },
     {
       id: uuid.v4(),
       name: "⚡️ To Improve",
-      cards: []
+      cardIds: []
     }
   ]
 };
@@ -48,6 +49,24 @@ app.get("/board/:boardId", function(_req, res) {
 
 function createNewBoard(boardId: string) {
   boards[boardId] = NEW_BOARD;
+}
+
+function getSession(boardId, sessionId: string) {
+  let session;
+  if (sessionId !== undefined) {
+    try {
+      session = sessionStore[boardId][sessionId]
+    } catch {
+      session =  null;
+    }
+  } else {
+    session =  null;
+  }
+
+  if (session === null || session === undefined) {
+    console.error("Not a valid session");
+    return null;
+  }
 }
 
 function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
@@ -353,11 +372,13 @@ io.on('connection', function (socket) {
 
     const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
     if (column) {
-      const cardIndex = column.cards.findIndex((card) => card.id === data.id);
-      const card = column.cards[cardIndex];
-      // Check to see if the request is coming from the card's owner
+      const card = boards[data.boardId].cards[data.id];
+
       if(card?.ownerId === data?.sessionId) {
-        column.cards.splice(cardIndex, 1);
+        const index = column.cardIds.indexOf(data.id);
+
+        delete boards[data.boardId].cards[data.id];
+        column.cardIds.splice(index, 1);
 
         reclaimStarsFromDeleteCard(card, data.boardId);
         emitUpdateRemainingStars(socket, data.boardId, data.sessionId);
@@ -369,41 +390,32 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("card:starred", function ({ id, star, boardId, columnId, sessionId }: { id: string, star: number, boardId: string, columnId: string, sessionId: string }) {
-    console.log("star for card request");
-    console.log("columnId", columnId)
-    console.log("cardId", id)
-    if (sessionId === undefined && !sessionStore[boardId][sessionId]) {
-      console.error("No session");
+  socket.on("card:starred", function ({ id, star, boardId, sessionId }: { id: string, star: number, boardId: string, columnId: string, sessionId: string }) {
+    const session = getSession(boardId, sessionId);
+    if (session === null) {
       return;
     }
-    const session = sessionStore[boardId][sessionId];
 
-    const column = boards[boardId].columns.find((column) => column.id === columnId);
-    if (column) {
-      const card = column.cards.find((card) => card.id === id);
-      if (card && canStar(session.remainingStars)) {
-        updateRemainingStars(session, socket, card, boardId, star);
-        const userStars = card.stars[session.id];
-        const { starsCount } = card;
+    const card = boards[boardId].cards[id];
 
-        console.log("EMIT ", `card:starred:${id}`)
-        socket.emit(`card:starred:${id}`, { starsCount, userStars });
+    if (card && canStar(session.remainingStars)) {
+      updateRemainingStars(session, socket, card, boardId, star);
+      const userStars = card.stars[session.id];
+      const { starsCount } = card;
 
-        console.log("broadcast EMIT ", `card:starred:${id}`)
-        socket.broadcast.emit(`card:starred:${id}`, {
-          starsCount,
-        });
-        socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
-          remainingStars: session.remainingStars,
-        });
-      } else {
-        console.log("cannot star")
-        console.log("card", card)
-        console.log("column", column)
-      }
+      console.log("EMIT ", `card:starred:${id}`)
+      socket.emit(`card:starred:${id}`, { starsCount, userStars });
+
+      console.log("broadcast EMIT ", `card:starred:${id}`)
+      socket.broadcast.emit(`card:starred:${id}`, {
+        starsCount,
+      });
+      socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
+        remainingStars: session.remainingStars,
+      });
     } else {
-      console.log("no column")
+      console.log("cannot star")
+      console.log("card", card)
     }
   });
 });
