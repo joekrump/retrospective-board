@@ -23,7 +23,7 @@ interface ColumnProps {
 
 export const Column = (props: ColumnProps) => {
   let nameInput = React.createRef<HTMLInputElement>();
-  let [cards, updateCards] = useState([] as CardData[]);
+  let [cards, updateCards] = useState([] as CardData[]); // TODO: update to use overmind to manage the state of cards.
   let [name, updateName] = useState(props.name);
   let [isEditing, updateEditingState] = useState(!!props.isEditing);
   let [newUsavedColumn, updateNewStatus] = useState(props.new);
@@ -106,14 +106,6 @@ export const Column = (props: ColumnProps) => {
       updateCards(cards);
     }
 
-    function handleCardMovedTo(data: { cardId: number }) {
-      // TODO: move card by adding it to the Map of cards for this column, stored in overmind state.
-    }
-
-    function handleCardMovedFrom(data: { cardId: number }) {
-      // TODO: move card by removing it from the Map of cards for this column, stored in overmind state.
-    }
-
     function handleCardCreated(data: { card: CardData }) {
       const cards = cardsRef.current.filter((card) => {
         return (card.id !== data.card.id);
@@ -132,8 +124,6 @@ export const Column = (props: ColumnProps) => {
     props.socket.on(`column:loaded:${props.id}`, handleColumnLoaded);
     props.socket.on(`card:deleted:${props.id}`, handleCardDeleted);
     props.socket.on(`card:created:${props.id}`, handleCardCreated);
-    props.socket.on(`card:moved-from:${props.id}`, handleCardMovedFrom);
-    props.socket.on(`card:moved-to:${props.id}`, handleCardMovedTo);
     props.socket.on(`column:updated:${props.id}`, (data: any) => {
       updateName(data.name);
     });
@@ -149,8 +139,6 @@ export const Column = (props: ColumnProps) => {
       props.socket.removeListener(`card:deleted:${props.id}`);
       props.socket.removeListener(`card:created:${props.id}`);
       props.socket.removeListener(`column:updated:${props.id}`);
-      props.socket.removeListener(`card:moved-from:${props.id}`);
-      props.socket.removeListener(`card:moved-to:${props.id}`);
 
       if (columnRef !== null) {
         columnRef.removeEventListener("dragover", handleDragOver);

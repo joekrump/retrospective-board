@@ -98,6 +98,18 @@ export const Main = (props: MainProps) => {
     actions.addColumn(boardColumn);
   }
 
+  function handleCardMoved({
+    cardId,
+    fromColumnId,
+    toColumnId,
+  }: {
+    cardId: string,
+    fromColumnId: string,
+    toColumnId: string
+  }) {
+    // TODO: move card by adding it to the Map of cards for this column, stored in overmind state.
+  }
+
   function renderColumns() {
     let markup: JSX.Element[] = [];
     const oneHundredPercent = 100;
