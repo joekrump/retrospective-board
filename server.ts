@@ -66,6 +66,8 @@ function getSession(boardId, sessionId: string) {
   if (session === null || session === undefined) {
     console.error("Not a valid session");
     return null;
+  } else {
+    return session;
   }
 }
 
@@ -183,10 +185,12 @@ io.on('connection', function (socket) {
   socket.on("column:loaded", function(data: { boardId: string, id: string, sessionId: string }) {
     console.log("column load request");
     const session = getSession(data.boardId, data.sessionId);
-    if (session === null) { return; }
-    const board = boards[data.boardId];
 
+    if (session === null) { return; }
+
+    const board = boards[data.boardId];
     const column = board?.columns.find((column) => column.id === data.id);
+
     if (column) {
       let card: Card;
       socket.emit(`column:loaded:${data.id}`, {
@@ -207,7 +211,9 @@ io.on('connection', function (socket) {
   socket.on("column:created", function({ boardId, id, name, sessionId }: { boardId: string, id: string, name: string, sessionId: string }) {
     console.log("column create request");
     const session = getSession(boardId, sessionId);
+
     if (session === null) { return; }
+
     const newColumn = {
       id,
       name,
@@ -221,6 +227,7 @@ io.on('connection', function (socket) {
   socket.on("column:updated", function(data: { boardId: string, id: string, name: string, sessionId: string }) {
     console.log("column update request");
     const session = getSession(data.boardId, data.sessionId);
+
     if (session === null) { return; }
 
     let column = boards[data.boardId].columns.find((column) => column.id === data.id);
@@ -235,6 +242,7 @@ io.on('connection', function (socket) {
   socket.on("column:deleted", function({ boardId, sessionId, id }: { boardId: string, id: string, sessionId: string }) {
     console.log("column delete request");
     const session = getSession(boardId, sessionId);
+
     if (session === null) { return; }
 
     let columnIndex = boards[boardId]?.columns.findIndex((column) => column.id === id);
@@ -271,6 +279,7 @@ io.on('connection', function (socket) {
 
   socket.on("card:moved", function(data: { boardId: string, fromColumnId: string, toColumnId: string, cardId: string, sessionId: string }) {
     const session = getSession(data.boardId, data.sessionId);
+
     if (session === null) { return; }
 
     const toColumn = boards[data.boardId].columns.find((column) => column.id === data.toColumnId);
