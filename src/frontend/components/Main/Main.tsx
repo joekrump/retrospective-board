@@ -38,7 +38,10 @@ export const Main = (props: MainProps) => {
         ...column,
         isEditing: false
       }));
-      actions.setColumns(initialColumns);
+      actions.setBoardState({
+        columns: initialColumns,
+        cards: data.board.cards,
+      });
 
       props.socket.on(`board:update-remaining-stars:${props.boardId}:${data.sessionId}`, (data: any) => {
         updateRemainingStars(data.remainingStars);

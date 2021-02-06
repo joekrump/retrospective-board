@@ -10,15 +10,14 @@ interface CardProps {
   key: string;
   id: string;
   deleteCard: (event: React.MouseEvent, id: string) => void;
-  editable: boolean;
-  isEditing: boolean;
   socket: SocketIOClient.Socket;
   columnId: string;
   boardId: string;
   text: string;
   starsCount: number;
   userStars: number;
-  newCard?: boolean;
+  ownerId?: string;
+  isEditing: boolean;
 }
 
 export const Card = (props: CardProps) => {
@@ -43,20 +42,17 @@ export const Card = (props: CardProps) => {
     const {
       id,
       columnId,
-      editable,
-      newCard
+      ownerId
     } = props;
 
     updateCardBeingDragged({
       id,
       columnId,
-      editable,
       text,
       starsCount,
       userStars,
       isEditing,
-      newCard,
-      ownerId: sessionStorage.getItem("retroSessionId") ?? "",
+      ownerId,
     });
     // }
   }
@@ -103,7 +99,7 @@ export const Card = (props: CardProps) => {
         cardRef.removeEventListener("dragend", () => handleDragEnd());
       }
     }
-  }, [text, isEditing, props.columnId, props.newCard, starsCount, userStars])
+  }, [text, isEditing, props.columnId, props.ownerId, starsCount, userStars])
 
   function toggleIsEditing(event?: React.MouseEvent) {
     if (!!event) {
@@ -116,7 +112,7 @@ export const Card = (props: CardProps) => {
     event.preventDefault();
     toggleIsEditing();
 
-    const eventName = !!props.newCard ? "card:created" : "card:updated";
+    const eventName = !!props.ownerId ? "card:updated" : "card:created";
 
     props.socket.emit(eventName, {
       boardId: props.boardId,
@@ -149,6 +145,10 @@ export const Card = (props: CardProps) => {
       star: -1,
       sessionId: sessionStorage.getItem("retroSessionId"),
     });
+  }
+
+  function isEditable() {
+    return props.ownerId === sessionStorage.getItem("retroSessionId");
   }
 
   function renderUserStars() {
@@ -193,7 +193,7 @@ export const Card = (props: CardProps) => {
     );
   } else {
     let editLink;
-    if (props.editable) {
+    if (isEditable()) {
       editLink = (
         <a
           data-cy="edit-card-button"
@@ -243,7 +243,7 @@ export const Card = (props: CardProps) => {
     );
   }
 
-  const draggable = !props.newCard && props.editable;
+  const draggable = !!props.ownerId && isEditable();
 
   return (
     <div
