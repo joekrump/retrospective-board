@@ -23,6 +23,7 @@ interface CardProps {
 export const Card = (props: CardProps) => {
   const [isEditing, updateIsEditing] = useState(props.isEditing);
   const [text, updateText] = useState(props.text);
+  const [ownerId, updateOwnerId] = useState(props.ownerId ?? null);
   const [userStars, updateUserStars] = useState(props.userStars);
   const [starsCount, updateStarsCount] = useState(props.starsCount);
   const { state: { mode }, actions: { updateCardBeingDragged } } = useOvermind();
@@ -38,11 +39,9 @@ export const Card = (props: CardProps) => {
       e.dataTransfer.effectAllowed = "move";
     }
 
-    // if (innerRef.current !== null) {
     const {
       id,
       columnId,
-      ownerId
     } = props;
 
     updateCardBeingDragged({
@@ -54,7 +53,6 @@ export const Card = (props: CardProps) => {
       isEditing,
       ownerId,
     });
-    // }
   }
 
   function handleDragEnd() {
@@ -99,7 +97,7 @@ export const Card = (props: CardProps) => {
         cardRef.removeEventListener("dragend", () => handleDragEnd());
       }
     }
-  }, [text, isEditing, props.columnId, props.ownerId, starsCount, userStars])
+  }, [text, isEditing, props.columnId, ownerId, starsCount, userStars])
 
   function toggleIsEditing(event?: React.MouseEvent) {
     if (!!event) {
@@ -111,14 +109,22 @@ export const Card = (props: CardProps) => {
   function save(event: React.FormEvent) {
     event.preventDefault();
     toggleIsEditing();
+    const sessionId = sessionStorage.getItem("retroSessionId");
 
-    const eventName = !!props.ownerId ? "card:updated" : "card:created";
+    let eventName: string;
+
+    if(!!ownerId) {
+      eventName = "card:updated";
+    } else {
+      eventName = "card:created";
+      updateOwnerId(sessionId);
+    }
 
     props.socket.emit(eventName, {
       boardId: props.boardId,
       columnId: props.columnId,
       cardId: props.id,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      sessionId,
       text,
     });
   }
@@ -148,7 +154,7 @@ export const Card = (props: CardProps) => {
   }
 
   function isEditable() {
-    return props.ownerId === sessionStorage.getItem("retroSessionId");
+    return ownerId === sessionStorage.getItem("retroSessionId");
   }
 
   function renderUserStars() {
@@ -243,7 +249,7 @@ export const Card = (props: CardProps) => {
     );
   }
 
-  const draggable = !!props.ownerId && isEditable();
+  const draggable = !!ownerId && isEditable();
 
   return (
     <div

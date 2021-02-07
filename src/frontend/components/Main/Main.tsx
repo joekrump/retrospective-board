@@ -61,7 +61,6 @@ export const Main = (props: MainProps) => {
 
     props.socket.on(`card:moved:${props.boardId}`, handleCardMoved);
     props.socket.on(`card:created:${props.boardId}`, ({ card }: { card: Card }) => {
-      console.log("CREATED!!!")
       actions.addCard(card);
     });
 
