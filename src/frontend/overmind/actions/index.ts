@@ -19,16 +19,20 @@ export const addCard = mutate(function addCard({ state }, card: Card) {
   const columnIndex = state.columns.findIndex((column) => {
     return column.id === card.columnId;
   });
-  let copy = state.columns;
-  copy[columnIndex].cardIds.push(card.id);
-  state.columns = copy;
+  let columnsCopy = state.columns;
+  columnsCopy[columnIndex].cardIds.push(card.id);
+  state.columns = [
+    ...columnsCopy,
+  ];
 });
 
 export const removeCard = mutate(function deleteCard({ state }, cardId: string) {
   const card = state.cards[cardId];
   let cardsCopy = state.cards;
   delete cardsCopy[cardId];
-  state.cards = cardsCopy;
+  state.cards = {
+    ...cardsCopy,
+  };
 
   const columnIndex = state.columns.findIndex((column) => {
     return column.id === card.columnId;
@@ -36,7 +40,9 @@ export const removeCard = mutate(function deleteCard({ state }, cardId: string) 
   let columnsCopy = state.columns;
   const cardIdIndex = columnsCopy[columnIndex].cardIds.indexOf(card.id);
   columnsCopy[columnIndex].cardIds.splice(cardIdIndex, 1);
-  state.columns = columnsCopy;
+  state.columns = [
+    ...columnsCopy,
+  ];
 });
 
 export const addColumn = mutate(function setColumns({ state }, column: BoardColumn) {
