@@ -20,7 +20,7 @@ export enum SortDirection {
 };
 
 export const Main = (props: MainProps) => {
-  const { state: { columns, mode }, actions } = useOvermind();
+  const { state: { cards, columns, mode }, actions } = useOvermind();
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
   const [remainingStars, updateRemainingStars] = React.useState(null as unknown as number);
@@ -114,15 +114,17 @@ export const Main = (props: MainProps) => {
 
   function handleCardMoved({
     cardId,
-    fromColumnId,
     toColumnId,
   }: {
     cardId: string,
-    fromColumnId: string,
     toColumnId: string
   }) {
-    // TODO: move card by adding it to the Map of cards for this column, stored in overmind state.
-    console.log("CARD MOVED!!!")
+    const cardCopy = {
+      ...cards[cardId],
+      columnId: toColumnId,
+    };
+    actions.removeCard(cardId);
+    actions.addCard(cardCopy);
   }
 
   function renderColumns() {

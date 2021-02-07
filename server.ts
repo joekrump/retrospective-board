@@ -308,13 +308,11 @@ io.on('connection', function (socket) {
 
     socket.emit(`card:moved:${boardId}`, {
       cardId,
-      fromColumnId,
       toColumnId,
     });
 
     socket.broadcast.emit(`card:moved:${boardId}`, {
       cardId,
-      fromColumnId,
       toColumnId,
     });
   });

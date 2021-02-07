@@ -6,7 +6,7 @@ import "./column.css";
 import { SortDirection } from "../Main/Main";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
-import { CardData, Card as ICard } from "../../../@types";
+import { Card as ICard } from "../../../@types";
 
 interface ColumnProps {
   key: string;
@@ -46,8 +46,6 @@ export const Column = (props: ColumnProps) => {
       if (droppedCard === null || droppedCard.columnId === props.id) {
         return false;
       }
-
-      // FIXME: createCard(droppedCard)
 
       props.socket.emit("card:moved", {
         boardId: props.boardId,
@@ -116,6 +114,7 @@ export const Column = (props: ColumnProps) => {
         columnId: props.id,
         text: "",
         starsCount: 0,
+        isEditing: true,
       };
     }
 
@@ -196,11 +195,11 @@ export const Column = (props: ColumnProps) => {
           id={card.id}
           deleteCard={(event: any, id: string) => deleteCard(event, id)}
           ownerId={card.ownerId}
-          isEditing={!card.ownerId}
+          isEditing={card.isEditing}
           socket={props.socket}
           columnId={props.id}
           boardId={props.boardId}
-          text={card.text ? card.text : ""}
+          text={card.text ?? ""}
           starsCount={card.starsCount}
           userStars={card.stars[sessionId]}
         />

@@ -21,7 +21,8 @@ interface CardProps {
 }
 
 export const Card = (props: CardProps) => {
-  const [isEditing, updateIsEditing] = useState(props.isEditing);
+  const sessionId = sessionStorage.getItem("retroSessionId") ?? "";
+  const [isEditing, updateIsEditing] = useState(props.isEditing && (props.ownerId === "" || sessionId === props.ownerId));
   const [text, updateText] = useState(props.text);
   const [ownerId, updateOwnerId] = useState(props.ownerId ?? null);
   const [userStars, updateUserStars] = useState(props.userStars);
@@ -113,7 +114,6 @@ export const Card = (props: CardProps) => {
   function save(event: React.FormEvent) {
     event.preventDefault();
     toggleIsEditing();
-    const sessionId = sessionStorage.getItem("retroSessionId");
 
     let eventName: string;
 
@@ -123,6 +123,8 @@ export const Card = (props: CardProps) => {
       eventName = "card:created";
       updateOwnerId(sessionId);
     }
+
+    updateCard({ id: props.id, isEditing: false, text, ownerId: sessionId });
 
     props.socket.emit(eventName, {
       boardId: props.boardId,
@@ -141,7 +143,7 @@ export const Card = (props: CardProps) => {
       columnId: props.columnId,
       id: props.id,
       star: 1,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      sessionId,
     });
   }
 
@@ -153,12 +155,12 @@ export const Card = (props: CardProps) => {
       columnId: props.columnId,
       id: props.id,
       star: -1,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      sessionId,
     });
   }
 
   function isEditable() {
-    return ownerId === sessionStorage.getItem("retroSessionId") && mode === AppMode.vote;
+    return ownerId === sessionId && mode === AppMode.vote;
   }
 
   function renderUserStars() {
@@ -253,7 +255,7 @@ export const Card = (props: CardProps) => {
     );
   }
 
-  const draggable = ownerId === sessionStorage.getItem("retroSessionId");
+  const draggable = ownerId === sessionId;
 
   return (
     <div

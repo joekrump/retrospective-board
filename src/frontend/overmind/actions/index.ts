@@ -13,8 +13,8 @@ export const updateCardBeingDragged: Action<any> = ({ state }, cardData: any) =>
 export const addCard = mutate(function addCard({ state }, card: Card) {
   state.cards = {
     ...state.cards,
-    [card.id]: card
-  }
+    [card.id]: card,
+  };
 
   const columnIndex = state.columns.findIndex((column) => {
     return column.id === card.columnId;
@@ -50,23 +50,20 @@ export const updateCard = mutate(function({ state }, {
   text,
   columnId,
   starsCount,
-}: {
-  id: string
-  text?: string,
-  columnId?: string,
-  starsCount?: number,
-}) {
+  isEditing,
+  ownerId,
+}: { id: string } & Partial<Card>) {
   const cardToUpdate = state.cards[id];
   const updatedCard = {
     ...cardToUpdate,
     text: text ?? cardToUpdate.text,
     columnId: columnId ?? cardToUpdate.columnId,
     starsCount: starsCount ?? cardToUpdate.starsCount,
+    isEditing: isEditing ?? cardToUpdate.isEditing,
+    ownerId: ownerId ?? cardToUpdate.ownerId,
   };
-  state.cards = {
-    ...state.cards,
-    [id]: updatedCard,
-  };
+
+  state.cards[id] = updatedCard;
 });
 
 export const addColumn = mutate(function setColumns({ state }, column: BoardColumn) {
