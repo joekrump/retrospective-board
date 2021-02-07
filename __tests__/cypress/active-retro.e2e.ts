@@ -46,6 +46,26 @@ describe("Participating in an active retro", () => {
     cy.get("[data-cy=save-card-button]")
       .should("not.exist");
 
+    cy.get(".column:nth-child(1) .card--list > .card-container:last-child [data-cy=add-star-button]")
+      .then((starButton) => {
+        // Max stars is 10 so this will attempt to add more stars than
+        // allowed and verify that the remaining stars cannot go below 0.
+        const numberOfClicks = 11;
+        for(let i = 0; i < numberOfClicks; i++) {
+          cy.wrap(starButton).click();
+        }
+      })
+      .get(".user-stars")
+      .should("contain.text", "10")
+      .get(".stars-remaining")
+      .should("contain.text", "⭐️: 0")
+      .get("[data-cy=undo-star-button]")
+      .click()
+      .get(".user-stars")
+      .should("have.text", "9") // verify that removing a star works.
+      .get(".stars-remaining")
+      .should("contain.text", "⭐️: 1")
+
     // Test that anyone who is not the owner of the card cannot edit it.
     const dummySessionId = "111111";
     const undoPreviousSessionChange = loginAsSession(dummySessionId);
@@ -68,27 +88,19 @@ describe("Participating in an active retro", () => {
       .should("have.length", 1)
       .get(".column:nth-child(1) .card--list .card-container")
       .should("have.length", 0)
+      .get(".column:nth-child(2) .card--list .card-container .user-stars")
+      .should("have.text", "9"); // Check that the star count after the drag and drop is the same as it was before it.
 
     // Delete
     cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=edit-card-button]")
       .invoke("show")
       .click()
-    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=delete-card-button]")
+      .get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=delete-card-button]")
       .click()
-    cy.get(".column:nth-child(2) .card--list .card-container")
+      .get(".column:nth-child(2) .card--list .card-container")
       .should("have.length", 0)
-  });
-
-  it("allows users to add and remove stars from cards", () => {
-    // Star count on a card should not go less than 0.
-    // Clicking on the star icon on a card adds 1 star
-
-    // Clicking on the undo icon on a card removes 1 star that had been added by the user
-
-    // A user cannot remove stars added by a different user.
-
-    // Star pool for a user (remaining number of stars) should start at 10.
-    // Star pool for a user should not go below 0.
+      .get(".stars-remaining")
+      .should("contain.text", "⭐️: 10"); // check that once a card is deleted, all the stars on it are returned.
   });
 
   it("columns can be added and edited", () => {
