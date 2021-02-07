@@ -158,7 +158,7 @@ export const Card = (props: CardProps) => {
   }
 
   function isEditable() {
-    return ownerId === sessionStorage.getItem("retroSessionId");
+    return ownerId === sessionStorage.getItem("retroSessionId") && mode === AppMode.vote;
   }
 
   function renderUserStars() {
@@ -253,7 +253,7 @@ export const Card = (props: CardProps) => {
     );
   }
 
-  const draggable = !!ownerId && isEditable();
+  const draggable = ownerId === sessionStorage.getItem("retroSessionId");
 
   return (
     <div
