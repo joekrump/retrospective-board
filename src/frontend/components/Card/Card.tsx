@@ -75,6 +75,9 @@ export const Card = (props: CardProps) => {
         updateCard({
           id: props.id,
           starsCount: data.starsCount,
+          stars: {
+            [sessionId]: data.userStars,
+          },
         });
         if(data.userStars !== undefined) {
           updateUserStars(data.userStars);

@@ -52,6 +52,7 @@ export const updateCard = mutate(function({ state }, {
   starsCount,
   isEditing,
   ownerId,
+  stars,
 }: { id: string } & Partial<Card>) {
   const cardToUpdate = state.cards[id];
   const updatedCard = {
@@ -61,6 +62,7 @@ export const updateCard = mutate(function({ state }, {
     starsCount: starsCount ?? cardToUpdate.starsCount,
     isEditing: isEditing ?? cardToUpdate.isEditing,
     ownerId: ownerId ?? cardToUpdate.ownerId,
+    stars: stars ?? cardToUpdate.stars,
   };
 
   state.cards[id] = updatedCard;
