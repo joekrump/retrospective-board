@@ -55,29 +55,28 @@ describe("Participating in an active retro", () => {
 
     undoPreviousSessionChange();
 
-    // Test that drag and drop works
     cy.get(".column:nth-child(1) .card--list .card-container")
-    .should("have.length", 1)
-    cy.get(".column:nth-child(2) .card--list .card-container")
-    .should("have.length", 0)
+      .should("have.length", 1)
+      .get(".column:nth-child(2) .card--list .card-container")
+      .should("have.length", 0)
 
-    // FIXME: draga and drop test is failing
-    // const cardSelector = ".column:nth-child(1) .card--list .card-container:last-child";
-    // const columnDropTargetSelector = ".column:nth-child(2) .card--list";
-    // cy.dragAndDrop(cardSelector, columnDropTargetSelector)
-    //   .get(".column:nth-child(2) .card--list .card-container")
-    //   .should("have.length", 1)
-    //   .get(".column:nth-child(1) .card--list .card-container")
-    //   .should("have.length", 0)
+     // Test that drag and drop works
+    const cardSelector = ".column:nth-child(1) .card--list .card-container:last-child";
+    const columnDropTargetSelector = ".column:nth-child(2) .card--list";
+    cy.dragAndDrop(cardSelector, columnDropTargetSelector)
+      .get(".column:nth-child(2) .card--list .card-container")
+      .should("have.length", 1)
+      .get(".column:nth-child(1) .card--list .card-container")
+      .should("have.length", 0)
 
     // Delete
-    // cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=edit-card-button]")
-    //   .invoke("show")
-    //   .click()
-    // cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=delete-card-button]")
-    //   .click()
-    // cy.get(".column:nth-child(2) .card--list .card-container")
-    //   .should("have.length", 0)
+    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=edit-card-button]")
+      .invoke("show")
+      .click()
+    cy.get(".column:nth-child(2) .card--list .card-container:last-child [data-cy=delete-card-button]")
+      .click()
+    cy.get(".column:nth-child(2) .card--list .card-container")
+      .should("have.length", 0)
   });
 
   it("allows users to add and remove stars from cards", () => {
