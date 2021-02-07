@@ -6,7 +6,7 @@ import { useOvermind } from "../../overmind";
 
 import "./main.css";
 import { AppMode } from "../../overmind/state";
-import { Board, BoardColumn } from "../../../@types";
+import { Board, BoardColumn, Card, Column as IColumn } from "../../../@types";
 
 interface MainProps {
   socket: SocketIOClient.Socket;
@@ -20,11 +20,10 @@ export enum SortDirection {
 };
 
 export const Main = (props: MainProps) => {
-  const { state: { columns }, actions } = useOvermind();
+  const { state: { cards, columns, mode }, actions } = useOvermind();
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
   const [remainingStars, updateRemainingStars] = React.useState(null as unknown as number);
-  let { state: { mode } } = useOvermind();
 
   useEffect(function onMount() {
     props.socket.on(`board:loaded:${props.boardId}`, (
@@ -34,11 +33,14 @@ export const Main = (props: MainProps) => {
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
 
-      const initialColumns = data.board.columns.map((column: { id: string; name: string; }) => ({
+      const initialColumns = data.board.columns.map((column: IColumn) => ({
         ...column,
         isEditing: false
       }));
-      actions.setColumns(initialColumns);
+      actions.setBoardState({
+        columns: initialColumns,
+        cards: data.board.cards,
+      });
 
       props.socket.on(`board:update-remaining-stars:${props.boardId}:${data.sessionId}`, (data: any) => {
         updateRemainingStars(data.remainingStars);
@@ -57,11 +59,23 @@ export const Main = (props: MainProps) => {
       deleteColumn(null, data.id, true);
     });
 
+    props.socket.on(`card:moved:${props.boardId}`, handleCardMoved);
+    props.socket.on(`card:created:${props.boardId}`, ({ card }: { card: Card }) => {
+      actions.addCard(card);
+    });
+
+    props.socket.on(`card:deleted:${props.boardId}`, ({ cardId }: { cardId: string }) => {
+      actions.removeCard(cardId);
+    });
+
     return function cleanup() {
       props.socket.removeListener(`board:loaded:${props.boardId}`);
       props.socket.removeListener(`board:update-remaining-stars:${props.boardId}`);
       props.socket.removeListener(`column:deleted:${props.boardId}`);
       props.socket.removeListener(`column:created:${props.boardId}`);
+      props.socket.removeListener(`card:moved:${props.boardId}`);
+      props.socket.removeListener(`card:created:${props.boardId}`);
+      props.socket.removeListener(`card:deleted:${props.boardId}`);
     };
   }, [columns]);
 
@@ -85,17 +99,32 @@ export const Main = (props: MainProps) => {
     let boardColumn: BoardColumn;
 
     if (column) {
-      boardColumn = { id: column.id, name: column.name, isEditing: false };
+      boardColumn = { id: column.id, name: column.name, isEditing: false, cardIds: [] };
       props.socket.emit("column:loaded", {
         boardId: props.boardId,
         id: column.id,
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     } else {
-      boardColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true };
+      boardColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true, cardIds: [] };
     }
 
     actions.addColumn(boardColumn);
+  }
+
+  function handleCardMoved({
+    cardId,
+    toColumnId,
+  }: {
+    cardId: string,
+    toColumnId: string
+  }) {
+    const cardCopy = {
+      ...cards[cardId],
+      columnId: toColumnId,
+    };
+    actions.removeCard(cardId);
+    actions.addCard(cardCopy);
   }
 
   function renderColumns() {

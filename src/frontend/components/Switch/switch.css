@@ -15,6 +15,7 @@
   border-radius: 1.5rem;
   position: relative;
   transition: background-color .2s;
+  box-shadow: inset 0px 0px 5px rgba(10,10,10,0.8);
 }
 
 .switch--label .switch--button {
@@ -27,7 +28,7 @@
   border-radius: 1.2rem;
   transition: 0.2s;
   background: #fff;
-  box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
+  box-shadow: 2px 0 5px rgba(10, 10, 10, 0.8);
 }
 
 .switch--checkbox:checked + .switch--label .switch--button {
@@ -36,7 +37,8 @@
 }
 
 .switch--checkbox:checked + .switch--label {
-  background-color: #76e00d;
+  background-color: var(--green);
+  box-shadow: inset 2px 0px 5px rgba(10,10,10,0.8);
 }
 
 .switch--label:active .switch--button {

@@ -10,23 +10,24 @@ interface CardProps {
   key: string;
   id: string;
   deleteCard: (event: React.MouseEvent, id: string) => void;
-  editable: boolean;
-  isEditing: boolean;
   socket: SocketIOClient.Socket;
   columnId: string;
   boardId: string;
   text: string;
   starsCount: number;
   userStars: number;
-  newCard?: boolean;
+  ownerId?: string;
+  isEditing: boolean;
 }
 
 export const Card = (props: CardProps) => {
-  const [isEditing, updateIsEditing] = useState(props.isEditing);
+  const sessionId = sessionStorage.getItem("retroSessionId") ?? "";
+  const [isEditing, updateIsEditing] = useState(props.isEditing && (props.ownerId === "" || sessionId === props.ownerId));
   const [text, updateText] = useState(props.text);
+  const [ownerId, updateOwnerId] = useState(props.ownerId ?? null);
   const [userStars, updateUserStars] = useState(props.userStars);
   const [starsCount, updateStarsCount] = useState(props.starsCount);
-  const { state: { mode }, actions: { updateCardBeingDragged } } = useOvermind();
+  const { state: { mode }, actions: { updateCardBeingDragged, updateCard } } = useOvermind();
   const innerRef: RefObject<HTMLDivElement> = useRef(null);
   let cardContents;
 
@@ -39,26 +40,20 @@ export const Card = (props: CardProps) => {
       e.dataTransfer.effectAllowed = "move";
     }
 
-    // if (innerRef.current !== null) {
     const {
       id,
       columnId,
-      editable,
-      newCard
     } = props;
 
     updateCardBeingDragged({
       id,
       columnId,
-      editable,
       text,
       starsCount,
       userStars,
       isEditing,
-      newCard,
-      ownerId: sessionStorage.getItem("retroSessionId") ?? "",
+      ownerId,
     });
-    // }
   }
 
   function handleDragEnd() {
@@ -77,6 +72,10 @@ export const Card = (props: CardProps) => {
     ) => {
       if(!!data) {
         updateStarsCount(data.starsCount);
+        updateCard({
+          id: props.id,
+          starsCount: data.starsCount,
+        });
         if(data.userStars !== undefined) {
           updateUserStars(data.userStars);
         }
@@ -103,7 +102,7 @@ export const Card = (props: CardProps) => {
         cardRef.removeEventListener("dragend", () => handleDragEnd());
       }
     }
-  }, [text, isEditing, props.columnId, props.newCard, starsCount, userStars])
+  }, [text, isEditing, props.columnId, ownerId, starsCount, userStars])
 
   function toggleIsEditing(event?: React.MouseEvent) {
     if (!!event) {
@@ -116,13 +115,22 @@ export const Card = (props: CardProps) => {
     event.preventDefault();
     toggleIsEditing();
 
-    const eventName = !!props.newCard ? "card:created" : "card:updated";
+    let eventName: string;
+
+    if(!!ownerId) {
+      eventName = "card:updated";
+    } else {
+      eventName = "card:created";
+      updateOwnerId(sessionId);
+    }
+
+    updateCard({ id: props.id, isEditing: false, text, ownerId: sessionId });
 
     props.socket.emit(eventName, {
       boardId: props.boardId,
       columnId: props.columnId,
-      id: props.id,
-      ownerId: sessionStorage.getItem("retroSessionId"),
+      cardId: props.id,
+      sessionId,
       text,
     });
   }
@@ -135,7 +143,7 @@ export const Card = (props: CardProps) => {
       columnId: props.columnId,
       id: props.id,
       star: 1,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      sessionId,
     });
   }
 
@@ -147,8 +155,12 @@ export const Card = (props: CardProps) => {
       columnId: props.columnId,
       id: props.id,
       star: -1,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      sessionId,
     });
+  }
+
+  function isEditable() {
+    return ownerId === sessionId && mode === AppMode.vote;
   }
 
   function renderUserStars() {
@@ -193,7 +205,7 @@ export const Card = (props: CardProps) => {
     );
   } else {
     let editLink;
-    if (props.editable) {
+    if (isEditable()) {
       editLink = (
         <a
           data-cy="edit-card-button"
@@ -243,7 +255,7 @@ export const Card = (props: CardProps) => {
     );
   }
 
-  const draggable = !props.newCard && props.editable;
+  const draggable = ownerId === sessionId;
 
   return (
     <div

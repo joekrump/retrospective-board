@@ -6,7 +6,7 @@ import "./column.css";
 import { SortDirection } from "../Main/Main";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
-import { CardData } from "../../../@types";
+import { Card as ICard } from "../../../@types";
 
 interface ColumnProps {
   key: string;
@@ -23,12 +23,10 @@ interface ColumnProps {
 
 export const Column = (props: ColumnProps) => {
   let nameInput = React.createRef<HTMLInputElement>();
-  let [cards, updateCards] = useState([] as CardData[]);
   let [name, updateName] = useState(props.name);
   let [isEditing, updateEditingState] = useState(!!props.isEditing);
   let [newUsavedColumn, updateNewStatus] = useState(props.new);
-  let { state: { mode, cardBeingDragged }, actions: { updateCardBeingDragged } } = useOvermind();
-  let cardsRef = useRef(cards);
+  let { state: { mode, cardBeingDragged, columns, cards }, actions: { updateCardBeingDragged, addCard, removeCard } } = useOvermind();
   const sessionId = sessionStorage.getItem("retroSessionId") || "";
   const innerRef: RefObject<HTMLDivElement> = useRef(null);
 
@@ -48,8 +46,6 @@ export const Column = (props: ColumnProps) => {
       if (droppedCard === null || droppedCard.columnId === props.id) {
         return false;
       }
-
-      addCard(droppedCard)
 
       props.socket.emit("card:moved", {
         boardId: props.boardId,
@@ -80,50 +76,6 @@ export const Column = (props: ColumnProps) => {
       sessionId,
     });
 
-    function handleColumnLoaded (data: any) {
-      let cardsData: CardData[] = [];
-
-      for (let i = 0; i < data.cards.length; i++) {
-        if (!!data.cards[i].text) {
-          cardsData.push({
-            id: data.cards[i].id,
-            editable: data.cards[i].ownerId === sessionId,
-            isEditing: false,
-            text: data.cards[i].text,
-            starsCount: data.cards[i].starsCount,
-            userStars: data.cards[i].stars[sessionId] ? data.cards[i].stars[sessionId] : 0,
-          } as CardData);
-        }
-      }
-      updateCards(cardsData);
-    }
-
-    function handleCardDeleted (data: any) {
-      const cards = cardsRef.current.filter((card: CardData) => {
-        return card.id !== data.id;
-      });
-
-      updateCards(cards);
-    }
-
-    function handleCardCreated(data: { card: CardData }) {
-      const cards = cardsRef.current.filter((card) => {
-        return (card.id !== data.card.id);
-      });
-
-      cards.push({
-        ...data.card,
-        userStars: 0,
-        editable: data.card.ownerId === sessionId,
-        isEditing: false,
-      });
-
-      updateCards(cards);
-    }
-
-    props.socket.on(`column:loaded:${props.id}`, handleColumnLoaded);
-    props.socket.on(`card:deleted:${props.id}`, handleCardDeleted);
-    props.socket.on(`card:created:${props.id}`, handleCardCreated);
     props.socket.on(`column:updated:${props.id}`, (data: any) => {
       updateName(data.name);
     });
@@ -135,9 +87,6 @@ export const Column = (props: ColumnProps) => {
     }
 
     return function cleanup() {
-      props.socket.removeListener(`column:loaded:${props.id}`);
-      props.socket.removeListener(`card:deleted:${props.id}`);
-      props.socket.removeListener(`card:created:${props.id}`);
       props.socket.removeListener(`column:updated:${props.id}`);
 
       if (columnRef !== null) {
@@ -156,55 +105,35 @@ export const Column = (props: ColumnProps) => {
     }
   }, [cardBeingDragged]);
 
-  useEffect(() => {
-    cardsRef.current = cards;
-  }, [cards]);
-
-  function addCard(card?: CardData) {
-    let updatedCards: CardData[] = [];
-
+  function createCard(card?: ICard) {
     if (card === undefined) {
       card = {
         id: `card-${uuid.v4()}`,
-        editable: true,
-        isEditing: true,
         ownerId: "",
+        stars: {},
+        columnId: props.id,
+        text: "",
         starsCount: 0,
-        userStars: 0,
-        newCard: true,
+        isEditing: true,
       };
     }
 
-    updatedCards = [
-      card,
-      ...cardsRef.current,
-    ];
-    updateCards(updatedCards);
+    addCard(card);
   }
 
-  function deleteCard(event: React.MouseEvent, id: string) {
+  function deleteCard(event: React.MouseEvent, cardId: string) {
     event.preventDefault();
-    let deletedCard: CardData | undefined;
-    let updatedCards: CardData[] = [];
+    const cardToDelete = cards[cardId];
+    removeCard(cardId);
 
-    cards.forEach((card: CardData) => {
-      if(card.id === id) {
-        deletedCard = card;
-      } else {
-        updatedCards.push(card);
-      }
-    });
-
-    if (!!deletedCard && !deletedCard.newCard) {
+    if (cardToDelete.ownerId !== undefined) {
       props.socket.emit("card:deleted", {
         boardId: props.boardId,
         columnId: props.id,
-        id,
+        cardId,
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     }
-
-    updateCards(updatedCards);
   }
 
   function toggleIsEditing(event?: React.MouseEvent) {
@@ -240,38 +169,39 @@ export const Column = (props: ColumnProps) => {
   }
 
   function renderCards() {
+    // FIXME: should not need to look up the index for the column each time.
+    const column = columns.find((column) => column.id === props.id);
+    let cardIds = [
+      ...column?.cardIds ?? [],
+    ];
+
     if (mode === AppMode.review) {
-      cards.sort((cardA, cardB) => {
+      cardIds?.sort((cardIdA, cardIdB) => {
         if (props.sortDirection === SortDirection.asc) {
-          return cardA.starsCount - cardB.starsCount
+          return cards[cardIdA].starsCount - cards[cardIdB].starsCount
         } else {
-          return cardB.starsCount - cardA.starsCount
+          return cards[cardIdB].starsCount - cards[cardIdA].starsCount
         }
       });
     }
+    let card: ICard;
 
-    return cards.map((card: CardData) => {
-      if (
-        mode === AppMode.review
-        && card.isEditing
-      ) {
-        return null;
-      }
+    return cardIds?.map((cardId: string) => {
+      card = cards[cardId];
 
       return (
         <Card
           key={card.id}
           id={card.id}
           deleteCard={(event: any, id: string) => deleteCard(event, id)}
-          editable={mode === AppMode.vote && card.editable}
+          ownerId={card.ownerId}
           isEditing={card.isEditing}
           socket={props.socket}
           columnId={props.id}
           boardId={props.boardId}
-          text={card.text ? card.text : ""}
+          text={card.text ?? ""}
           starsCount={card.starsCount}
-          userStars={card.userStars}
-          newCard={card.newCard}
+          userStars={card.stars[sessionId]}
         />
       );
     });
@@ -302,7 +232,7 @@ export const Column = (props: ColumnProps) => {
           mode === AppMode.review ?
             null
             :
-            <button className="card--button__add" data-cy="add-card-button" onClick={() => addCard() }>
+            <button className="card--button__add" data-cy="add-card-button" onClick={() => createCard() }>
               +
             </button>
         }
