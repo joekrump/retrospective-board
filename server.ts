@@ -347,9 +347,6 @@ io.on('connection', function (socket) {
       boards[boardId].cards[cardId] = newCard;
       column.cardIds.push(cardId);
 
-      socket.emit(`card:created:${boardId}`, {
-        card: newCard
-      });
       socket.broadcast.emit(`card:created:${boardId}`, {
         card: newCard,
       });
@@ -378,28 +375,36 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("card:deleted", function (data: { boardId: string, columnId: string, id: string, sessionId: string }) {
+  socket.on("card:deleted", function ({
+    boardId,
+    columnId,
+    cardId,
+    sessionId,
+  }:{
+    boardId: string,
+    columnId: string,
+    cardId: string,
+    sessionId: string,
+  }) {
     console.log("card delete request");
-    if (data.sessionId === undefined && !sessionStore[data.boardId][data.sessionId]) {
-      console.error("No session");
-      return;
-    }
+    const session = getSession(boardId, sessionId);
+    if (session === null) { return; }
 
-    const column = boards[data.boardId].columns.find((column) => column.id === data.columnId);
+    const column = boards[boardId].columns.find((column) => column.id === columnId);
     if (column) {
-      const card = boards[data.boardId].cards[data.id];
+      const card = boards[boardId].cards[cardId];
 
-      if(card?.ownerId === data?.sessionId) {
-        const index = column.cardIds.indexOf(data.id);
+      if(card?.ownerId === sessionId) {
+        const index = column.cardIds.indexOf(cardId);
 
-        delete boards[data.boardId].cards[data.id];
+        delete boards[boardId].cards[cardId];
         column.cardIds.splice(index, 1);
 
-        reclaimStarsFromDeleteCard(card, data.boardId);
-        emitUpdateRemainingStars(socket, data.boardId, data.sessionId);
+        reclaimStarsFromDeleteCard(card, boardId);
+        emitUpdateRemainingStars(socket, boardId, sessionId);
 
-        socket.broadcast.emit(`card:deleted:${data.boardId}`, {
-          id: data.id
+        socket.broadcast.emit(`card:deleted:${boardId}`, {
+          cardId,
         });
       }
     }
@@ -407,9 +412,8 @@ io.on('connection', function (socket) {
 
   socket.on("card:starred", function ({ id, star, boardId, sessionId }: { id: string, star: number, boardId: string, columnId: string, sessionId: string }) {
     const session = getSession(boardId, sessionId);
-    if (session === null) {
-      return;
-    }
+
+    if (session === null) { return; }
 
     const card = boards[boardId].cards[id];
 

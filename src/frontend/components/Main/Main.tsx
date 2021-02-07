@@ -6,7 +6,7 @@ import { useOvermind } from "../../overmind";
 
 import "./main.css";
 import { AppMode } from "../../overmind/state";
-import { Board, BoardColumn, Column as IColumn } from "../../../@types";
+import { Board, BoardColumn, Card, Column as IColumn } from "../../../@types";
 
 interface MainProps {
   socket: SocketIOClient.Socket;
@@ -20,11 +20,10 @@ export enum SortDirection {
 };
 
 export const Main = (props: MainProps) => {
-  const { state: { columns }, actions } = useOvermind();
+  const { state: { columns, mode }, actions } = useOvermind();
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
   const [remainingStars, updateRemainingStars] = React.useState(null as unknown as number);
-  let { state: { mode } } = useOvermind();
 
   useEffect(function onMount() {
     props.socket.on(`board:loaded:${props.boardId}`, (
@@ -48,8 +47,6 @@ export const Main = (props: MainProps) => {
       });
     });
 
-    // TODO: add handlers and listeners for card creation and deletion
-
     props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
       updateBoardTitle(data.title);
     });
@@ -63,6 +60,14 @@ export const Main = (props: MainProps) => {
     });
 
     props.socket.on(`card:moved:${props.boardId}`, handleCardMoved);
+    props.socket.on(`card:created:${props.boardId}`, ({ card }: { card: Card }) => {
+      console.log("CREATED!!!")
+      actions.addCard(card);
+    });
+
+    props.socket.on(`card:deleted:${props.boardId}`, ({ cardId }: { cardId: string }) => {
+      actions.removeCard(cardId);
+    });
 
     return function cleanup() {
       props.socket.removeListener(`board:loaded:${props.boardId}`);
@@ -70,6 +75,8 @@ export const Main = (props: MainProps) => {
       props.socket.removeListener(`column:deleted:${props.boardId}`);
       props.socket.removeListener(`column:created:${props.boardId}`);
       props.socket.removeListener(`card:moved:${props.boardId}`);
+      props.socket.removeListener(`card:created:${props.boardId}`);
+      props.socket.removeListener(`card:deleted:${props.boardId}`);
     };
   }, [columns]);
 

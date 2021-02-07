@@ -24,9 +24,10 @@ export const addCard = mutate(function addCard({ state }, card: Card) {
   state.columns = copy;
 });
 
-export const removeCard = mutate(function deleteCard({ state }, card: Card) {
+export const removeCard = mutate(function deleteCard({ state }, cardId: string) {
+  const card = state.cards[cardId];
   let cardsCopy = state.cards;
-  delete cardsCopy[card.id];
+  delete cardsCopy[cardId];
   state.cards = cardsCopy;
 
   const columnIndex = state.columns.findIndex((column) => {

@@ -78,34 +78,6 @@ export const Column = (props: ColumnProps) => {
       sessionId,
     });
 
-    // FIXME: move initial load handling into Main to be managed
-    // by overlordjs.
-    // function handleColumnLoaded (data: any) {
-    //   let cardsData: CardData[] = [];
-
-    //   for (let i = 0; i < data.cards.length; i++) {
-    //     if (!!data.cards[i].text) {
-    //       cardsData.push({
-    //         id: data.cards[i].id,
-    //         editable: data.cards[i].ownerId === sessionId,
-    //         isEditing: false,
-    //         text: data.cards[i].text,
-    //         starsCount: data.cards[i].starsCount,
-    //         userStars: data.cards[i].stars[sessionId] ? data.cards[i].stars[sessionId] : 0,
-    //       } as CardData);
-    //     }
-    //   }
-    //   updateCards(cardsData);
-    // }
-
-    function handleCardDeleted (data: any) {
-      removeCard(data.cardId);
-    }
-
-    function handleCardCreated(data: { card: ICard }) {
-      addCard(data.card);
-    }
-
     props.socket.on(`column:updated:${props.id}`, (data: any) => {
       updateName(data.name);
     });
@@ -150,16 +122,16 @@ export const Column = (props: ColumnProps) => {
     addCard(card);
   }
 
-  function deleteCard(event: React.MouseEvent, id: string) {
+  function deleteCard(event: React.MouseEvent, cardId: string) {
     event.preventDefault();
-    const cardToDelete = cards[id];
-    removeCard(cardToDelete);
+    const cardToDelete = cards[cardId];
+    removeCard(cardId);
 
     if (cardToDelete.ownerId !== undefined) {
       props.socket.emit("card:deleted", {
         boardId: props.boardId,
         columnId: props.id,
-        id,
+        cardId,
         sessionId: sessionStorage.getItem("retroSessionId"),
       });
     }
