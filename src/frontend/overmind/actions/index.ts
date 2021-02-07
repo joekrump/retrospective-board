@@ -45,6 +45,30 @@ export const removeCard = mutate(function deleteCard({ state }, cardId: string) 
   ];
 });
 
+export const updateCard = mutate(function({ state }, {
+  id,
+  text,
+  columnId,
+  starsCount,
+}: {
+  id: string
+  text?: string,
+  columnId?: string,
+  starsCount?: number,
+}) {
+  const cardToUpdate = state.cards[id];
+  const updatedCard = {
+    ...cardToUpdate,
+    text: text ?? cardToUpdate.text,
+    columnId: columnId ?? cardToUpdate.columnId,
+    starsCount: starsCount ?? cardToUpdate.starsCount,
+  };
+  state.cards = {
+    ...state.cards,
+    [id]: updatedCard,
+  };
+});
+
 export const addColumn = mutate(function setColumns({ state }, column: BoardColumn) {
   state.columns = [
     ...state.columns,

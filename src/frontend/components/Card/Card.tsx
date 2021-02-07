@@ -26,7 +26,7 @@ export const Card = (props: CardProps) => {
   const [ownerId, updateOwnerId] = useState(props.ownerId ?? null);
   const [userStars, updateUserStars] = useState(props.userStars);
   const [starsCount, updateStarsCount] = useState(props.starsCount);
-  const { state: { mode }, actions: { updateCardBeingDragged } } = useOvermind();
+  const { state: { mode }, actions: { updateCardBeingDragged, updateCard } } = useOvermind();
   const innerRef: RefObject<HTMLDivElement> = useRef(null);
   let cardContents;
 
@@ -71,6 +71,10 @@ export const Card = (props: CardProps) => {
     ) => {
       if(!!data) {
         updateStarsCount(data.starsCount);
+        updateCard({
+          id: props.id,
+          starsCount: data.starsCount,
+        });
         if(data.userStars !== undefined) {
           updateUserStars(data.userStars);
         }

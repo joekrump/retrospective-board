@@ -366,7 +366,7 @@ io.on('connection', function (socket) {
     console.log("card update request");
     const session = getSession(data.boardId, data.sessionId);
 
-    if (session === null) { return;}
+    if (session === null) { return; }
 
     boards[data.boardId].cards[data.cardId].text = data.text;
 
