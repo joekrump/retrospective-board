@@ -172,10 +172,12 @@ export const Column = (props: ColumnProps) => {
   function renderCards() {
     // FIXME: should not need to look up the index for the column each time.
     const column = columns.find((column) => column.id === props.id);
-    let cardIds = column?.cardIds;
+    let cardIds = [
+      ...column?.cardIds ?? [],
+    ];
 
     if (mode === AppMode.review) {
-      cardIds = cardIds?.sort((cardIdA, cardIdB) => {
+      cardIds?.sort((cardIdA, cardIdB) => {
         if (props.sortDirection === SortDirection.asc) {
           return cards[cardIdA].starsCount - cards[cardIdB].starsCount
         } else {
