@@ -14,6 +14,7 @@ A tool for running retros.
    - See the total number of ⭐️ values given to each card
    - Quickly identify the cards with the most ⭐️s using sorting.
 4. Markdown syntax support for `**bold**, _italic_, ![image](src)`, and `inline_code`.
+5. Data stored in memory only. Once you stop the server, all data is erased.
 
 ## Setup
 
