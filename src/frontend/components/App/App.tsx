@@ -13,7 +13,7 @@ import { Board as IBoard } from "../../../@types";
 const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
 
-const colorThresholdForLightText = 0x70;
+const colorThresholdForLightText = 0x90;
 const lightTextColor = "#e6e6e6";
 
 export const App = () => {
