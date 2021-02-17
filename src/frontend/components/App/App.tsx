@@ -6,9 +6,9 @@ import { useOvermind } from "../../overmind";
 import "./app.css";
 
 import { Header } from "../Header/Header";
-import { Main } from "../Main/Main";
+import { Board } from "../Board/Board";
 import { AppMode } from "../../overmind/state";
-import { Board } from "../../../@types";
+import { Board as IBoard } from "../../../@types";
 
 const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
@@ -46,7 +46,7 @@ export const App = () => {
   useEffect(function onMount() {
     const sessionId = sessionStorage.getItem("retroSessionId");
     socket.on(`board:loaded:${boardId}`, (
-      data: { board: Board, sessionId: string, remainingStars: number, showResults: boolean },
+      data: { board: IBoard, sessionId: string, remainingStars: number, showResults: boolean },
     ) => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
     });
@@ -76,7 +76,7 @@ export const App = () => {
         socket={socket}
         boardId={boardId}
       />
-      <Main
+      <Board
         socket={socket}
         boardId={boardId}
       />
