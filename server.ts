@@ -16,6 +16,8 @@ const NEW_BOARD = {
   showResults: false,
   maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
   cards: {},
+  currentStep: 0,
+  totalSteps: 12,
   columns: [
     {
       id: uuid.v4(),
@@ -79,7 +81,13 @@ function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
 
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
   socket.emit(`board:loaded:${boardId}`, {
-    board: boards[boardId],
+    board: {
+      currentStep: boards[boardId].currentStep,
+      totalSteps: boards[boardId].totalSteps,
+      title: boards[boardId].title,
+      cards: boards[boardId].cards,
+      columns: boards[boardId].columns,
+    },
     sessionId,
     showResults: boards[boardId].showResults,
     remainingStars: sessionStore[boardId][sessionId].remainingStars,
@@ -151,18 +159,6 @@ io.on('connection', function (socket) {
       id: sessionId,
       remainingStars: MAX_VOTES_USER_VOTE_PER_BOARD,
     };
-    let currentStep = 0;
-    const totalSteps = 12;
-
-    const intervalId = setInterval(() => {
-      socket.emit(`board:darken-app-tick:${boardId}`, {
-        currentStep: currentStep++,
-        totalSteps,
-      });
-      if (currentStep > totalSteps) {
-        clearInterval(intervalId)
-      }
-    }, 2000);
 
     if(!sessionStore[boardId]) {
       createNewBoard(boardId)
@@ -174,6 +170,26 @@ io.on('connection', function (socket) {
     }
 
     emitBoardLoaded(socket, boardId, sessionId);
+
+    if (!boards[boardId]?.stepsIntervalId) {
+      boards[boardId].stepsIntervalId = setInterval(() => {
+        if (boards[boardId].currentStep > boards[boardId].totalSteps) {
+          clearInterval(boards[boardId].stepsIntervalId);
+          boards[boardId].stepsIntervalId = undefined;
+        }
+
+        boards[boardId].currentStep++;
+
+        socket.emit(`board:darken-app-tick:${boardId}`, {
+          currentStep: boards[boardId].currentStep,
+          totalSteps: boards[boardId].totalSteps,
+        });
+        socket.broadcast.emit(`board:darken-app-tick:${boardId}`, {
+          currentStep: boards[boardId].currentStep,
+          totalSteps: boards[boardId].totalSteps,
+        });
+      }, 5000);
+    }
   });
 
   socket.on('board:updated', function(data: { boardId: string, title: string, sessionId: string }) {

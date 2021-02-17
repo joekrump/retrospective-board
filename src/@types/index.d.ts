@@ -20,6 +20,9 @@ export interface Board {
   title: string;
   showResults: boolean;
   columns: Column[];
+  currentStep: number;
+  totalSteps: number;
+  stepsIntervalId?: ReturnType<typeof setInterval>;
   cards: { [id: string]: Card };
 }
 

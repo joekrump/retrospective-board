@@ -13,6 +13,9 @@ import { Board as IBoard } from "../../../@types";
 const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
 
+const colorThresholdForLightText = 0x70;
+const lightTextColor = "#e6e6e6";
+
 export const App = () => {
   const { actions: { updateMode} } = useOvermind();
   const initialCSSBackgroundColor = getComputedStyle(document.documentElement)
@@ -58,9 +61,15 @@ export const App = () => {
   useEffect(function onMount() {
     const sessionId = sessionStorage.getItem("retroSessionId");
     socket.on(`board:loaded:${boardId}`, (
-      data: { board: IBoard, sessionId: string, remainingStars: number, showResults: boolean },
+      data: {
+        board: IBoard,
+        sessionId: string,
+        remainingStars: number,
+        showResults: boolean,
+      },
     ) => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
+      darkenTheApp(data.board.currentStep, data.board.totalSteps);
     });
     socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {
       displayStarLimitAlert(data.maxStars);
@@ -74,7 +83,7 @@ export const App = () => {
     });
     socket.on(`board:darken-app-tick:${boardId}`, ({ currentStep, totalSteps }: { currentStep: number, totalSteps: number }) => {
       if (totalSteps > currentStep) {
-        darkenTheApp((totalSteps - currentStep) / totalSteps);
+        darkenTheApp(currentStep, totalSteps);
       }
     });
 
@@ -92,14 +101,24 @@ export const App = () => {
     };
   }, []);
 
-  function darkenTheApp(percentageTimeRemainingInRetroStage: number) {
-    const theseHoldForWhiteText = 0x70;
-    const newHexColor = Math.floor(initialBackgroundColor * percentageTimeRemainingInRetroStage);
+  function getBackgroundColor(stepPercentageCompleteDecimal: number) {
+    const newHexColor = Math.floor(initialBackgroundColor * stepPercentageCompleteDecimal);
     const newHexColorString = newHexColor.toString(16);
     const newBackgroundColor = `#${newHexColorString}${newHexColorString}${newHexColorString}`;
 
-    if (newHexColor < theseHoldForWhiteText) {
-      document.documentElement.style.setProperty("--text-color-primary", "#e6e6e6");
+    return {
+      newBackgroundColor,
+      newHexColor,
+    };
+  }
+
+  function darkenTheApp(currentStep: number, totalSteps: number) {
+    console.log(currentStep);
+    const stepPercentageCompleteDecimal = (totalSteps - currentStep) / totalSteps;
+    const { newBackgroundColor, newHexColor } = getBackgroundColor(stepPercentageCompleteDecimal);
+
+    if (newHexColor < colorThresholdForLightText) {
+      document.documentElement.style.setProperty("--text-color-primary", lightTextColor);
     }
     document.documentElement.style.setProperty("--app--background-color", `${newBackgroundColor}`);
   }
