@@ -173,9 +173,10 @@ io.on('connection', function (socket) {
 
     if (!boards[boardId]?.stepsIntervalId) {
       boards[boardId].stepsIntervalId = setInterval(() => {
-        if (boards[boardId].currentStep > boards[boardId].totalSteps) {
+        if (boards[boardId].currentStep >= boards[boardId].totalSteps) {
           clearInterval(boards[boardId].stepsIntervalId);
           boards[boardId].stepsIntervalId = undefined;
+          return;
         }
 
         boards[boardId].currentStep++;
