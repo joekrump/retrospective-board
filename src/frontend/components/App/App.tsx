@@ -55,7 +55,9 @@ export const App = () => {
   }
 
   function updateClock(timeMS: number) {
-    // set time
+    // TODO: allow someone to set a timer for the retro and start it.
+    // This can be tracked via an interval on the server.
+    // TODO: set time on a clock
   }
 
   useEffect(function onMount() {
