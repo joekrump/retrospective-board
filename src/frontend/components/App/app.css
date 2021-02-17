@@ -8,8 +8,14 @@
 
 html, body, #react-root {
   height: 100%;
-  background-color: var(--app--background-color);
-  transition: background-color 2s ease-out, color 1s ease-out;
+}
+
+#react-root {
+  display: grid;
+  grid-template:
+    "hd   hd   hd   hd   hd   hd   hd   hd   hd   hd   hd   hd" minmax(10vh, auto)
+    "main main main main main main main main main main main main" minmax(100px, 1fr)
+    / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
 body {

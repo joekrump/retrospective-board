@@ -197,7 +197,7 @@ export const Board = (props: BoardProps) => {
   }, [columns, mode, sortDirection]);
 
   return (
-    <main>
+    <main id="board">
       <BoardControls
         sortColumnCardsByStars={sortColumnCardsByStars}
         title={boardTitle}

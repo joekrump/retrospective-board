@@ -28,7 +28,7 @@ export const Header = (props: HeaderProps) => {
   }
 
   return (
-    <header id="top-header">
+    <header id="header">
       <div id="logo">
         <AppLogo />
         <h2>Retro</h2>

@@ -1,22 +1,16 @@
 header {
-  display: grid;
-  padding: 15px 0;
-  grid-template-columns: repeat(12, 1fr);
+  grid-area: hd;
+  display: flex;
+  justify-content: space-between;
+  height: 10vh;
   background: #673ab7;
 }
 
-#top-header {
-  grid-row: 1 / span 1;
-  grid-column: 1 / span 12;
-  display: flex;
-  justify-content: space-between;
-}
-
 #logo,
-#top-header h1,
-#top-header h2,
-#top-header h3,
-#top-header h4 {
+#header h1,
+#header h2,
+#header h3,
+#header h4 {
   color: #fff;
   margin: 0;
 }
