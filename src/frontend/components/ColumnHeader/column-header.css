@@ -5,7 +5,7 @@
 }
 
 .column-header input {
-  background-color: var(--app--background-color);
+  background-color: none;
 }
 
 .column-header--text {
