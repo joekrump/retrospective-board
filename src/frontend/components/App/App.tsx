@@ -115,7 +115,6 @@ export const App = () => {
   }
 
   function darkenTheApp(currentStep: number, totalSteps: number) {
-    console.log(currentStep);
     const stepPercentageCompleteDecimal = (totalSteps - currentStep) / totalSteps;
     const { newBackgroundColor, newHexColor } = getBackgroundColor(stepPercentageCompleteDecimal);
 
