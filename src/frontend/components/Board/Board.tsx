@@ -4,11 +4,11 @@ import * as uuid from "uuid";
 import { BoardControls } from "../BoardControls/BoardControls";
 import { useOvermind } from "../../overmind";
 
-import "./main.css";
+import "./board.css";
 import { AppMode } from "../../overmind/state";
-import { Board, BoardColumn, Card, Column as IColumn } from "../../../@types";
+import { Board as IBoard, BoardColumn, Card, Column as IColumn } from "../../../@types";
 
-interface MainProps {
+interface BoardProps {
   socket: SocketIOClient.Socket;
   boardId: string;
 }
@@ -19,7 +19,7 @@ export enum SortDirection {
   "desc",
 };
 
-export const Main = (props: MainProps) => {
+export const Board = (props: BoardProps) => {
   const { state: { cards, columns, mode }, actions } = useOvermind();
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
@@ -27,7 +27,7 @@ export const Main = (props: MainProps) => {
 
   useEffect(function onMount() {
     props.socket.on(`board:loaded:${props.boardId}`, (
-      data: { board: Board, sessionId: string, remainingStars: number, showResults: boolean },
+      data: { board: IBoard, sessionId: string, remainingStars: number, showResults: boolean },
     ) => {
       updateBoardTitle(data.board.title);
       updateRemainingStars(data.remainingStars);

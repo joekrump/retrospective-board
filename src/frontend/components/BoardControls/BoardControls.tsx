@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import "./board-controls.css";
-import { SortDirection } from "../Main/Main";
+import { SortDirection } from "../Board/Board";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
 interface BoardControlsProps {

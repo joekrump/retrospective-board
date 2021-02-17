@@ -3,7 +3,7 @@ import { Card } from "../Card/Card";
 import * as uuid from "uuid";
 import { ColumnHeader } from "../ColumnHeader/ColumnHeader";
 import "./column.css";
-import { SortDirection } from "../Main/Main";
+import { SortDirection } from "../Board/Board";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
 import { Card as ICard } from "../../../@types";
