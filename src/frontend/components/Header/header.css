@@ -2,7 +2,8 @@ header {
   grid-area: hd;
   display: flex;
   justify-content: space-between;
-  height: 10vh;
+  align-items: center;
+  height: 4.0em;
   background: #673ab7;
 }
 
@@ -18,6 +19,7 @@ header {
 #logo {
   display: flex;
   align-items: center;
+  height: 3.0em;
   margin-left: 20px;
 }
 

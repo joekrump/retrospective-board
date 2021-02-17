@@ -13,8 +13,8 @@ html, body, #react-root {
 #react-root {
   display: grid;
   grid-template:
-    "hd   hd   hd   hd   hd   hd   hd   hd   hd   hd   hd   hd" minmax(10vh, auto)
-    "main main main main main main main main main main main main" minmax(100px, 1fr)
+    "hd   hd   hd   hd   hd   hd   hd   hd   hd   hd   hd   hd" minmax(4em, auto)
+    "main main main main main main main main main main main main" minmax(90vh, 1fr)
     / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
