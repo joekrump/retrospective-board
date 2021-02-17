@@ -151,7 +151,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('board:loaded', function (data: { boardId: string, sessionId?: string }) {
+  socket.on("board:loaded", function (data: { boardId: string, sessionId?: string }) {
     const sessionId = data.sessionId ?? uuid.v4();
     const boardId = data.boardId ?? uuid.v4();
 
@@ -192,7 +192,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('board:updated', function(data: { boardId: string, title: string, sessionId: string }) {
+  socket.on("board:updated", function(data: { boardId: string, title: string, sessionId: string }) {
     if(data.title !== undefined) {
       boards[data.boardId].title = data.title;
     }
