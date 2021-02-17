@@ -63,7 +63,7 @@ export const App = () => {
       sessionId,
     });
 
-    const intervalId = updateBackgroundColorIncrementally();
+    const intervalId = darkenTheAppIncrementally();
 
     return function cleanup() {
       socket.removeListener(`board:star-limit-reached:${boardId}`);
@@ -73,7 +73,7 @@ export const App = () => {
     };
   }, []);
 
-  function updateBackgroundColorIncrementally() {
+  function darkenTheAppIncrementally() {
     const tenSeconds = 1000;
     const initialCSSBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--app--background-color');
     // remove # prefix from the color string value so that we get an hex number that we can parse.
@@ -89,13 +89,13 @@ export const App = () => {
         clearInterval(intervalId);
         return;
       }
-      updateAppThemeOnTick(newBackgroundColor);
+      darkenTheApp(newBackgroundColor);
     }, tenSeconds);
 
     return intervalId;
   }
 
-  function updateAppThemeOnTick(newBackgroundColor: number) {
+  function darkenTheApp(newBackgroundColor: number) {
     const darkGray = 0x707070;
 
     if (newBackgroundColor < darkGray) {
