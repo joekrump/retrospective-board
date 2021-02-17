@@ -151,6 +151,18 @@ io.on('connection', function (socket) {
       id: sessionId,
       remainingStars: MAX_VOTES_USER_VOTE_PER_BOARD,
     };
+    let currentStep = 0;
+    const totalSteps = 12;
+
+    const intervalId = setInterval(() => {
+      socket.emit(`board:darken-app-tick:${boardId}`, {
+        currentStep: currentStep++,
+        totalSteps,
+      });
+      if (currentStep > totalSteps) {
+        clearInterval(intervalId)
+      }
+    }, 2000);
 
     if(!sessionStore[boardId]) {
       createNewBoard(boardId)
