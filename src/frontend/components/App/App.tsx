@@ -74,7 +74,7 @@ export const App = () => {
   }, []);
 
   function darkenTheAppIncrementally() {
-    const tenSeconds = 1000;
+    const tenSeconds = 10000;
     const initialCSSBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--app--background-color');
     // remove # prefix from the color string value so that we get an hex number that we can parse.
     const initialBackgroundColorHexValue = initialCSSBackgroundColor.trim().substr(1);

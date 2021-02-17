@@ -9,7 +9,7 @@
 html, body, #react-root {
   height: 100%;
   background-color: var(--app--background-color);
-  transition: background-color 0.5s linear;
+  transition: background-color 5s ease-out, color 1s ease-out;
 }
 
 body {
