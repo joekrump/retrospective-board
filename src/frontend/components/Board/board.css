@@ -7,11 +7,67 @@ main#board {
   transition: background-color 2s ease-out, color 1s ease-out;
 }
 
+.landscape {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+}
+
+.background {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: var(--app--background-opacity);
+}
+
+.small-mountain {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 25vw solid transparent;
+  border-right: 25vw solid transparent;
+  border-bottom: 30vh solid orangered;
+}
+
+.big-mountain {
+  position: absolute;
+  bottom: 0;
+  left: 15vw;
+  width: 0;
+  height: 0;
+  border-left: 50vw solid transparent;
+  border-right: 50vw solid transparent;
+  border-bottom: 75vh solid orange;
+}
+.small-tree {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 150px solid greenyellow;
+}
+.big-tree {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 75px solid transparent;
+  border-right: 75px solid transparent;
+  border-bottom: 200px solid green;
+}
+
 #columns {
   grid-row: 2 / span 1;
   grid-column: 1 / span 12;
   display: flex;
   margin: 0 10px;
+  z-index: 1;
 }
 
 .add-column--button-filler {

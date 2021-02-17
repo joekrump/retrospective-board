@@ -198,6 +198,14 @@ export const Board = (props: BoardProps) => {
 
   return (
     <main id="board">
+      <div className="landscape">
+        <div className="background">
+          <div className="big-mountain"></div>
+          <div className="small-mountain"></div>
+          <div className="big-tree"></div>
+          <div className="small-tree"></div>
+        </div>
+      </div>
       <BoardControls
         sortColumnCardsByStars={sortColumnCardsByStars}
         title={boardTitle}
