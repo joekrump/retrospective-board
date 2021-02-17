@@ -1,12 +1,17 @@
 .button--delete {
+  width: 30px;
+  height: 30px;
   cursor: pointer;
+  justify-content: center;
   align-items: center;
   font-size: 14pt;
+  display: flex;
 }
 
 .button--delete .gg-trash {
-  display: inline-block;
+  display: flex;
 }
+
 .button--delete:hover,
 .button--delete:focus {
   color: #c41414;

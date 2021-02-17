@@ -59,6 +59,7 @@
 
 .draggable .card--content {
   user-select: none;
+  color: #363636;
 }
 
 .card-container .card--content p {

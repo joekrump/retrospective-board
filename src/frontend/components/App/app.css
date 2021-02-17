@@ -23,7 +23,17 @@ input,
 textarea {
   font-family: -apple-system, BlinkMacSystemFont,"Segoe UI","Roboto", "Droid Sans","Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.0rem;
+}
+
+html,
+body,
+#react-root,
+input {
   color: var(--text-color-primary);
+}
+
+input {
+  background-color: rgba(0,0,0,0);
 }
 
 footer {
