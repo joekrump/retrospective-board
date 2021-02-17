@@ -51,7 +51,7 @@ function createNewBoard(boardId: string) {
   boards[boardId] = NEW_BOARD;
 }
 
-function getSession(boardId, sessionId: string) {
+function getSession(boardId, sessionId: string): Session | null {
   let session;
   if (sessionId !== undefined) {
     try {
@@ -120,15 +120,10 @@ function emitUpdateRemainingStars(
   socket: SocketIO.Socket,
   boardId: string,
   sessionId: string,
+  remainingStars: number,
 ) {
   socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
-    remainingStars: sessionStore[boardId][sessionId].remainingStars,
-  });
-
-  Object.keys(sessionStore[boardId]).forEach((boardSessionId) => {
-    socket.broadcast.emit(`board:update-remaining-stars:${boardId}:${boardSessionId}`, {
-      remainingStars: sessionStore[boardId][boardSessionId].remainingStars,
-    });
+    remainingStars,
   });
 }
 
@@ -255,7 +250,7 @@ io.on('connection', function (socket) {
         delete boards[boardId].cards[cardId];
       });
 
-      emitUpdateRemainingStars(socket, boardId, sessionId);
+      emitUpdateRemainingStars(socket, boardId, sessionId, session.remainingStars);
 
       boards[boardId]?.columns.splice(columnIndex, 1);
       socket.broadcast.emit(`column:deleted:${boardId}`, { id });
@@ -340,6 +335,7 @@ io.on('connection', function (socket) {
         ownerId: sessionId,
         starsCount: 0,
         columnId,
+        isEditing: false,
       };
 
       boards[boardId].cards[cardId] = newCard;
@@ -399,7 +395,7 @@ io.on('connection', function (socket) {
         column.cardIds.splice(index, 1);
 
         reclaimStarsFromDeleteCard(card, boardId);
-        emitUpdateRemainingStars(socket, boardId, sessionId);
+        emitUpdateRemainingStars(socket, boardId, sessionId, session.remainingStars);
 
         socket.broadcast.emit(`card:deleted:${boardId}`, {
           cardId,
