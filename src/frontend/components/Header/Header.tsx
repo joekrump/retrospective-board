@@ -35,8 +35,10 @@ export const Header = (props: HeaderProps) => {
         <AppLogo />
         <h2>Retro</h2>
       </div>
-      <TimerDisplay timerClockMS={props.timerClockMS} />
-      { isReviewing() ? <h1 data-cy="reviewing-header">Reviewing</h1> : null }
+      <div className="middle-header">
+        <TimerDisplay timerClockMS={props.timerClockMS} />
+        { isReviewing() ? <h1 data-cy="reviewing-header">Reviewing</h1> : null }
+      </div>
       <div id="app-controls">
         <h4>Review</h4>
         <Switch id="toggle-app-state" isOn={isReviewing()} handleChange={(e) => toggleShowResults(e)}/>

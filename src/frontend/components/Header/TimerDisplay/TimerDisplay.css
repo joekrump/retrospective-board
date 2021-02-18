@@ -12,10 +12,6 @@
   margin-right: 0.6rem;
 }
 
-.timer-display.hidden {
-  display: none;
-}
-
 .timer-display .digits {
   width: 80px;
 }
