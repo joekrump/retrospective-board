@@ -7,7 +7,7 @@
   transition: display 1s linear;
 }
 
-.timer-display h3 {
+.timer-display h4 {
   text-align: right;
   margin-right: 0.6rem;
 }

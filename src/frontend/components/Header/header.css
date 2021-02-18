@@ -28,6 +28,10 @@
   margin-left: 0.6rem;
 }
 
+.header-middle {
+  text-align: center;
+}
+
 #app-controls {
   display: flex;
   align-items: center;

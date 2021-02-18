@@ -30,7 +30,7 @@ export const TimerDisplay = ({ timerClockMS, socket, boardId }: {
   } else {
     return (
       <div className="timer-display">
-        <h3>Remaining Time:</h3>
+        <h4>Remaining Time:</h4>
         <strong className="digits">{getFormattedRemainingTimerTime(timerClockMS)}</strong>
       </div>
     );
