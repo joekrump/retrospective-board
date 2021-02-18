@@ -36,7 +36,7 @@ export const Header = (props: HeaderProps) => {
         <h2>Retro</h2>
       </div>
       <div className="middle-header">
-        <TimerDisplay timerClockMS={props.timerClockMS} />
+        <TimerDisplay timerClockMS={props.timerClockMS} socket={props.socket} boardId={props.boardId} />
         { isReviewing() ? <h1 data-cy="reviewing-header">Reviewing</h1> : null }
       </div>
       <div id="app-controls">

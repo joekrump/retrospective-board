@@ -1,4 +1,5 @@
 import React from "react";
+import { Timer } from "../../Timer/Timer";
 
 import "./TimerDisplay.css";
 
@@ -8,7 +9,11 @@ const minutesPerHour = 60;
 const millisecondsPerHour = millisecondsPerSecond * secondsPerMinute * minutesPerHour;
 const millisecondsPerMinute = millisecondsPerSecond * secondsPerMinute;
 
-export const TimerDisplay = ({ timerClockMS }: { timerClockMS: number }) => {
+export const TimerDisplay = ({ timerClockMS, socket, boardId }: {
+  timerClockMS: number,
+  socket: SocketIOClient.Socket,
+  boardId: string,
+}) => {
   function getFormattedRemainingTimerTime(timerClockMS: number): string {
     // FIXME: this can probably be made more efficient.
     const hours = Math.floor(timerClockMS / millisecondsPerHour);
@@ -19,7 +24,7 @@ export const TimerDisplay = ({ timerClockMS }: { timerClockMS: number }) => {
   }
 
   if (timerClockMS < 0) {
-    return null;
+    return <Timer socket={socket} boardId={boardId} />;
   } else if (timerClockMS === 0) {
     return <strong>Time's up!</strong>
   } else {
