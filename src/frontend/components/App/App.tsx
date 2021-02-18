@@ -25,9 +25,9 @@ export const App = () => {
   // These will be assumed to be the hex value that is assign to r, g, and b.
   // Ex. If "e6", then it will be assumed the initial bg color is #e6e6e6.
   const initialBackgroundColorHexValue = initialCSSBackgroundColor.substr(initialCSSBackgroundColor.length - 2);
-  const initalOpacity = parseInt(getComputedStyle(document.documentElement)
-    .getPropertyValue("--app--background-opacity")
-    .trim());
+  // const initalOpacity = parseInt(getComputedStyle(document.documentElement)
+  //   .getPropertyValue("--app--background-opacity")
+  //   .trim());
   const initialBackgroundColor = parseInt(`0x${initialBackgroundColorHexValue}`, 16);
   let serverURL = window.location.origin;
   let initialBoardId = window.location.pathname.split("/").pop() || "";
@@ -119,14 +119,14 @@ export const App = () => {
 
   function darkenTheApp(currentStep: number, totalSteps: number) {
     const stepPercentageCompleteDecimal = (totalSteps - currentStep) / totalSteps;
-    // const { newBackgroundColor, newHexColor } = getBackgroundColor(stepPercentageCompleteDecimal);
-    let opacity = initalOpacity * stepPercentageCompleteDecimal;
+    const { newBackgroundColor, newHexColor } = getBackgroundColor(stepPercentageCompleteDecimal);
+    // let opacity = initalOpacity * stepPercentageCompleteDecimal;
 
-    // if (newHexColor < colorThresholdForLightText) {
-    if (opacity < 0.5) {
+    if (newHexColor < colorThresholdForLightText) {
+    // if (opacity < 0.5) {
       document.documentElement.style.setProperty("--text-color-primary", lightTextColor);
     }
-    document.documentElement.style.setProperty("--app--background-opacity", `${opacity}`);
+    document.documentElement.style.setProperty("--app--background-color", `${newBackgroundColor}`);
   }
 
   return (
