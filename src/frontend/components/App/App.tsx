@@ -133,7 +133,7 @@ export const App = () => {
       <Header
         socket={socket}
         boardId={boardId}
-        timerClockSeconds={timerClockRemainingMS / 1000}
+        timerClockMS={timerClockRemainingMS}
       />
       <Board
         socket={socket}
