@@ -73,7 +73,7 @@ export const App = () => {
       },
     ) => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
-      darkenTheApp(data.board.currentStep, data.board.totalSteps);
+      // darkenTheApp(data.board.currentStep, data.board.totalSteps);
     });
     socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {
       displayStarLimitAlert(data.maxStars);
