@@ -1,0 +1,21 @@
+.timer-display {
+  display: flex;
+  align-items: baseline;
+  color: #fff;
+  justify-content: center;
+  width: 40vw;
+  transition: display 1s linear;
+}
+
+.timer-display h3 {
+  text-align: right;
+  margin-right: 0.6rem;
+}
+
+.timer-display.hidden {
+  display: none;
+}
+
+.timer-display .digits {
+  width: 80px;
+}

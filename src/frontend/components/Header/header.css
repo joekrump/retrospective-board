@@ -1,4 +1,4 @@
-header {
+.app-header {
   grid-area: hd;
   display: flex;
   justify-content: space-between;
@@ -8,10 +8,10 @@ header {
 }
 
 #logo,
-#header h1,
-#header h2,
-#header h3,
-#header h4 {
+.app-header h1,
+.app-header h2,
+.app-header h3,
+.app-header h4 {
   color: #fff;
   margin: 0;
 }
@@ -36,20 +36,4 @@ header {
 
 #app-controls a {
   margin-left: 10px;
-}
-
-#header .timer-display {
-  display: flex;
-  align-items: baseline;
-  color: #fff;
-  justify-content: center;
-  width: 40vw;
-}
-#header .timer-display h3 {
-  text-align: right;
-  margin-right: 0.6rem;
-}
-
-#header .timer-display .digits {
-  width: 80px;
 }
