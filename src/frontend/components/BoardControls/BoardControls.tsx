@@ -4,6 +4,7 @@ import "./board-controls.css";
 import { SortDirection } from "../Board/Board";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
+import { Timer } from "../Timer/Timer";
 interface BoardControlsProps {
   title: string;
   socket: SocketIOClient.Socket;
@@ -62,6 +63,7 @@ export const BoardControls = (props: BoardControlsProps) => {
       <div id="board-title">
         { titleContent }
       </div>
+      <Timer socket={props.socket} boardId={props.boardId} />
       {
         mode === AppMode.review ?
           <button className="button button__sort" onClick={props.sortColumnCardsByStars}>
