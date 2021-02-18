@@ -15,15 +15,16 @@ export const Timer = ({ socket, boardId }: {
   socket: SocketIOClient.Socket,
   boardId: string,
 }) => {
-  let unitSelectRef = useRef<HTMLSelectElement>(new HTMLSelectElement());
-  let numberInputRef = useRef<HTMLInputElement>(new HTMLInputElement());
+  let unitSelectRef = useRef<HTMLSelectElement>(null);
+  let numberInputRef = useRef<HTMLInputElement>(null);
   function submit(e: FormEvent) {
     e.preventDefault();
-
-    socket.emit(`board:start-timer:${boardId}`, {
+    console.log("fired")
+    socket.emit(`board:start-timer`, {
+      boardId,
       durationMS: calculateTimeDurationInMilliseconds(
-        unitSelectRef.current.value,
-        parseInt(numberInputRef.current.value),
+        unitSelectRef?.current?.value ?? "",
+        parseInt(numberInputRef?.current?.value ?? "1"),
       )
     });
     return false;

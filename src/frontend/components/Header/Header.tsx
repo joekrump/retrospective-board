@@ -9,6 +9,7 @@ import { AppMode } from "../../overmind/state";
 interface HeaderProps {
   socket: SocketIOClient.Socket;
   boardId: string;
+  timerClockSeconds: number;
 }
 
 export const Header = (props: HeaderProps) => {
@@ -33,6 +34,7 @@ export const Header = (props: HeaderProps) => {
         <AppLogo />
         <h2>Retro</h2>
       </div>
+      { props.timerClockSeconds > 0 ? <strong>{props.timerClockSeconds}</strong>: null}
       { isReviewing() ? <h1 data-cy="reviewing-header">Reviewing</h1> : null }
       <div id="app-controls">
         <h4>Review</h4>

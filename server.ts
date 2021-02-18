@@ -17,7 +17,7 @@ const NEW_BOARD = {
   maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
   cards: {},
   currentStep: 0,
-  totalSteps: 12,
+  totalSteps: 0,
   columns: [
     {
       id: uuid.v4(),
@@ -170,27 +170,6 @@ io.on('connection', function (socket) {
     }
 
     emitBoardLoaded(socket, boardId, sessionId);
-
-    if (!boards[boardId]?.stepsIntervalId) {
-      boards[boardId].stepsIntervalId = setInterval(() => {
-        if (boards[boardId].currentStep >= boards[boardId].totalSteps) {
-          clearInterval(boards[boardId].stepsIntervalId);
-          boards[boardId].stepsIntervalId = undefined;
-          return;
-        }
-
-        boards[boardId].currentStep++;
-
-        socket.emit(`board:darken-app-tick:${boardId}`, {
-          currentStep: boards[boardId].currentStep,
-          totalSteps: boards[boardId].totalSteps,
-        });
-        socket.broadcast.emit(`board:darken-app-tick:${boardId}`, {
-          currentStep: boards[boardId].currentStep,
-          totalSteps: boards[boardId].totalSteps,
-        });
-      }, 5000);
-    }
   });
 
   socket.on("board:updated", function(data: { boardId: string, title: string, sessionId: string }) {
@@ -204,6 +183,49 @@ io.on('connection', function (socket) {
     socket.broadcast.emit(`board:updated:${data.boardId}`, {
       title: boards[data.boardId].title,
     });
+  });
+
+  socket.on("board:start-timer", ({
+    boardId,
+    durationMS,
+  }: {
+    boardId: string,
+    durationMS: number,
+  }) => {
+    const millisecondsPerSecond = 1000;
+    // console.log("TIMER STARTED")
+    // console.log(boardId)
+    // console.log(durationMS)
+    boards[boardId].currentStep = 0;
+    boards[boardId].totalSteps = durationMS / millisecondsPerSecond;
+
+    if (!boards[boardId]?.stepsIntervalId) {
+      boards[boardId].stepsIntervalId = setInterval(() => {
+        if (boards[boardId].currentStep >= boards[boardId].totalSteps) {
+          clearInterval(boards[boardId].stepsIntervalId);
+          boards[boardId].stepsIntervalId = undefined;
+          return;
+        }
+
+        boards[boardId].currentStep++;
+
+        // socket.emit(`board:darken-app-tick:${boardId}`, {
+        //   currentStep: boards[boardId].currentStep,
+        //   totalSteps: boards[boardId].totalSteps,
+        // });
+        // socket.broadcast.emit(`board:darken-app-tick:${boardId}`, {
+        //   currentStep: boards[boardId].currentStep,
+        //   totalSteps: boards[boardId].totalSteps,
+        // });
+        let remainingTimeMS = (boards[boardId].totalSteps * millisecondsPerSecond) - (boards[boardId].currentStep * millisecondsPerSecond);
+        socket.emit(`board:timer-tick:${boardId}`, {
+          remainingTimeMS,
+        });
+        socket.broadcast.emit(`board:timer-tick:${boardId}`, {
+          remainingTimeMS,
+        });
+      }, 1000);
+    }
   });
 
   socket.on("column:loaded", function(data: { boardId: string, id: string, sessionId: string }) {

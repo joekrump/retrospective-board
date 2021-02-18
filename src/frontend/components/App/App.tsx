@@ -18,6 +18,7 @@ const lightTextColor = "#e6e6e6";
 
 export const App = () => {
   const { actions: { updateMode} } = useOvermind();
+  let [timerClockRemainingMS, updateTimeClockRemainingMS] = useState(-1);
   const initialCSSBackgroundColor = getComputedStyle(document.documentElement)
     .getPropertyValue("--app--background-color")
     .trim();
@@ -57,10 +58,8 @@ export const App = () => {
     setHideStarLimitAlertTimeout();
   }
 
-  function updateClock(timeMS: number) {
-    // TODO: allow someone to set a timer for the retro and start it.
-    // This can be tracked via an interval on the server.
-    // TODO: set time on a clock
+  function updateTimerClock(timeMS: number) {
+    updateTimeClockRemainingMS(timeMS);
   }
 
   useEffect(function onMount() {
@@ -84,7 +83,7 @@ export const App = () => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
     });
     socket.on(`board:timer-tick:${boardId}`, ({ remainingTimeMS }: { remainingTimeMS: number }) => {
-      updateClock(remainingTimeMS);
+      updateTimerClock(remainingTimeMS);
     });
     socket.on(`board:darken-app-tick:${boardId}`, ({ currentStep, totalSteps }: { currentStep: number, totalSteps: number }) => {
       if (totalSteps > currentStep) {
@@ -134,6 +133,7 @@ export const App = () => {
       <Header
         socket={socket}
         boardId={boardId}
+        timerClockSeconds={timerClockRemainingMS / 1000}
       />
       <Board
         socket={socket}
