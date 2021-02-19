@@ -84,12 +84,13 @@ export const App = () => {
         columns: initialColumns,
         cards: data.board.cards,
       });
-
-      socket.on(`board:update-remaining-stars:${boardId}:${data.sessionId}`, (data: any) => {
-        console.log("update remaining stars")
-        updateRemainingStars(data.remainingStars);
-      });
     });
+
+    socket.on(`board:update-remaining-stars:${boardId}:${sessionId}`, (data: any) => {
+      console.log("update remaining stars")
+      updateRemainingStars(data.remainingStars);
+    });
+
     socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {
       displayStarLimitAlert(data.maxStars);
     });
