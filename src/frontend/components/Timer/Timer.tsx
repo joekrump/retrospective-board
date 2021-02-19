@@ -2,6 +2,12 @@ import React, { FormEvent, useRef, useState } from "react";
 
 import "./Timer.css";
 
+const millisecondsPerSecond = 1000;
+const secondsPerMinute = 60;
+const minutesPerHour = 60;
+const millisecondsPerHour = millisecondsPerSecond * secondsPerMinute * minutesPerHour;
+const millisecondsPerMinute = millisecondsPerSecond * secondsPerMinute;
+
 function calculateTimeDurationInMilliseconds(unitSelected: string, numberInput: number) {
   const millisecondsPerSeconds = 1000;
   const secondsPerMinute = 60;
@@ -13,21 +19,29 @@ function calculateTimeDurationInMilliseconds(unitSelected: string, numberInput: 
   return numberInput * multiplier
 }
 
-export const Timer = ({ socket, boardId, formattedTimeRemaining }: {
+function getFormattedRemainingTimerTime(timerClockMS: number): string {
+  // FIXME: this can probably be made more efficient.
+  const hours = Math.floor(timerClockMS / millisecondsPerHour);
+  const minutes = Math.floor((timerClockMS - (hours * millisecondsPerHour)) /millisecondsPerMinute);
+  const seconds = ((timerClockMS - (minutes * millisecondsPerMinute) - (hours * millisecondsPerHour)) / millisecondsPerSecond);
+
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
+export const Timer = ({ socket, boardId, timerClockMS }: {
   socket: SocketIOClient.Socket,
   boardId: string,
-  formattedTimeRemaining: string | null,
+  timerClockMS: number,
 }) => {
   let unitSelectRef = useRef<HTMLSelectElement>(null);
   let numberInputRef = useRef<HTMLInputElement>(null);
-  let [isTimerRunning, updateIsTimerRunning] = useState(formattedTimeRemaining !== null);
+  const isTimerRunning = timerClockMS > 0;
 
   function submit(e: FormEvent) {
     e.preventDefault();
 
     if (isTimerRunning) {
       // TODO: pause timer
-      updateIsTimerRunning(false);
     } else {
       socket.emit(`board:start-timer`, {
         boardId,
@@ -36,7 +50,6 @@ export const Timer = ({ socket, boardId, formattedTimeRemaining }: {
           parseInt(numberInputRef?.current?.value ?? "1"),
         )
       });
-      updateIsTimerRunning(true);
     }
 
     return false;
@@ -56,7 +69,7 @@ export const Timer = ({ socket, boardId, formattedTimeRemaining }: {
 
   return (
     <>
-      { isTimerRunning ? formattedTimeRemaining : null }
+      { isTimerRunning ? getFormattedRemainingTimerTime(timerClockMS) : null }
       <form className="timer-control" onSubmit={submit}>
         { isTimerRunning ? null : timerConfigUI() }
         <button type="submit">{isTimerRunning ? "pause" : "start"}</button>

@@ -6,7 +6,7 @@ import { AppLogo } from "../AppLogo/AppLogo";
 
 import "./header.css";
 import { AppMode } from "../../overmind/state";
-import { TimerDisplay } from "./TimerDisplay/TimerDisplay";
+import { Timer } from "../Timer/Timer";
 interface HeaderProps {
   socket: SocketIOClient.Socket;
   boardId: string;
@@ -37,7 +37,7 @@ const Header = (props: HeaderProps) => {
       </div>
       <div className="header-middle">
         { isReviewing() ? <h2 data-cy="reviewing-header">Reviewing</h2> : null }
-        <TimerDisplay timerClockMS={props.timerClockMS} socket={props.socket} boardId={props.boardId} />
+        <Timer timerClockMS={props.timerClockMS} socket={props.socket} boardId={props.boardId} />
       </div>
       <div id="app-controls">
         <h4>Review</h4>
