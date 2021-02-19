@@ -1,3 +1,6 @@
 .timer-control input {
   width: 50px;
+  color: #fff;
+  outline: none;
+  border: 1px solid white;
 }
