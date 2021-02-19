@@ -1,4 +1,4 @@
-import React, { FormEvent, useRef } from "react";
+import React, { FormEvent, MouseEvent, useRef } from "react";
 
 import "./Timer.css";
 
@@ -37,12 +37,16 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
   let numberInputRef = useRef<HTMLInputElement>(null);
   const isTimerRunning = timerClockMS > 0;
 
-  function submit(e: FormEvent) {
-    console.log("submit")
+  function stopTimer(e: MouseEvent) {
+    e.preventDefault();
+    socket.emit(`board:stop-timer`, { boardId });
+  }
+
+  function toggleTimerRunning(e: FormEvent) {
     e.preventDefault();
 
     if (isTimerRunning) {
-      // TODO: pause timer
+      socket.emit(`board:pause-timer`, { boardId });
     } else {
       socket.emit(`board:start-timer`, {
         boardId,
@@ -60,15 +64,15 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
     return (
       <>
         { getFormattedRemainingTimerTime(timerClockMS) }
-        <form className="timer-control" onSubmit={submit}>
+        <form className="timer-control" onSubmit={toggleTimerRunning}>
           <button type="submit">pause</button>
-          <button type="button">stop</button>
+          <button type="button" onClick={stopTimer}>stop</button>
         </form>
       </>
     )
   } else {
     return (
-      <form className="timer-control" onSubmit={submit}>
+      <form className="timer-control" onSubmit={toggleTimerRunning}>
         <input type="number" min="1" ref={numberInputRef} defaultValue={30}/>
         <select defaultValue="min" ref={unitSelectRef}>
           <option value="sec">seconds</option>
