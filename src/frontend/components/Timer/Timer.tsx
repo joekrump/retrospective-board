@@ -1,4 +1,4 @@
-import React, { FormEvent, useRef, useState } from "react";
+import React, { FormEvent, useRef } from "react";
 
 import "./Timer.css";
 
@@ -55,25 +55,27 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
     return false;
   }
 
-  function timerConfigUI() {
+  if (isTimerRunning) {
     return (
       <>
+        { getFormattedRemainingTimerTime(timerClockMS) }
+        <form className="timer-control" onSubmit={submit}>
+          <button type="submit">pause</button>
+          <button type="submit">stop</button>
+        </form>
+      </>
+    )
+  } else {
+    return (
+      <form className="timer-control" onSubmit={submit}>
         <input type="number" min="1" ref={numberInputRef} defaultValue={30}/>
         <select defaultValue="min" ref={unitSelectRef}>
           <option value="sec">seconds</option>
           <option value="min">minutes</option>
         </select>
-      </>
+        <button type="submit">pause</button>
+        <button type="submit">stop</button>
+      </form>
     );
   }
-
-  return (
-    <>
-      { isTimerRunning ? getFormattedRemainingTimerTime(timerClockMS) : null }
-      <form className="timer-control" onSubmit={submit}>
-        { isTimerRunning ? null : timerConfigUI() }
-        <button type="submit">{isTimerRunning ? "pause" : "start"}</button>
-      </form>
-    </>
-  );
 };
