@@ -21,9 +21,11 @@ export type State = {
   remainingStars: number;
 };
 
+const initialSessionId = sessionStorage.getItem("retroSessionId") ?? "";
+
 export const state: State = {
   mode: AppMode.vote,
-  sessionId: sessionStorage.getItem("retroSessionId") ?? "",
+  sessionId: initialSessionId,
   remainingStars: 0,
   board: {
     title: "",

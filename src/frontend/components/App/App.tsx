@@ -18,18 +18,16 @@ export const App = () => {
   let [timerClockRemainingMS, updateTimeClockRemainingMS] = useState(-1);
   let [timerState, updateTimerState]: ["running" | "paused" | "stopped", Function] = useState("stopped");
   let serverURL = window.location.origin;
-  let initialBoardId = window.location.pathname.split("/").pop() || "";
+  let boardId = window.location.pathname.split("/").pop() ?? uuidV4();
 
   if (window.location.port === LOCAL_DEV_SERVER_PORT) {
     serverURL = window.location.origin.replace(window.location.port, SERVER_PORT);
-    initialBoardId = "dev-board";
-  } else if (!initialBoardId) {
-    initialBoardId = uuidV4();
-    window.location.assign(`/board/${initialBoardId}`);
+    boardId = "dev-board";
+  } else {
+    window.location.assign(`/board/${boardId}`);
   }
 
   const socket = socketConnect(serverURL);
-  const [boardId] = useState(initialBoardId);
   const [maxStars, setMaxStars] = useState(null as unknown as number);
   const [showStarLimitAlert, updateShowStarLimitAlert] = useState(false);
 

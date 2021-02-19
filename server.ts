@@ -138,9 +138,9 @@ function emitUpdateRemainingStars(
   });
 }
 
-io.on('connection', function (socket) {
+io.on("connection", function (socket) {
 
-  socket.on('board:show-results', function(data: { boardId: string, sessionId: string }) {
+  socket.on("board:show-results", function(data: { boardId: string, sessionId: string }) {
     if (!!boards[data.boardId]) {
       boards[data.boardId].showResults = !boards[data.boardId].showResults;
 
@@ -154,8 +154,8 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("board:loaded", function (data: { boardId: string, sessionId?: string }) {
-    const sessionId = data.sessionId ?? uuid.v4();
+  socket.on("board:loaded", function (data: { boardId: string, sessionId: string }) {
+    const sessionId = data.sessionId === "" ? uuid.v4() : data.sessionId;
     const boardId = data.boardId ?? uuid.v4();
 
     const newSession = {
@@ -340,7 +340,7 @@ io.on('connection', function (socket) {
     cardId: string,
     sessionId: string,
   }) {
-    console.log("card move request")
+    console.log("card move request");
     const session = getSession(boardId, sessionId);
 
     if (session === null) { return; }
@@ -483,8 +483,7 @@ io.on('connection', function (socket) {
         remainingStars: session.remainingStars,
       });
     } else {
-      console.log("cannot star")
-      console.log("card", card)
+      console.error("cannot star card: ", card.id, card.columnId);
     }
   });
 });
