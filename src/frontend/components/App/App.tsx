@@ -17,7 +17,7 @@ const colorThresholdForLightText = 0x90;
 const lightTextColor = "#e6e6e6";
 
 export const App = () => {
-  const { actions: { updateMode, setBoardState } } = useOvermind();
+  const { actions: { updateMode, setBoardState, updateBoardTitle, updateRemainingStars } } = useOvermind();
   let [timerClockRemainingMS, updateTimeClockRemainingMS] = useState(-1);
   let [timerState, updateTimerState]: ["running" | "paused" | "stopped", Function] = useState("stopped");
   const initialCSSBackgroundColor = getComputedStyle(document.documentElement)
@@ -77,9 +77,17 @@ export const App = () => {
         ...column,
         isEditing: false
       }));
+      updateBoardTitle(data.board.title);
+      updateRemainingStars(data.remainingStars);
+      sessionStorage.setItem("retroSessionId", data.sessionId);
       setBoardState({
         columns: initialColumns,
         cards: data.board.cards,
+      });
+
+      socket.on(`board:update-remaining-stars:${boardId}:${data.sessionId}`, (data: any) => {
+        console.log("update remaining stars")
+        updateRemainingStars(data.remainingStars);
       });
     });
     socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {

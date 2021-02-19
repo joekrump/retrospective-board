@@ -501,6 +501,8 @@ io.on('connection', function (socket) {
       socket.broadcast.emit(`card:starred:${id}`, {
         starsCount,
       });
+      console.log(sessionId)
+      console.log(boardId)
       socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
         remainingStars: session.remainingStars,
       });

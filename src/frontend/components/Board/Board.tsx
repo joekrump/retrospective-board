@@ -24,18 +24,6 @@ const Board = (props: BoardProps) => {
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
 
   useEffect(function onMount() {
-    props.socket.on(`board:loaded:${props.boardId}`, (
-      data: { board: IBoard, sessionId: string, remainingStars: number, showResults: boolean },
-    ) => {
-      actions.updateBoardTitle(data.board.title);
-      actions.updateRemainingStars(data.remainingStars);
-      sessionStorage.setItem("retroSessionId", data.sessionId);
-
-      props.socket.on(`board:update-remaining-stars:${props.boardId}:${data.sessionId}`, (data: any) => {
-        actions.updateRemainingStars(data.remainingStars);
-      });
-    });
-
     props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
       actions.updateBoardTitle(data.title);
     });
@@ -58,15 +46,13 @@ const Board = (props: BoardProps) => {
     });
 
     return function cleanup() {
-      props.socket.removeListener(`board:loaded:${props.boardId}`);
-      props.socket.removeListener(`board:update-remaining-stars:${props.boardId}`);
       props.socket.removeListener(`column:deleted:${props.boardId}`);
       props.socket.removeListener(`column:created:${props.boardId}`);
       props.socket.removeListener(`card:moved:${props.boardId}`);
       props.socket.removeListener(`card:created:${props.boardId}`);
       props.socket.removeListener(`card:deleted:${props.boardId}`);
     };
-  }, [columns, props.boardId]);
+  }, [columns]);
 
   const sortColumnCardsByStars = () => {
     let newSortDirection = SortDirection.none;
