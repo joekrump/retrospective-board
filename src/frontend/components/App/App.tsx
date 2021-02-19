@@ -19,6 +19,7 @@ const lightTextColor = "#e6e6e6";
 export const App = () => {
   const { actions: { updateMode, setBoardState } } = useOvermind();
   let [timerClockRemainingMS, updateTimeClockRemainingMS] = useState(-1);
+  let [timerState, updateTimerState]: ["running" | "paused" | "stopped", Function] = useState("stopped");
   const initialCSSBackgroundColor = getComputedStyle(document.documentElement)
     .getPropertyValue("--app--background-color")
     .trim();
@@ -70,6 +71,8 @@ export const App = () => {
       },
     ) => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
+      updateTimerState(data.board.timerState);
+      updateTimeClockRemainingMS(data.board.timerRemainingMS);
       const initialColumns = data.board.columns.map((column: IColumn) => ({
         ...column,
         isEditing: false
@@ -87,13 +90,9 @@ export const App = () => {
     socket.on(`board:show-results:${boardId}`, (data: { showResults: boolean }) => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
     });
-    socket.on(`board:timer-tick:${boardId}`, ({ remainingTimeMS }: { remainingTimeMS: number }) => {
+    socket.on(`board:timer-tick:${boardId}`, ({ remainingTimeMS, state }: { remainingTimeMS: number, state: "running" | "paused" | "stopped" }) => {
       updateTimerClock(remainingTimeMS);
-    });
-    socket.on(`board:darken-app-tick:${boardId}`, ({ currentStep, totalSteps }: { currentStep: number, totalSteps: number }) => {
-      if (totalSteps > currentStep) {
-        darkenTheApp(currentStep, totalSteps);
-      }
+      updateTimerState(state);
     });
 
     socket.emit("board:loaded", {
@@ -104,7 +103,6 @@ export const App = () => {
     return function cleanup() {
       socket.removeListener(`board:star-limit-reached:${boardId}`);
       socket.removeListener(`board:show-results:${boardId}`);
-      socket.removeListener(`board:darken-app-tick:${boardId}`);
       socket.removeListener(`board:timer-tick:${boardId}`);
       socket.close();
     };
@@ -121,17 +119,17 @@ export const App = () => {
     };
   }
 
-  function darkenTheApp(currentStep: number, totalSteps: number) {
-    const stepPercentageCompleteDecimal = (totalSteps - currentStep) / totalSteps;
-    const { newBackgroundColor, newHexColor } = getBackgroundColor(stepPercentageCompleteDecimal);
-    // let opacity = initalOpacity * stepPercentageCompleteDecimal;
+  // function darkenTheApp(currentStep: number, totalSteps: number) {
+  //   const stepPercentageCompleteDecimal = (totalSteps - currentStep) / totalSteps;
+  //   const { newBackgroundColor, newHexColor } = getBackgroundColor(stepPercentageCompleteDecimal);
+  //   // let opacity = initalOpacity * stepPercentageCompleteDecimal;
 
-    if (newHexColor < colorThresholdForLightText) {
-    // if (opacity < 0.5) {
-      document.documentElement.style.setProperty("--text-color-primary", lightTextColor);
-    }
-    document.documentElement.style.setProperty("--app--background-color", `${newBackgroundColor}`);
-  }
+  //   if (newHexColor < colorThresholdForLightText) {
+  //   // if (opacity < 0.5) {
+  //     document.documentElement.style.setProperty("--text-color-primary", lightTextColor);
+  //   }
+  //   document.documentElement.style.setProperty("--app--background-color", `${newBackgroundColor}`);
+  // }
 
   function renderLoading() {
     return <div>Loading...</div>
@@ -143,6 +141,7 @@ export const App = () => {
         socket={socket}
         boardId={boardId}
         timerClockMS={timerClockRemainingMS}
+        timerState={timerState}
       />
       <Board
         socket={socket}

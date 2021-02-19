@@ -28,26 +28,34 @@ function getFormattedRemainingTimerTime(timerClockMS: number): string {
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export const Timer = ({ socket, boardId, timerClockMS }: {
+export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
   socket: SocketIOClient.Socket,
   boardId: string,
-  timerClockMS: number,
+  remainingTimeMS: number,
+  state: "running" | "paused" | "stopped",
 }) => {
   let unitSelectRef = useRef<HTMLSelectElement>(null);
   let numberInputRef = useRef<HTMLInputElement>(null);
-  const sessionId = sessionStorage.getItem("retroSessionId");
-  const isTimerRunning = timerClockMS > 0;
+  const specialInitialTimerMS = -1;
 
   function stopTimer(e: MouseEvent) {
+    const sessionId = sessionStorage.getItem("retroSessionId");
     e.preventDefault();
     socket.emit(`board:timer-stop`, { boardId, sessionId });
   }
 
   function toggleTimerRunning(e: FormEvent) {
+    const sessionId = sessionStorage.getItem("retroSessionId");
     e.preventDefault();
 
-    if (isTimerRunning) {
+    if (state === "running") {
       socket.emit(`board:timer-pause`, { boardId, sessionId });
+    } else if (state === "paused") {
+      socket.emit(`board:timer-start`, {
+        boardId,
+        sessionId,
+        durationMS: remainingTimeMS,
+      });
     } else {
       socket.emit(`board:timer-start`, {
         boardId,
@@ -62,12 +70,14 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
     return false;
   }
 
-  if (isTimerRunning) {
+  if (remainingTimeMS === specialInitialTimerMS) {
+    return null;
+  } else if (state === "running" || state === "paused") {
     return (
       <>
-        { getFormattedRemainingTimerTime(timerClockMS) }
+        { getFormattedRemainingTimerTime(remainingTimeMS) }
         <form className="timer-control" onSubmit={toggleTimerRunning}>
-          <button type="submit">pause</button>
+          <button type="submit">{ state === "running" ? "pause" : "start" }</button>
           <button type="button" onClick={stopTimer}>stop</button>
         </form>
       </>

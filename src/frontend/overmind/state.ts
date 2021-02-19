@@ -10,10 +10,18 @@ export type State = {
   columns: BoardColumn[];
   cards: { [ id: string ]: Card }
   cardBeingDragged: any;
+  timer: {
+    remainingMS: number;
+    status: "running" | "paused" | "stopped";
+  }
 };
 
 export const state: State = {
   mode: AppMode.vote,
+  timer: {
+    remainingMS: 0,
+    status: "stopped",
+  },
   columns: [
     {
       id: "3",

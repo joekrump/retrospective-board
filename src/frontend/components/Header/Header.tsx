@@ -11,6 +11,7 @@ interface HeaderProps {
   socket: SocketIOClient.Socket;
   boardId: string;
   timerClockMS: number;
+  timerState: "running" | "paused" | "stopped";
 }
 
 const Header = (props: HeaderProps) => {
@@ -37,7 +38,7 @@ const Header = (props: HeaderProps) => {
       </div>
       <div className="header-middle">
         { isReviewing() ? <h2 data-cy="reviewing-header">Reviewing</h2> : null }
-        <Timer timerClockMS={props.timerClockMS} socket={props.socket} boardId={props.boardId} />
+        <Timer remainingTimeMS={props.timerClockMS} state={props.timerState} socket={props.socket} boardId={props.boardId} />
       </div>
       <div id="app-controls">
         <h4>Review</h4>

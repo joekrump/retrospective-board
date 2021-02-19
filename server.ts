@@ -11,13 +11,14 @@ let sessionStore: {
 } = {};
 
 const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
-const NEW_BOARD = {
+const NEW_BOARD: Board = {
   title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`,
   showResults: false,
   maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
   cards: {},
-  currentStep: 0,
-  totalSteps: 0,
+  timerRemainingMS: 0,
+  timerDurationMS: 0,
+  timerState: "stopped",
   columns: [
     {
       id: uuid.v4(),
@@ -83,8 +84,8 @@ function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: st
   console.log("load board");
   socket.emit(`board:loaded:${boardId}`, {
     board: {
-      currentStep: boards[boardId].currentStep,
-      totalSteps: boards[boardId].totalSteps,
+      timerRemainingMS: boards[boardId].timerRemainingMS,
+      timerDurationMS: boards[boardId].timerDurationMS,
       title: boards[boardId].title,
       cards: boards[boardId].cards,
       columns: boards[boardId].columns,
@@ -194,11 +195,11 @@ io.on('connection', function (socket) {
 
     clearInterval(boards[boardId].stepsIntervalId);
     boards[boardId].stepsIntervalId = undefined;
-    boards[boardId].totalSteps = 0;
-    boards[boardId].currentStep = 0;
+    boards[boardId].timerRemainingMS = 0;
+    boards[boardId].timerDurationMS = 0;
 
-    socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0 });
-    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0 });
+    socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0, state: "stopped" });
+    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0, state: "stopped" });
   }));
 
   socket.on("board:timer-pause", (({ boardId, sessionId }: { boardId: string, sessionId: string }) => {
@@ -206,6 +207,10 @@ io.on('connection', function (socket) {
     const session = getSession(boardId, sessionId);
 
     if (session === null) { return; }
+
+    boards[boardId].timerState = "paused";
+    socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: boards[boardId].timerRemainingMS, state: "paused" });
+    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: boards[boardId].timerRemainingMS, state: "paused" });
   }));
 
   socket.on("board:timer-start", ({
@@ -221,37 +226,33 @@ io.on('connection', function (socket) {
     const session = getSession(boardId, sessionId);
 
     if (session === null) { return; }
-    const millisecondsPerSecond = 1000;
+    const intervalFrequencyMS = 1000;
 
-    boards[boardId].currentStep = 0;
-    boards[boardId].totalSteps = durationMS / millisecondsPerSecond;
+    boards[boardId].timerState = "running";
+    boards[boardId].timerDurationMS = durationMS;
+    boards[boardId].timerRemainingMS = durationMS;
 
     if (!boards[boardId]?.stepsIntervalId) {
       boards[boardId].stepsIntervalId = setInterval(() => {
-        if (boards[boardId].currentStep >= boards[boardId].totalSteps) {
+        if (boards[boardId].timerState === "paused") { return; }
+        if (boards[boardId].timerRemainingMS === 0) {
           clearInterval(boards[boardId].stepsIntervalId);
+          boards[boardId].timerState = "stopped";
           boards[boardId].stepsIntervalId = undefined;
           return;
         }
 
-        boards[boardId].currentStep++;
+        boards[boardId].timerRemainingMS = boards[boardId].timerRemainingMS - intervalFrequencyMS;
 
-        // socket.emit(`board:darken-app-tick:${boardId}`, {
-        //   currentStep: boards[boardId].currentStep,
-        //   totalSteps: boards[boardId].totalSteps,
-        // });
-        // socket.broadcast.emit(`board:darken-app-tick:${boardId}`, {
-        //   currentStep: boards[boardId].currentStep,
-        //   totalSteps: boards[boardId].totalSteps,
-        // });
-        let remainingTimeMS = (boards[boardId].totalSteps * millisecondsPerSecond) - (boards[boardId].currentStep * millisecondsPerSecond);
         socket.emit(`board:timer-tick:${boardId}`, {
-          remainingTimeMS,
+          remainingTimeMS: boards[boardId].timerRemainingMS,
+          state: "running"
         });
         socket.broadcast.emit(`board:timer-tick:${boardId}`, {
-          remainingTimeMS,
+          remainingTimeMS: boards[boardId].timerRemainingMS,
+          state: "running",
         });
-      }, 1000);
+      }, intervalFrequencyMS);
     }
   });
 
