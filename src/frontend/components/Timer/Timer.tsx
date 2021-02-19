@@ -74,13 +74,13 @@ export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
     return null;
   } else if (state === "running" || state === "paused") {
     return (
-      <>
-        { getFormattedRemainingTimerTime(remainingTimeMS) }
+      <div className="timer-display">
+        <h4 className="digits">{ getFormattedRemainingTimerTime(remainingTimeMS) }</h4>
         <form className="timer-control" onSubmit={toggleTimerRunning}>
           <button type="submit">{ state === "running" ? "pause" : "start" }</button>
           <button type="button" onClick={stopTimer}>stop</button>
         </form>
-      </>
+      </div>
     )
   } else {
     return (

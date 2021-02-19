@@ -1,6 +1,10 @@
+:root {
+  --timer-light-color: #fff;
+}
+
 .timer-control input {
   width: 50px;
-  color: #fff;
+  color: var(--timer-light-color);
   outline: none;
   border: 1px solid white;
 }
@@ -20,17 +24,15 @@
 .timer-display {
   display: flex;
   align-items: baseline;
-  color: #fff;
+  color: var(--timer-light-color);
   justify-content: center;
   width: 40vw;
   transition: display 1s linear;
 }
 
-.timer-display h4 {
+.timer-display .digits {
   text-align: right;
   margin-right: 0.6rem;
-}
-
-.timer-display .digits {
   width: 80px;
+  color: var(--timer-light-color);
 }
