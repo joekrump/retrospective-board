@@ -81,7 +81,6 @@ export const App = () => {
         columns: initialColumns,
         cards: data.board.cards,
       });
-      // darkenTheApp(data.board.currentStep, data.board.totalSteps);
     });
     socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {
       displayStarLimitAlert(data.maxStars);
