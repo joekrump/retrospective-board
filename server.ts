@@ -186,7 +186,12 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("board:timer-stop", (({ boardId }: { boardId: string }) => {
+  socket.on("board:timer-stop", (({ boardId, sessionId }: { boardId: string, sessionId: string }) => {
+    console.log("timer stop request");
+    const session = getSession(boardId, sessionId);
+
+    if (session === null) { return; }
+
     clearInterval(boards[boardId].stepsIntervalId);
     boards[boardId].stepsIntervalId = undefined;
     boards[boardId].totalSteps = 0;
@@ -196,21 +201,28 @@ io.on('connection', function (socket) {
     socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0 });
   }));
 
-  socket.on("board:timer-pause", (({ boardId }: { boardId: string }) => {
+  socket.on("board:timer-pause", (({ boardId, sessionId }: { boardId: string, sessionId: string }) => {
+    console.log("timer pause request");
+    const session = getSession(boardId, sessionId);
 
+    if (session === null) { return; }
   }));
 
   socket.on("board:timer-start", ({
     boardId,
     durationMS,
+    sessionId,
   }: {
     boardId: string,
     durationMS: number,
+    sessionId: string
   }) => {
+    console.log("timer start request");
+    const session = getSession(boardId, sessionId);
+
+    if (session === null) { return; }
     const millisecondsPerSecond = 1000;
-    // console.log("TIMER STARTED")
-    // console.log(boardId)
-    // console.log(durationMS)
+
     boards[boardId].currentStep = 0;
     boards[boardId].totalSteps = durationMS / millisecondsPerSecond;
 

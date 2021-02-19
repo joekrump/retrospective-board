@@ -35,21 +35,23 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
 }) => {
   let unitSelectRef = useRef<HTMLSelectElement>(null);
   let numberInputRef = useRef<HTMLInputElement>(null);
+  const sessionId = sessionStorage.getItem("retroSessionId");
   const isTimerRunning = timerClockMS > 0;
 
   function stopTimer(e: MouseEvent) {
     e.preventDefault();
-    socket.emit(`board:timer-stop`, { boardId });
+    socket.emit(`board:timer-stop`, { boardId, sessionId });
   }
 
   function toggleTimerRunning(e: FormEvent) {
     e.preventDefault();
 
     if (isTimerRunning) {
-      socket.emit(`board:timer-pause`, { boardId });
+      socket.emit(`board:timer-pause`, { boardId, sessionId });
     } else {
       socket.emit(`board:timer-start`, {
         boardId,
+        sessionId,
         durationMS: calculateTimeDurationInMilliseconds(
           unitSelectRef?.current?.value ?? "",
           parseInt(numberInputRef?.current?.value ?? "1"),

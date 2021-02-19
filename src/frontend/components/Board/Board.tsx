@@ -33,15 +33,6 @@ const Board = (props: BoardProps) => {
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
 
-      const initialColumns = data.board.columns.map((column: IColumn) => ({
-        ...column,
-        isEditing: false
-      }));
-      actions.setBoardState({
-        columns: initialColumns,
-        cards: data.board.cards,
-      });
-
       props.socket.on(`board:update-remaining-stars:${props.boardId}:${data.sessionId}`, (data: any) => {
         updateRemainingStars(data.remainingStars);
       });

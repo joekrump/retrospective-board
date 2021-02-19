@@ -8,7 +8,7 @@ import "./app.css";
 const Header = lazy(() => import("../Header/Header"));
 const Board = lazy(() => import("../Board/Board"));
 import { AppMode } from "../../overmind/state";
-import { Board as IBoard } from "../../../@types";
+import { Board as IBoard, Column as IColumn } from "../../../@types";
 
 const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
@@ -17,7 +17,7 @@ const colorThresholdForLightText = 0x90;
 const lightTextColor = "#e6e6e6";
 
 export const App = () => {
-  const { actions: { updateMode} } = useOvermind();
+  const { actions: { updateMode, setBoardState } } = useOvermind();
   let [timerClockRemainingMS, updateTimeClockRemainingMS] = useState(-1);
   const initialCSSBackgroundColor = getComputedStyle(document.documentElement)
     .getPropertyValue("--app--background-color")
@@ -26,9 +26,6 @@ export const App = () => {
   // These will be assumed to be the hex value that is assign to r, g, and b.
   // Ex. If "e6", then it will be assumed the initial bg color is #e6e6e6.
   const initialBackgroundColorHexValue = initialCSSBackgroundColor.substr(initialCSSBackgroundColor.length - 2);
-  // const initalOpacity = parseInt(getComputedStyle(document.documentElement)
-  //   .getPropertyValue("--app--background-opacity")
-  //   .trim());
   const initialBackgroundColor = parseInt(`0x${initialBackgroundColorHexValue}`, 16);
   let serverURL = window.location.origin;
   let initialBoardId = window.location.pathname.split("/").pop() || "";
@@ -73,6 +70,14 @@ export const App = () => {
       },
     ) => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
+      const initialColumns = data.board.columns.map((column: IColumn) => ({
+        ...column,
+        isEditing: false
+      }));
+      setBoardState({
+        columns: initialColumns,
+        cards: data.board.cards,
+      });
       // darkenTheApp(data.board.currentStep, data.board.totalSteps);
     });
     socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {
