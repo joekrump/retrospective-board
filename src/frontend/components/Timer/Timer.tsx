@@ -1,4 +1,5 @@
 import React, { FormEvent, MouseEvent, useRef } from "react";
+import { useOvermind } from "../../overmind";
 
 import "./Timer.css";
 
@@ -35,16 +36,15 @@ export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
 }) => {
   let minutesInputRef = useRef<HTMLInputElement>(null);
   let secondsInputRef = useRef<HTMLInputElement>(null);
+  let { state: { sessionId } } = useOvermind();
   const specialInitialTimerMS = -1;
 
   function stopTimer(e: MouseEvent) {
-    const sessionId = sessionStorage.getItem("retroSessionId");
     e.preventDefault();
     socket.emit(`board:timer-stop`, { boardId, sessionId });
   }
 
   function toggleTimerRunning(e: FormEvent) {
-    const sessionId = sessionStorage.getItem("retroSessionId");
     e.preventDefault();
 
     if (state === "running") {

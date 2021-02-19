@@ -15,19 +15,19 @@ interface HeaderProps {
 }
 
 const Header = (props: HeaderProps) => {
-  let { state } = useOvermind();
+  let { state: { sessionId, mode } } = useOvermind();
 
   function toggleShowResults(e: React.ChangeEvent) {
     e.preventDefault();
     // emit an event to show results.
     props.socket.emit(`board:show-results`, {
       boardId: props.boardId,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      sessionId,
     });
   }
 
   function isReviewing() {
-    return state.mode === AppMode.review;
+    return mode === AppMode.review;
   }
 
   return (

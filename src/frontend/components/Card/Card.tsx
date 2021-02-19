@@ -21,14 +21,13 @@ interface CardProps {
 }
 
 export const Card = (props: CardProps) => {
-  const sessionId = sessionStorage.getItem("retroSessionId") ?? "";
-  const [isEditing, updateIsEditing] = useState(props.isEditing && (props.ownerId === "" || sessionId === props.ownerId));
   const [text, updateText] = useState(props.text);
   const [ownerId, updateOwnerId] = useState(props.ownerId ?? null);
   const [userStars, updateUserStars] = useState(props.userStars);
   const [starsCount, updateStarsCount] = useState(props.starsCount);
-  const { state: { mode }, actions: { updateCardBeingDragged, updateCard } } = useOvermind();
+  const { state: { mode, sessionId }, actions: { updateCardBeingDragged, updateCard } } = useOvermind();
   const innerRef: RefObject<HTMLDivElement> = useRef(null);
+  const [isEditing, updateIsEditing] = useState(props.isEditing && (props.ownerId === "" || sessionId === props.ownerId));
   let cardContents;
 
   function handleDragStart(e: DragEvent) {

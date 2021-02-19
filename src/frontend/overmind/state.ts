@@ -10,6 +10,7 @@ export type State = {
   board: {
     title: string;
   };
+  sessionId: string;
   columns: BoardColumn[];
   cards: { [ id: string ]: Card }
   cardBeingDragged: any;
@@ -22,6 +23,7 @@ export type State = {
 
 export const state: State = {
   mode: AppMode.vote,
+  sessionId: sessionStorage.getItem("retroSessionId") ?? "",
   remainingStars: 0,
   board: {
     title: "",

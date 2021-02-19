@@ -14,7 +14,7 @@ interface BoardControlsProps {
 export const BoardControls = (props: BoardControlsProps) => {
   let titleInput = React.createRef<HTMLInputElement>();
   let [isEditingTitle, updateIsEditingTitle] = useState(false);
-  let { state: { mode, board, remainingStars } } = useOvermind();
+  let { state: { mode, board, remainingStars, sessionId } } = useOvermind();
 
   function editTitle(event?: React.MouseEvent) {
     if (event) {
@@ -27,7 +27,7 @@ export const BoardControls = (props: BoardControlsProps) => {
     props.socket.emit("board:updated", {
       boardId: props.boardId,
       title: titleInput?.current?.value,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      sessionId,
     });
     editTitle();
   }

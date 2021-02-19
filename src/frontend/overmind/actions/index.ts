@@ -10,8 +10,12 @@ export const updateBoardTitle: Action<string> = ({ state }, title: string) => {
   state.board.title = title;
 };
 
-export const updateRemainingStars = mutate(({ state }, remainingStars: number) => {
+export const updateRemainingStars: Action<number> = (({ state }, remainingStars: number) => {
   state.remainingStars = remainingStars;
+});
+
+export const updateSessionId: Action<string> = (({ state }, sessionId: string) => {
+  state.sessionId = sessionId;
 });
 
 export const updateCardBeingDragged: Action<any> = ({ state }, cardData: any) => {

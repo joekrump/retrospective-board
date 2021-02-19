@@ -13,21 +13,10 @@ import { Board as IBoard, Column as IColumn } from "../../../@types";
 const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
 
-const colorThresholdForLightText = 0x90;
-const lightTextColor = "#e6e6e6";
-
 export const App = () => {
-  const { actions: { updateMode, setBoardState, updateBoardTitle, updateRemainingStars } } = useOvermind();
+  const { state: { sessionId }, actions: { updateMode, updateSessionId, setBoardState, updateBoardTitle, updateRemainingStars } } = useOvermind();
   let [timerClockRemainingMS, updateTimeClockRemainingMS] = useState(-1);
   let [timerState, updateTimerState]: ["running" | "paused" | "stopped", Function] = useState("stopped");
-  const initialCSSBackgroundColor = getComputedStyle(document.documentElement)
-    .getPropertyValue("--app--background-color")
-    .trim();
-  // Get the last 2 characters of the hex value.
-  // These will be assumed to be the hex value that is assign to r, g, and b.
-  // Ex. If "e6", then it will be assumed the initial bg color is #e6e6e6.
-  const initialBackgroundColorHexValue = initialCSSBackgroundColor.substr(initialCSSBackgroundColor.length - 2);
-  const initialBackgroundColor = parseInt(`0x${initialBackgroundColorHexValue}`, 16);
   let serverURL = window.location.origin;
   let initialBoardId = window.location.pathname.split("/").pop() || "";
 
@@ -61,7 +50,6 @@ export const App = () => {
   }
 
   useEffect(function onMount() {
-    const sessionId = sessionStorage.getItem("retroSessionId");
     socket.on(`board:loaded:${boardId}`, (
       data: {
         board: IBoard,
@@ -80,6 +68,7 @@ export const App = () => {
       updateBoardTitle(data.board.title);
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
+      updateSessionId(data.sessionId);
       setBoardState({
         columns: initialColumns,
         cards: data.board.cards,
@@ -87,7 +76,6 @@ export const App = () => {
     });
 
     socket.on(`board:update-remaining-stars:${boardId}:${sessionId}`, (data: any) => {
-      console.log("update remaining stars")
       updateRemainingStars(data.remainingStars);
     });
 

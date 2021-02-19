@@ -20,7 +20,7 @@ export enum SortDirection {
 };
 
 const Board = (props: BoardProps) => {
-  const { state: { cards, columns, mode }, actions } = useOvermind();
+  const { state: { cards, columns, mode, sessionId }, actions } = useOvermind();
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
 
   useEffect(function onMount() {
@@ -78,7 +78,7 @@ const Board = (props: BoardProps) => {
       props.socket.emit("column:loaded", {
         boardId: props.boardId,
         id: column.id,
-        sessionId: sessionStorage.getItem("retroSessionId"),
+        sessionId,
       });
     } else {
       boardColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true, cardIds: [] };
@@ -162,7 +162,7 @@ const Board = (props: BoardProps) => {
       props.socket.emit(`column:deleted`, {
         boardId: props.boardId,
         id,
-        sessionId: sessionStorage.getItem("retroSessionId"),
+        sessionId,
       });
     }
   }

@@ -26,8 +26,7 @@ export const Column = (props: ColumnProps) => {
   let [name, updateName] = useState(props.name);
   let [isEditing, updateEditingState] = useState(!!props.isEditing);
   let [newUsavedColumn, updateNewStatus] = useState(props.new);
-  let { state: { mode, cardBeingDragged, columns, cards }, actions: { updateCardBeingDragged, addCard, removeCard } } = useOvermind();
-  const sessionId = sessionStorage.getItem("retroSessionId") || "";
+  let { state: { mode, cardBeingDragged, columns, cards, sessionId }, actions: { updateCardBeingDragged, addCard, removeCard } } = useOvermind();
   const innerRef: RefObject<HTMLDivElement> = useRef(null);
 
   function handleDragOver(e: DragEvent) {
@@ -131,7 +130,7 @@ export const Column = (props: ColumnProps) => {
         boardId: props.boardId,
         columnId: props.id,
         cardId,
-        sessionId: sessionStorage.getItem("retroSessionId"),
+        sessionId,
       });
     }
   }
@@ -162,7 +161,7 @@ export const Column = (props: ColumnProps) => {
       boardId: props.boardId,
       id: props.id,
       name: nameInput?.current?.value,
-      sessionId: sessionStorage.getItem("retroSessionId"),
+      sessionId,
     });
 
     toggleIsEditing();
@@ -188,22 +187,23 @@ export const Column = (props: ColumnProps) => {
 
     return cardIds?.map((cardId: string) => {
       card = cards[cardId];
-
-      return (
-        <Card
-          key={card.id}
-          id={card.id}
-          deleteCard={(event: any, id: string) => deleteCard(event, id)}
-          ownerId={card.ownerId}
-          isEditing={card.isEditing}
-          socket={props.socket}
-          columnId={props.id}
-          boardId={props.boardId}
-          text={card.text ?? ""}
-          starsCount={card.starsCount}
-          userStars={card.stars[sessionId]}
-        />
-      );
+      if (card) {
+        return (
+          <Card
+            key={card.id}
+            id={card.id}
+            deleteCard={(event: any, id: string) => deleteCard(event, id)}
+            ownerId={card.ownerId}
+            isEditing={card.isEditing}
+            socket={props.socket}
+            columnId={props.id}
+            boardId={props.boardId}
+            text={card.text ?? ""}
+            starsCount={card.starsCount}
+            userStars={card.stars[sessionId]}
+          />
+        );
+      }
     });
   }
 
