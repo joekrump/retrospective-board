@@ -69,11 +69,6 @@ export const Column = (props: ColumnProps) => {
 
   useEffect(function onMount() {
     const columnRef = innerRef.current;
-    props.socket.emit("column:loaded", {
-      boardId: props.boardId,
-      id: props.id,
-      sessionId,
-    });
 
     props.socket.on(`column:updated:${props.id}`, (data: any) => {
       updateName(data.name);

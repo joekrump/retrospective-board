@@ -75,11 +75,6 @@ const Board = (props: BoardProps) => {
 
     if (column) {
       boardColumn = { id: column.id, name: column.name, isEditing: false, cardIds: [] };
-      props.socket.emit("column:loaded", {
-        boardId: props.boardId,
-        id: column.id,
-        sessionId,
-      });
     } else {
       boardColumn = { id: uuid.v4(), name: "New Column", isEditing: true, new: true, cardIds: [] };
     }

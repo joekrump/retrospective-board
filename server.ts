@@ -258,32 +258,6 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("column:loaded", function(data: { boardId: string, id: string, sessionId: string }) {
-    console.log("column load request");
-    const session = getSession(data.boardId, data.sessionId);
-
-    if (session === null) { return; }
-
-    const board = boards[data.boardId];
-    const column = board?.columns.find((column) => column.id === data.id);
-
-    if (column) {
-      let card: Card;
-      socket.emit(`column:loaded:${data.id}`, {
-        cards: column.cardIds.map((cardId) => {
-          card = board?.cards[cardId];
-          // Remove all stars other than the current users.
-          return {
-            ...card,
-            stars: {
-              [data.sessionId]: card.stars[data.sessionId]
-            },
-          };
-        }),
-      });
-    }
-  });
-
   socket.on("column:created", function({ boardId, id, name, sessionId }: { boardId: string, id: string, name: string, sessionId: string }) {
     console.log("column create request");
     const session = getSession(boardId, sessionId);
