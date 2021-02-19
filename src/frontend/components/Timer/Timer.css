@@ -4,3 +4,14 @@
   outline: none;
   border: 1px solid white;
 }
+
+.timer-control input::-webkit-outer-spin-button,
+.timer-control input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.timer-control input[type=number] {
+  -moz-appearance: textfield;
+}
