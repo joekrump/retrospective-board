@@ -80,6 +80,7 @@ function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
 }
 
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
+  console.log("load board");
   socket.emit(`board:loaded:${boardId}`, {
     board: {
       currentStep: boards[boardId].currentStep,

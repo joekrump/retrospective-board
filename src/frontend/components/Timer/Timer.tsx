@@ -38,6 +38,7 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
   const isTimerRunning = timerClockMS > 0;
 
   function submit(e: FormEvent) {
+    console.log("submit")
     e.preventDefault();
 
     if (isTimerRunning) {
@@ -61,7 +62,7 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
         { getFormattedRemainingTimerTime(timerClockMS) }
         <form className="timer-control" onSubmit={submit}>
           <button type="submit">pause</button>
-          <button type="submit">stop</button>
+          <button type="button">stop</button>
         </form>
       </>
     )
@@ -73,8 +74,7 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
           <option value="sec">seconds</option>
           <option value="min">minutes</option>
         </select>
-        <button type="submit">pause</button>
-        <button type="submit">stop</button>
+        <button type="submit">start</button>
       </form>
     );
   }
