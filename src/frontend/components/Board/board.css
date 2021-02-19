@@ -1,4 +1,4 @@
-main#board {
+#board {
   grid-area: main;
   display: grid;
   grid-template-rows: 5vh 1fr;
