@@ -5,6 +5,7 @@
   border: 1px solid white;
 }
 
+/* Hide number input arrows */
 .timer-control input::-webkit-outer-spin-button,
 .timer-control input::-webkit-inner-spin-button {
   -webkit-appearance: none;
