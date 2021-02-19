@@ -34,27 +34,27 @@ const Board = (props: BoardProps) => {
       props.socket.on(`board:update-remaining-stars:${props.boardId}:${data.sessionId}`, (data: any) => {
         actions.updateRemainingStars(data.remainingStars);
       });
+    });
 
-      props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
-        actions.updateBoardTitle(data.title);
-      });
+    props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
+      actions.updateBoardTitle(data.title);
+    });
 
-      props.socket.on(`column:created:${props.boardId}`, (data: any) => {
-        addColumn(data);
-      });
+    props.socket.on(`column:created:${props.boardId}`, (data: any) => {
+      addColumn(data);
+    });
 
-      props.socket.on(`column:deleted:${props.boardId}`, (data: any) => {
-        deleteColumn(null, data.id, true);
-      });
+    props.socket.on(`column:deleted:${props.boardId}`, (data: any) => {
+      deleteColumn(null, data.id, true);
+    });
 
-      props.socket.on(`card:moved:${props.boardId}`, handleCardMoved);
-      props.socket.on(`card:created:${props.boardId}`, ({ card }: { card: Card }) => {
-        actions.addCard(card);
-      });
+    props.socket.on(`card:moved:${props.boardId}`, handleCardMoved);
+    props.socket.on(`card:created:${props.boardId}`, ({ card }: { card: Card }) => {
+      actions.addCard(card);
+    });
 
-      props.socket.on(`card:deleted:${props.boardId}`, ({ cardId }: { cardId: string }) => {
-        actions.removeCard(cardId);
-      });
+    props.socket.on(`card:deleted:${props.boardId}`, ({ cardId }: { cardId: string }) => {
+      actions.removeCard(cardId);
     });
 
     return function cleanup() {

@@ -74,10 +74,15 @@ export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
   } else if (state === "running" || state === "paused") {
     return (
       <div className="timer-display">
+        <span className="gg-timer"></span>
         <h4 className="digits">{ getFormattedRemainingTimerTime(remainingTimeMS) }</h4>
         <form className="timer-control" onSubmit={toggleTimerRunning}>
-          <button type="submit">{ state === "running" ? "pause" : "start" }</button>
-          <button type="button" onClick={stopTimer}>stop</button>
+          <button type="submit">
+            <span className={`gg-play-${state === "running" ? "pause" : "button"}`}></span>
+          </button>
+          <button type="button" onClick={stopTimer}>
+            <span className="gg-play-stop"></span>
+          </button>
         </form>
       </div>
     )
@@ -85,10 +90,10 @@ export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
     return (
       <form className="timer-control" onSubmit={toggleTimerRunning}>
         <div className="timer-display">
-          <input name="minutes" type="number" min="0" ref={minutesInputRef} defaultValue={30}/>
-          &nbsp;:&nbsp;
-          <input name="seconds" type="number" min="0" ref={secondsInputRef} defaultValue={0}/>
-          <button type="submit">start</button>
+          <span className="gg-timer"></span>
+          <input name="minutes" type="number" min="0" ref={minutesInputRef} defaultValue={30}/>m
+          <input name="seconds" type="number" min="0" ref={secondsInputRef} defaultValue={0}/>s
+          <button type="submit"><span className="gg-play-button"></span></button>
         </div>
       </form>
     );
