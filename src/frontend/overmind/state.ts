@@ -7,17 +7,25 @@ export enum AppMode {
 
 export type State = {
   mode: AppMode;
+  board: {
+    title: string;
+  };
   columns: BoardColumn[];
   cards: { [ id: string ]: Card }
   cardBeingDragged: any;
   timer: {
     remainingMS: number;
     status: "running" | "paused" | "stopped";
-  }
+  },
+  remainingStars: number;
 };
 
 export const state: State = {
   mode: AppMode.vote,
+  remainingStars: 0,
+  board: {
+    title: "",
+  },
   timer: {
     remainingMS: 0,
     status: "stopped",

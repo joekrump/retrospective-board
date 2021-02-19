@@ -5,10 +5,8 @@ import { SortDirection } from "../Board/Board";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
 interface BoardControlsProps {
-  title: string;
   socket: SocketIOClient.Socket;
   boardId: string;
-  remainingStars: number | undefined;
   sortDirection: SortDirection;
   sortColumnCardsByStars: (e: React.MouseEvent) => void;
 };
@@ -16,7 +14,7 @@ interface BoardControlsProps {
 export const BoardControls = (props: BoardControlsProps) => {
   let titleInput = React.createRef<HTMLInputElement>();
   let [isEditingTitle, updateIsEditingTitle] = useState(false);
-  let { state: { mode } } = useOvermind();
+  let { state: { mode, board, remainingStars } } = useOvermind();
 
   function editTitle(event?: React.MouseEvent) {
     if (event) {
@@ -38,7 +36,7 @@ export const BoardControls = (props: BoardControlsProps) => {
   if (isEditingTitle) {
     titleContent = (
       <>
-        <input className="board-title--text" type="text" autoFocus={true} defaultValue={props.title} ref={titleInput}></input>
+        <input className="board-title--text" type="text" autoFocus={true} defaultValue={board.title} ref={titleInput}></input>
         <div className="board-title--actions">
           <button onClick={saveTitle} title="Save">
             <span className="gg-check"></span>
@@ -52,7 +50,7 @@ export const BoardControls = (props: BoardControlsProps) => {
   } else {
     titleContent = (
       <h1 className="board-title--text" onClick={() => editTitle()}>
-        {props.title}
+        {board.title}
       </h1>
     );
   }
@@ -70,7 +68,7 @@ export const BoardControls = (props: BoardControlsProps) => {
         :
         <div className="board-actions">
           <strong className="stars-remaining">
-            ⭐️: {props.remainingStars}
+            ⭐️: {remainingStars}
           </strong>
         </div>
       }
