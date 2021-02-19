@@ -86,6 +86,7 @@ function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: st
     board: {
       timerRemainingMS: boards[boardId].timerRemainingMS,
       timerDurationMS: boards[boardId].timerDurationMS,
+      timerState: boards[boardId].timerState,
       title: boards[boardId].title,
       cards: boards[boardId].cards,
       columns: boards[boardId].columns,
@@ -197,6 +198,7 @@ io.on('connection', function (socket) {
     boards[boardId].stepsIntervalId = undefined;
     boards[boardId].timerRemainingMS = 0;
     boards[boardId].timerDurationMS = 0;
+    boards[boardId].timerState = "stopped";
 
     socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0, state: "stopped" });
     socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0, state: "stopped" });

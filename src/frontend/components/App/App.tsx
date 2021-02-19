@@ -108,29 +108,6 @@ export const App = () => {
     };
   }, []);
 
-  function getBackgroundColor(stepPercentageCompleteDecimal: number) {
-    const newHexColor = Math.floor(initialBackgroundColor * stepPercentageCompleteDecimal);
-    const newHexColorString = newHexColor.toString(16);
-    const newBackgroundColor = `#${newHexColorString}${newHexColorString}${newHexColorString}`;
-
-    return {
-      newBackgroundColor,
-      newHexColor,
-    };
-  }
-
-  // function darkenTheApp(currentStep: number, totalSteps: number) {
-  //   const stepPercentageCompleteDecimal = (totalSteps - currentStep) / totalSteps;
-  //   const { newBackgroundColor, newHexColor } = getBackgroundColor(stepPercentageCompleteDecimal);
-  //   // let opacity = initalOpacity * stepPercentageCompleteDecimal;
-
-  //   if (newHexColor < colorThresholdForLightText) {
-  //   // if (opacity < 0.5) {
-  //     document.documentElement.style.setProperty("--text-color-primary", lightTextColor);
-  //   }
-  //   document.documentElement.style.setProperty("--app--background-color", `${newBackgroundColor}`);
-  // }
-
   function renderLoading() {
     return <div>Loading...</div>
   }
