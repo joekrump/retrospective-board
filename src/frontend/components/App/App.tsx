@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import * as io from "socket.io-client";
-import * as uuid from "uuid";
+import React, { useState, useEffect, lazy, Suspense } from "react";
+import { connect as socketConnect } from "socket.io-client";
+import { v4 as uuidV4} from "uuid";
 import { useOvermind } from "../../overmind";
 
 import "./app.css";
 
-import { Header } from "../Header/Header";
-import { Board } from "../Board/Board";
+const Header = lazy(() => import("../Header/Header"));
+const Board = lazy(() => import("../Board/Board"));
 import { AppMode } from "../../overmind/state";
 import { Board as IBoard } from "../../../@types";
 
@@ -37,11 +37,11 @@ export const App = () => {
     serverURL = window.location.origin.replace(window.location.port, SERVER_PORT);
     initialBoardId = "dev-board";
   } else if (!initialBoardId) {
-    initialBoardId = uuid.v4();
+    initialBoardId = uuidV4();
     window.location.assign(`/board/${initialBoardId}`);
   }
 
-  const socket = io.connect(serverURL);
+  const socket = socketConnect(serverURL);
   const [boardId] = useState(initialBoardId);
   const [maxStars, setMaxStars] = useState(null as unknown as number);
   const [showStarLimitAlert, updateShowStarLimitAlert] = useState(false);
@@ -128,8 +128,12 @@ export const App = () => {
     document.documentElement.style.setProperty("--app--background-color", `${newBackgroundColor}`);
   }
 
+  function renderLoading() {
+    return <div>Loading...</div>
+  }
+
   return (
-    <>
+    <Suspense fallback={renderLoading}>
       <Header
         socket={socket}
         boardId={boardId}
@@ -142,6 +146,6 @@ export const App = () => {
       <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
         Your voting limit of {maxStars} has been reached. Undo previous stars if you want some back.
       </div>
-    </>
+    </Suspense>
   );
 }

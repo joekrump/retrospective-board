@@ -13,7 +13,7 @@ interface HeaderProps {
   timerClockMS: number;
 }
 
-export const Header = (props: HeaderProps) => {
+const Header = (props: HeaderProps) => {
   let { state } = useOvermind();
 
   function toggleShowResults(e: React.ChangeEvent) {
@@ -47,3 +47,5 @@ export const Header = (props: HeaderProps) => {
     </header>
   );
 }
+
+export default Header;

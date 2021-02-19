@@ -19,7 +19,7 @@ export enum SortDirection {
   "desc",
 };
 
-export const Board = (props: BoardProps) => {
+const Board = (props: BoardProps) => {
   const { state: { cards, columns, mode }, actions } = useOvermind();
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
@@ -212,3 +212,5 @@ export const Board = (props: BoardProps) => {
     </main>
   );
 }
+
+export default Board;
