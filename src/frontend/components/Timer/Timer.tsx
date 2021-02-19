@@ -8,15 +8,14 @@ const minutesPerHour = 60;
 const millisecondsPerHour = millisecondsPerSecond * secondsPerMinute * minutesPerHour;
 const millisecondsPerMinute = millisecondsPerSecond * secondsPerMinute;
 
-function calculateTimeDurationInMilliseconds(unitSelected: string, numberInput: number) {
+function calculateTimeDurationInMilliseconds(minutes: number, seconds: number) {
   const millisecondsPerSeconds = 1000;
   const secondsPerMinute = 60;
-  let multiplier: number = millisecondsPerSeconds;
+  const durationMilliseconds =
+    (minutes * secondsPerMinute * millisecondsPerSeconds) +
+    (seconds * millisecondsPerSecond);
 
-  if (unitSelected === "min") {
-    multiplier = secondsPerMinute * millisecondsPerSeconds;
-  }
-  return numberInput * multiplier
+  return durationMilliseconds;
 }
 
 function getFormattedRemainingTimerTime(timerClockMS: number): string {
@@ -34,8 +33,8 @@ export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
   remainingTimeMS: number,
   state: "running" | "paused" | "stopped",
 }) => {
-  let unitSelectRef = useRef<HTMLSelectElement>(null);
-  let numberInputRef = useRef<HTMLInputElement>(null);
+  let minutesInputRef = useRef<HTMLInputElement>(null);
+  let secondsInputRef = useRef<HTMLInputElement>(null);
   const specialInitialTimerMS = -1;
 
   function stopTimer(e: MouseEvent) {
@@ -61,8 +60,8 @@ export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
         boardId,
         sessionId,
         durationMS: calculateTimeDurationInMilliseconds(
-          unitSelectRef?.current?.value ?? "",
-          parseInt(numberInputRef?.current?.value ?? "1"),
+          parseInt(minutesInputRef?.current?.value ?? "1"),
+          parseInt(secondsInputRef?.current?.value ?? "1"),
         )
       });
     }
@@ -85,12 +84,12 @@ export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
   } else {
     return (
       <form className="timer-control" onSubmit={toggleTimerRunning}>
-        <input type="number" min="1" ref={numberInputRef} defaultValue={30}/>
-        <select defaultValue="min" ref={unitSelectRef}>
-          <option value="sec">seconds</option>
-          <option value="min">minutes</option>
-        </select>
-        <button type="submit">start</button>
+        <div className="timer-display">
+          <input name="minutes" type="number" min="0" ref={minutesInputRef} defaultValue={30}/>
+          &nbsp;:&nbsp;
+          <input name="seconds" type="number" min="0" ref={secondsInputRef} defaultValue={0}/>
+          <button type="submit">start</button>
+        </div>
       </form>
     );
   }
