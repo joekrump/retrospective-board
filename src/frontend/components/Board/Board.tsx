@@ -6,11 +6,10 @@ import { useOvermind } from "../../overmind";
 
 import "./board.css";
 import { AppMode } from "../../overmind/state";
-import { Board as IBoard, BoardColumn, Card } from "../../../@types";
+import { BoardColumn, Card } from "../../../@types";
 
 interface BoardProps {
   socket: SocketIOClient.Socket;
-  boardId: string;
 }
 
 export enum SortDirection {
@@ -20,39 +19,39 @@ export enum SortDirection {
 };
 
 const Board = (props: BoardProps) => {
-  const { state: { cards, columns, mode, sessionId }, actions } = useOvermind();
+  const { state: { cards, columns, mode, board, sessionId, }, actions } = useOvermind();
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
 
   useEffect(function onMount() {
-    props.socket.on(`board:updated:${props.boardId}`, (data: any) => {
-      actions.updateBoardTitle(data.title);
+    props.socket.on(`board:updated:${board.id}`, (data: any) => {
+      actions.updateBoard(data.title);
     });
 
-    props.socket.on(`column:created:${props.boardId}`, (data: any) => {
+    props.socket.on(`column:created:${board.id}`, (data: any) => {
       addColumn(data);
     });
 
-    props.socket.on(`column:deleted:${props.boardId}`, (data: any) => {
+    props.socket.on(`column:deleted:${board.id}`, (data: any) => {
       deleteColumn(null, data.id, true);
     });
 
-    props.socket.on(`card:moved:${props.boardId}`, handleCardMoved);
-    props.socket.on(`card:created:${props.boardId}`, ({ card }: { card: Card }) => {
+    props.socket.on(`card:moved:${board.id}`, handleCardMoved);
+    props.socket.on(`card:created:${board.id}`, ({ card }: { card: Card }) => {
       actions.addCard(card);
     });
 
-    props.socket.on(`card:deleted:${props.boardId}`, ({ cardId }: { cardId: string }) => {
+    props.socket.on(`card:deleted:${board.id}`, ({ cardId }: { cardId: string }) => {
       actions.removeCard(cardId);
     });
 
     return function cleanup() {
-      props.socket.removeListener(`column:deleted:${props.boardId}`);
-      props.socket.removeListener(`column:created:${props.boardId}`);
-      props.socket.removeListener(`card:moved:${props.boardId}`);
-      props.socket.removeListener(`card:created:${props.boardId}`);
-      props.socket.removeListener(`card:deleted:${props.boardId}`);
+      props.socket.removeListener(`column:deleted:${board.id}`);
+      props.socket.removeListener(`column:created:${board.id}`);
+      props.socket.removeListener(`card:moved:${board.id}`);
+      props.socket.removeListener(`card:created:${board.id}`);
+      props.socket.removeListener(`card:deleted:${board.id}`);
     };
-  }, [columns]);
+  }, [columns, board.id]);
 
   const sortColumnCardsByStars = () => {
     let newSortDirection = SortDirection.none;
@@ -112,7 +111,7 @@ const Board = (props: BoardProps) => {
           name={name}
           deleteColumn={(event) => deleteColumn(event, columns[i].id)}
           socket={props.socket}
-          boardId={props.boardId}
+          boardId={board.id}
           maxWidthPercentage={maxWidthPercentage}
           isEditing={columns[i].isEditing}
           new={columns[i].new}
@@ -155,7 +154,7 @@ const Board = (props: BoardProps) => {
 
     if (!fromSocket) {
       props.socket.emit(`column:deleted`, {
-        boardId: props.boardId,
+        boardId: board.id,
         id,
         sessionId,
       });
@@ -171,7 +170,7 @@ const Board = (props: BoardProps) => {
       <BoardControls
         sortColumnCardsByStars={sortColumnCardsByStars}
         socket={props.socket}
-        boardId={props.boardId}
+        boardId={board.id}
         sortDirection={sortDirection}
       />
       <div id="columns">

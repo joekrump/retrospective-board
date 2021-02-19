@@ -1,13 +1,16 @@
 import { AppMode } from "../state";
 import { Action, mutate } from "overmind";
-import { BoardColumn, Card } from "../../../@types";
+import { BoardColumn, Card, Board } from "../../../@types";
 
 export const updateMode: Action<AppMode> = ({ state }, mode: AppMode) => {
   state.mode = mode;
 };
 
-export const updateBoardTitle: Action<string> = ({ state }, title: string) => {
-  state.board.title = title;
+export const updateBoard: Action<{ title: string, id: string }> = ({ state }, board: { title: string, id: string }) => {
+  state.board = {
+    ...state.board,
+    ...board,
+  };
 };
 
 export const updateRemainingStars: Action<number> = (({ state }, remainingStars: number) => {

@@ -14,7 +14,7 @@ const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
 
 export const App = () => {
-  const { state: { sessionId }, actions: { updateMode, updateSessionId, setBoardState, updateBoardTitle, updateRemainingStars } } = useOvermind();
+  const { state: { sessionId }, actions: { updateMode, updateSessionId, setBoardState, updateBoard, updateRemainingStars } } = useOvermind();
   let [timerClockRemainingMS, updateTimeClockRemainingMS] = useState(-1);
   let [timerState, updateTimerState]: ["running" | "paused" | "stopped", Function] = useState("stopped");
   let serverURL = window.location.origin;
@@ -63,7 +63,10 @@ export const App = () => {
         ...column,
         isEditing: false
       }));
-      updateBoardTitle(data.board.title);
+      updateBoard({
+        id: boardId,
+        title: data.board.title,
+      });
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
       updateSessionId(data.sessionId);
@@ -116,7 +119,6 @@ export const App = () => {
       />
       <Board
         socket={socket}
-        boardId={boardId}
       />
       <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
         Your voting limit of {maxStars} has been reached. Undo previous stars if you want some back.

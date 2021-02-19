@@ -9,6 +9,7 @@ export type State = {
   mode: AppMode;
   board: {
     title: string;
+    id: string;
   };
   sessionId: string;
   columns: BoardColumn[];
@@ -29,6 +30,7 @@ export const state: State = {
   remainingStars: 0,
   board: {
     title: "",
+    id: "",
   },
   timer: {
     remainingMS: 0,
