@@ -133,7 +133,7 @@ export const App = () => {
   }
 
   return (
-    <Suspense fallback={renderLoading}>
+    <Suspense fallback={renderLoading()}>
       <Header
         socket={socket}
         boardId={boardId}

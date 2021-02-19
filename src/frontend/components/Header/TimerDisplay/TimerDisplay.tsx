@@ -23,16 +23,9 @@ export const TimerDisplay = ({ timerClockMS, socket, boardId }: {
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   }
 
-  if (timerClockMS < 0) {
-    return <Timer socket={socket} boardId={boardId} />;
-  } else if (timerClockMS === 0) {
-    return <strong>Time's up!</strong>
-  } else {
-    return (
-      <div className="timer-display">
-        <h4>Remaining Time:</h4>
-        <strong className="digits">{getFormattedRemainingTimerTime(timerClockMS)}</strong>
-      </div>
-    );
-  }
+  return <Timer
+    socket={socket}
+    boardId={boardId}
+    formattedTimeRemaining={timerClockMS < 0 ? null : getFormattedRemainingTimerTime(timerClockMS)}
+  />;
 };
