@@ -39,16 +39,16 @@ export const Timer = ({ socket, boardId, timerClockMS }: {
 
   function stopTimer(e: MouseEvent) {
     e.preventDefault();
-    socket.emit(`board:stop-timer`, { boardId });
+    socket.emit(`board:timer-stop`, { boardId });
   }
 
   function toggleTimerRunning(e: FormEvent) {
     e.preventDefault();
 
     if (isTimerRunning) {
-      socket.emit(`board:pause-timer`, { boardId });
+      socket.emit(`board:timer-pause`, { boardId });
     } else {
-      socket.emit(`board:start-timer`, {
+      socket.emit(`board:timer-start`, {
         boardId,
         durationMS: calculateTimeDurationInMilliseconds(
           unitSelectRef?.current?.value ?? "",

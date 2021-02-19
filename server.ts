@@ -186,7 +186,21 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on("board:start-timer", ({
+  socket.on("board:timer-stop", (({ boardId }: { boardId: string }) => {
+    clearInterval(boards[boardId].stepsIntervalId);
+    boards[boardId].stepsIntervalId = undefined;
+    boards[boardId].totalSteps = 0;
+    boards[boardId].currentStep = 0;
+
+    socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0 });
+    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0 });
+  }));
+
+  socket.on("board:timer-pause", (({ boardId }: { boardId: string }) => {
+
+  }));
+
+  socket.on("board:timer-start", ({
     boardId,
     durationMS,
   }: {
