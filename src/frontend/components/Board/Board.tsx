@@ -19,7 +19,7 @@ export enum SortDirection {
   "desc",
 };
 
-export const Board = (props: BoardProps) => {
+const Board = (props: BoardProps) => {
   const { state: { cards, columns, mode }, actions } = useOvermind();
   const [boardTitle, updateBoardTitle] = React.useState("" as string);
   const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
@@ -32,15 +32,6 @@ export const Board = (props: BoardProps) => {
       updateBoardTitle(data.board.title);
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
-
-      const initialColumns = data.board.columns.map((column: IColumn) => ({
-        ...column,
-        isEditing: false
-      }));
-      actions.setBoardState({
-        columns: initialColumns,
-        cards: data.board.cards,
-      });
 
       props.socket.on(`board:update-remaining-stars:${props.boardId}:${data.sessionId}`, (data: any) => {
         updateRemainingStars(data.remainingStars);
@@ -197,7 +188,7 @@ export const Board = (props: BoardProps) => {
   }, [columns, mode, sortDirection]);
 
   return (
-    <main>
+    <main id="board">
       <BoardControls
         sortColumnCardsByStars={sortColumnCardsByStars}
         title={boardTitle}
@@ -212,3 +203,5 @@ export const Board = (props: BoardProps) => {
     </main>
   );
 }
+
+export default Board;

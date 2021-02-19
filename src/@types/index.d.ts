@@ -17,9 +17,14 @@ export interface Column {
 }
 
 export interface Board {
+  maxStars: number;
   title: string;
   showResults: boolean;
   columns: Column[];
+  timerRemainingMS: number;
+  timerDurationMS: number;
+  timerState: "running" | "paused" | "stopped";
+  stepsIntervalId?: ReturnType<typeof setInterval>;
   cards: { [id: string]: Card };
 }
 

@@ -2,7 +2,6 @@
   margin: 0 20px;
   padding: 5px 0;
   display: flex;
-  height: max-content;
   align-items: center;
   justify-content: space-between;
   grid-row: 1 / span 1;
@@ -32,7 +31,7 @@
   font-size: 1.4rem;
   font-weight: 600;
   border: none;
-  background-color: var(--app--background-color);
+  background-color: none;
 }
 
 .board-title--actions {

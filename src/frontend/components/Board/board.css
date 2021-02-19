@@ -1,17 +1,17 @@
-main {
+#board {
+  grid-area: main;
   display: grid;
-  height: 90vh;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: 4% 1fr;
-  --ggs: 1;
+  grid-template-rows: 5vh 1fr;
+  background-color: var(--app--background-color);
+  transition: background-color 1s ease-out, color 1s ease-in;
 }
 
 #columns {
   grid-row: 2 / span 1;
   grid-column: 1 / span 12;
   display: flex;
-  padding-top: 20px;
   margin: 0 10px;
+  z-index: 1;
 }
 
 .add-column--button-filler {

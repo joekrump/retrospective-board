@@ -1,5 +1,6 @@
 :root {
   --app--background-color: #e6e6e6;
+  --app--background-opacity: 1;
   --green: #51be51;
   --text-color-primary: #363636;
   --button--background-color: #f8fbfb;
@@ -8,7 +9,14 @@
 
 html, body, #react-root {
   height: 100%;
-  background-color: var(--app--background-color);
+}
+
+#react-root {
+  display: grid;
+  grid-template:
+    "hd   hd   hd   hd   hd   hd   hd   hd   hd   hd   hd   hd" minmax(4em, auto)
+    "main main main main main main main main main main main main" minmax(90vh, 1fr)
+    / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
 body {
@@ -22,7 +30,17 @@ input,
 textarea {
   font-family: -apple-system, BlinkMacSystemFont,"Segoe UI","Roboto", "Droid Sans","Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.0rem;
+}
+
+html,
+body,
+#react-root,
+input {
   color: var(--text-color-primary);
+}
+
+input {
+  background-color: rgba(0,0,0,0);
 }
 
 footer {

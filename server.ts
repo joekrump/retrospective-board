@@ -11,11 +11,14 @@ let sessionStore: {
 } = {};
 
 const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
-const NEW_BOARD = {
+const NEW_BOARD: Board = {
   title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`,
   showResults: false,
   maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
   cards: {},
+  timerRemainingMS: 0,
+  timerDurationMS: 0,
+  timerState: "stopped",
   columns: [
     {
       id: uuid.v4(),
@@ -78,8 +81,16 @@ function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
 }
 
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
+  console.log("load board");
   socket.emit(`board:loaded:${boardId}`, {
-    board: boards[boardId],
+    board: {
+      timerRemainingMS: boards[boardId].timerRemainingMS,
+      timerDurationMS: boards[boardId].timerDurationMS,
+      timerState: boards[boardId].timerState,
+      title: boards[boardId].title,
+      cards: boards[boardId].cards,
+      columns: boards[boardId].columns,
+    },
     sessionId,
     showResults: boards[boardId].showResults,
     remainingStars: sessionStore[boardId][sessionId].remainingStars,
@@ -143,7 +154,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('board:loaded', function (data: { boardId: string, sessionId?: string }) {
+  socket.on("board:loaded", function (data: { boardId: string, sessionId?: string }) {
     const sessionId = data.sessionId ?? uuid.v4();
     const boardId = data.boardId ?? uuid.v4();
 
@@ -164,7 +175,7 @@ io.on('connection', function (socket) {
     emitBoardLoaded(socket, boardId, sessionId);
   });
 
-  socket.on('board:updated', function(data: { boardId: string, title: string, sessionId: string }) {
+  socket.on("board:updated", function(data: { boardId: string, title: string, sessionId: string }) {
     if(data.title !== undefined) {
       boards[data.boardId].title = data.title;
     }
@@ -175,6 +186,76 @@ io.on('connection', function (socket) {
     socket.broadcast.emit(`board:updated:${data.boardId}`, {
       title: boards[data.boardId].title,
     });
+  });
+
+  socket.on("board:timer-stop", (({ boardId, sessionId }: { boardId: string, sessionId: string }) => {
+    console.log("timer stop request");
+    const session = getSession(boardId, sessionId);
+
+    if (session === null) { return; }
+
+    clearInterval(boards[boardId].stepsIntervalId);
+    boards[boardId].stepsIntervalId = undefined;
+    boards[boardId].timerRemainingMS = 0;
+    boards[boardId].timerDurationMS = 0;
+    boards[boardId].timerState = "stopped";
+
+    socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0, state: "stopped" });
+    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0, state: "stopped" });
+  }));
+
+  socket.on("board:timer-pause", (({ boardId, sessionId }: { boardId: string, sessionId: string }) => {
+    console.log("timer pause request");
+    const session = getSession(boardId, sessionId);
+
+    if (session === null) { return; }
+
+    boards[boardId].timerState = "paused";
+    socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: boards[boardId].timerRemainingMS, state: "paused" });
+    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: boards[boardId].timerRemainingMS, state: "paused" });
+  }));
+
+  socket.on("board:timer-start", ({
+    boardId,
+    durationMS,
+    sessionId,
+  }: {
+    boardId: string,
+    durationMS: number,
+    sessionId: string
+  }) => {
+    console.log("timer start request");
+    const session = getSession(boardId, sessionId);
+
+    if (session === null) { return; }
+    const intervalFrequencyMS = 1000;
+
+    boards[boardId].timerState = "running";
+    boards[boardId].timerDurationMS = durationMS;
+    boards[boardId].timerRemainingMS = durationMS;
+
+    if (!boards[boardId]?.stepsIntervalId) {
+      boards[boardId].stepsIntervalId = setInterval(() => {
+        if (boards[boardId].timerState === "paused") { return; }
+        if (boards[boardId].timerRemainingMS === 0) {
+          clearInterval(boards[boardId].stepsIntervalId);
+          boards[boardId].timerState = "stopped";
+          boards[boardId].stepsIntervalId = undefined;
+          return;
+        }
+
+        boards[boardId].timerRemainingMS = boards[boardId].timerRemainingMS - intervalFrequencyMS;
+
+        socket.emit(`board:timer-tick:${boardId}`, {
+          remainingTimeMS: boards[boardId].timerRemainingMS,
+          state: "running"
+        });
+        socket.broadcast.emit(`board:timer-tick:${boardId}`, {
+          remainingTimeMS: boards[boardId].timerRemainingMS,
+          state: "running",
+        });
+      }, intervalFrequencyMS);
+    }
   });
 
   socket.on("column:loaded", function(data: { boardId: string, id: string, sessionId: string }) {

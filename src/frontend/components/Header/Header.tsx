@@ -6,12 +6,15 @@ import { AppLogo } from "../AppLogo/AppLogo";
 
 import "./header.css";
 import { AppMode } from "../../overmind/state";
+import { Timer } from "../Timer/Timer";
 interface HeaderProps {
   socket: SocketIOClient.Socket;
   boardId: string;
+  timerClockMS: number;
+  timerState: "running" | "paused" | "stopped";
 }
 
-export const Header = (props: HeaderProps) => {
+const Header = (props: HeaderProps) => {
   let { state } = useOvermind();
 
   function toggleShowResults(e: React.ChangeEvent) {
@@ -28,12 +31,15 @@ export const Header = (props: HeaderProps) => {
   }
 
   return (
-    <header id="top-header">
+    <header className="app-header">
       <div id="logo">
         <AppLogo />
         <h2>Retro</h2>
       </div>
-      { isReviewing() ? <h1 data-cy="reviewing-header">Reviewing</h1> : null }
+      <div className="header-middle">
+        { isReviewing() ? <h2 data-cy="reviewing-header">Reviewing</h2> : null }
+        <Timer remainingTimeMS={props.timerClockMS} state={props.timerState} socket={props.socket} boardId={props.boardId} />
+      </div>
       <div id="app-controls">
         <h4>Review</h4>
         <Switch id="toggle-app-state" isOn={isReviewing()} handleChange={(e) => toggleShowResults(e)}/>
@@ -42,3 +48,5 @@ export const Header = (props: HeaderProps) => {
     </header>
   );
 }
+
+export default Header;

@@ -1,22 +1,17 @@
-header {
-  display: grid;
-  padding: 15px 0;
-  grid-template-columns: repeat(12, 1fr);
+.app-header {
+  grid-area: hd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4.0em;
   background: #673ab7;
 }
 
-#top-header {
-  grid-row: 1 / span 1;
-  grid-column: 1 / span 12;
-  display: flex;
-  justify-content: space-between;
-}
-
 #logo,
-#top-header h1,
-#top-header h2,
-#top-header h3,
-#top-header h4 {
+.app-header h1,
+.app-header h2,
+.app-header h3,
+.app-header h4 {
   color: #fff;
   margin: 0;
 }
@@ -24,12 +19,17 @@ header {
 #logo {
   display: flex;
   align-items: center;
+  height: 3.0em;
   margin-left: 20px;
 }
 
 #logo h2 {
   font-size: 1.8em;
   margin-left: 0.6rem;
+}
+
+.header-middle {
+  text-align: center;
 }
 
 #app-controls {

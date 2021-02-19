@@ -1,0 +1,96 @@
+import React, { FormEvent, MouseEvent, useRef } from "react";
+
+import "./Timer.css";
+
+const millisecondsPerSecond = 1000;
+const secondsPerMinute = 60;
+const minutesPerHour = 60;
+const millisecondsPerHour = millisecondsPerSecond * secondsPerMinute * minutesPerHour;
+const millisecondsPerMinute = millisecondsPerSecond * secondsPerMinute;
+
+function calculateTimeDurationInMilliseconds(minutes: number, seconds: number) {
+  const millisecondsPerSeconds = 1000;
+  const secondsPerMinute = 60;
+  const durationMilliseconds =
+    (minutes * secondsPerMinute * millisecondsPerSeconds) +
+    (seconds * millisecondsPerSecond);
+
+  return durationMilliseconds;
+}
+
+function getFormattedRemainingTimerTime(timerClockMS: number): string {
+  // FIXME: this can probably be made more efficient.
+  const hours = Math.floor(timerClockMS / millisecondsPerHour);
+  const minutes = Math.floor((timerClockMS - (hours * millisecondsPerHour)) /millisecondsPerMinute);
+  const seconds = ((timerClockMS - (minutes * millisecondsPerMinute) - (hours * millisecondsPerHour)) / millisecondsPerSecond);
+
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
+export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
+  socket: SocketIOClient.Socket,
+  boardId: string,
+  remainingTimeMS: number,
+  state: "running" | "paused" | "stopped",
+}) => {
+  let minutesInputRef = useRef<HTMLInputElement>(null);
+  let secondsInputRef = useRef<HTMLInputElement>(null);
+  const specialInitialTimerMS = -1;
+
+  function stopTimer(e: MouseEvent) {
+    const sessionId = sessionStorage.getItem("retroSessionId");
+    e.preventDefault();
+    socket.emit(`board:timer-stop`, { boardId, sessionId });
+  }
+
+  function toggleTimerRunning(e: FormEvent) {
+    const sessionId = sessionStorage.getItem("retroSessionId");
+    e.preventDefault();
+
+    if (state === "running") {
+      socket.emit(`board:timer-pause`, { boardId, sessionId });
+    } else if (state === "paused") {
+      socket.emit(`board:timer-start`, {
+        boardId,
+        sessionId,
+        durationMS: remainingTimeMS,
+      });
+    } else {
+      socket.emit(`board:timer-start`, {
+        boardId,
+        sessionId,
+        durationMS: calculateTimeDurationInMilliseconds(
+          parseInt(minutesInputRef?.current?.value ?? "1"),
+          parseInt(secondsInputRef?.current?.value ?? "1"),
+        )
+      });
+    }
+
+    return false;
+  }
+
+  if (remainingTimeMS === specialInitialTimerMS) {
+    return null;
+  } else if (state === "running" || state === "paused") {
+    return (
+      <div className="timer-display">
+        <h4 className="digits">{ getFormattedRemainingTimerTime(remainingTimeMS) }</h4>
+        <form className="timer-control" onSubmit={toggleTimerRunning}>
+          <button type="submit">{ state === "running" ? "pause" : "start" }</button>
+          <button type="button" onClick={stopTimer}>stop</button>
+        </form>
+      </div>
+    )
+  } else {
+    return (
+      <form className="timer-control" onSubmit={toggleTimerRunning}>
+        <div className="timer-display">
+          <input name="minutes" type="number" min="0" ref={minutesInputRef} defaultValue={30}/>
+          &nbsp;:&nbsp;
+          <input name="seconds" type="number" min="0" ref={secondsInputRef} defaultValue={0}/>
+          <button type="submit">start</button>
+        </div>
+      </form>
+    );
+  }
+};
