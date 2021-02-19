@@ -12,7 +12,7 @@ let sessionStore: {
 
 const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
 const NEW_BOARD: Board = {
-  title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`,
+  title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`,
   showResults: false,
   maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
   cards: {},
