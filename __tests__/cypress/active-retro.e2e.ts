@@ -1,13 +1,4 @@
 describe("Participating in an active retro", () => {
-
-  function loginAsSession(sessionId: string): Function {
-    const previousSessionId = sessionStorage.getItem("retroSessionId");
-    sessionStorage.setItem("retroSessionId", sessionId);
-    return function logInAsPreviousSession() {
-      sessionStorage.setItem("retroSessionId", previousSessionId);
-    };
-  }
-
   before(() => {
     cy.visit("/");
     cy.wait(1000);
@@ -66,17 +57,13 @@ describe("Participating in an active retro", () => {
       .get(".stars-remaining")
       .should("contain.text", "⭐️: 1")
 
-    // Test that anyone who is not the owner of the card cannot edit it.
-    // FIXME: this test fails when run in headless browser
-    // const dummySessionId = "111111";
-    // const undoPreviousSessionChange = loginAsSession(dummySessionId);
-    // cy.visit("/");
-    // cy.get(".column:nth-child(1) .card--list .card-container:last-child [data-cy=edit-card-button]")
+    // FIXME: test that a user can only see the edit button if they are the owner of the card.
+    // cy.reload()
+    //   .get(".column:nth-child(1) .card--list .card-container:last-child [data-cy=edit-card-button]")
     //   .should("not.exist");
 
-    // undoPreviousSessionChange();
-
-    cy.get(".column:nth-child(1) .card--list .card-container")
+    cy
+      .get(".column:nth-child(1) .card--list .card-container")
       .should("have.length", 1)
       .get(".column:nth-child(2) .card--list .card-container")
       .should("have.length", 0)
