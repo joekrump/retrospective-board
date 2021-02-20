@@ -100,7 +100,7 @@ export const App = () => {
       socket.removeListener(`board:timer-tick:${boardId}`);
       socket.close();
     };
-  }, [boardId]);
+  }, [boardId, sessionId]);
 
   function renderLoading() {
     return <div>Loading...</div>

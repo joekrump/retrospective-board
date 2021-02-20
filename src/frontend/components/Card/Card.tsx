@@ -139,8 +139,6 @@ export const Card = (props: CardProps) => {
 
   function starUp(event: React.MouseEvent) {
     event.preventDefault();
-    console.log("STAR UP")
-    console.log(props)
 
     props.socket.emit("card:starred", {
       boardId: props.boardId,
