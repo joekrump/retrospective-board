@@ -1,4 +1,4 @@
-# Retro
+# Retrospective Board
 
 [![CI](https://github.com/joekrump/retro-board/actions/workflows/main.yml/badge.svg)](https://github.com/joekrump/retro-board/actions/workflows/main.yml)
 
