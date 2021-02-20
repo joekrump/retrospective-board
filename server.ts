@@ -133,25 +133,39 @@ function emitUpdateRemainingStars(
   });
 }
 
-io.on("connection", function (socket) {
+io.on("connection", (socket) => {
 
-  socket.on("board:show-results", function(data: { boardId: string, sessionId: string }) {
-    if (!!boards[data.boardId]) {
-      boards[data.boardId].showResults = !boards[data.boardId].showResults;
+  socket.on("board:show-results", ({
+    boardId,
+  }: {
+    boardId: string,
+  }) => {
+    if (!!boards[boardId]) {
+      boards[boardId].showResults = !boards[boardId].showResults;
 
-      boards[data.boardId].columns.forEach((column) => {
+      boards[boardId].columns.forEach((column) => {
         socket.emit(`column:loaded:${column.id}`, column);
         socket.broadcast.emit(`column:loaded:${column.id}`, column);
       });
 
-      socket.emit(`board:show-results:${data.boardId}`, { showResults: boards[data.boardId].showResults });
-      socket.broadcast.emit(`board:show-results:${data.boardId}`, { showResults: boards[data.boardId].showResults });
+      socket.emit(`board:show-results:${boardId}`, {
+        showResults: boards[boardId].showResults,
+      });
+      socket.broadcast.emit(`board:show-results:${boardId}`, {
+        showResults: boards[boardId].showResults,
+      });
     }
   });
 
-  socket.on("board:loaded", function (data: { boardId: string, sessionId: string }) {
-    const sessionId = data.sessionId === "" ? uuid.v4() : data.sessionId;
-    const boardId = data.boardId ?? uuid.v4();
+  socket.on("board:loaded", ({
+    sessionId,
+    boardId,
+  }: {
+    boardId: string,
+    sessionId: string,
+  }) => {
+    sessionId = sessionId === "" ? uuid.v4() : sessionId;
+    boardId = boardId ?? uuid.v4();
 
     const newSession = {
       id: sessionId,
@@ -170,20 +184,30 @@ io.on("connection", function (socket) {
     emitBoardLoaded(socket, boardId, sessionId);
   });
 
-  socket.on("board:updated", function(data: { boardId: string, title: string, sessionId: string }) {
-    if(data.title !== undefined) {
-      boards[data.boardId].title = data.title;
+  socket.on("board:updated", ({
+    title,
+    boardId,
+  }: {
+    boardId: string,
+    title: string,
+    sessionId: string,
+  }) => {
+    if (title !== undefined) {
+      boards[boardId].title = title;
     }
 
-    socket.emit(`board:updated:${data.boardId}`, {
-      title: boards[data.boardId].title,
-    });
-    socket.broadcast.emit(`board:updated:${data.boardId}`, {
-      title: boards[data.boardId].title,
+    socket.broadcast.emit(`board:updated:${boardId}`, {
+      title: boards[boardId].title,
     });
   });
 
-  socket.on("board:timer-stop", (({ boardId, sessionId }: { boardId: string, sessionId: string }) => {
+  socket.on("board:timer-stop", (({
+    boardId,
+    sessionId,
+  }: {
+    boardId: string,
+    sessionId: string,
+  }) => {
     console.log("timer stop request");
     const session = getSession(boardId, sessionId);
 
@@ -199,7 +223,13 @@ io.on("connection", function (socket) {
     socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingMS: 0, status: "stopped" });
   }));
 
-  socket.on("board:timer-pause", (({ boardId, sessionId }: { boardId: string, sessionId: string }) => {
+  socket.on("board:timer-pause", (({
+    boardId,
+    sessionId,
+  }: {
+    boardId: string,
+    sessionId: string,
+  }) => {
     console.log("timer pause request");
     const session = getSession(boardId, sessionId);
 
@@ -253,7 +283,17 @@ io.on("connection", function (socket) {
     }
   });
 
-  socket.on("column:created", function({ boardId, id, name, sessionId }: { boardId: string, id: string, name: string, sessionId: string }) {
+  socket.on("column:created", ({
+    boardId,
+    id,
+    name,
+    sessionId,
+  }: {
+    boardId: string,
+    id: string,
+    name: string,
+    sessionId: string,
+  }) => {
     console.log("column create request");
     const session = getSession(boardId, sessionId);
 
@@ -269,22 +309,40 @@ io.on("connection", function (socket) {
     socket.broadcast.emit(`column:created:${boardId}`, newColumn);
   });
 
-  socket.on("column:updated", function(data: { boardId: string, id: string, name: string, sessionId: string }) {
+  socket.on("column:updated", ({
+    boardId,
+    id,
+    name,
+    sessionId,
+  }: {
+    boardId: string,
+    id: string,
+    name: string,
+    sessionId: string,
+  }) => {
     console.log("column update request");
-    const session = getSession(data.boardId, data.sessionId);
+    const session = getSession(boardId, sessionId);
 
     if (session === null) { return; }
 
-    let column = boards[data.boardId].columns.find((column) => column.id === data.id);
+    const column = boards[boardId].columns.find((column) => column.id === id);
     if (column) {
-      column.name = data.name;
-      socket.broadcast.emit(`column:updated:${data.id}`, {
-        name: data.name
+      column.name = name;
+      socket.broadcast.emit(`column:updated:${id}`, {
+        name,
       });
     }
   });
 
-  socket.on("column:deleted", function({ boardId, sessionId, id }: { boardId: string, id: string, sessionId: string }) {
+  socket.on("column:deleted", ({
+    boardId,
+    sessionId,
+    id,
+  }: {
+    boardId: string,
+    id: string,
+    sessionId: string,
+  }) => {
     console.log("column delete request");
     const session = getSession(boardId, sessionId);
 
@@ -322,7 +380,7 @@ io.on("connection", function (socket) {
     column.cardIds.push(cardId);
   }
 
-  socket.on("card:moved", function({
+  socket.on("card:moved", ({
     boardId,
     fromColumnId,
     toColumnId,
@@ -334,7 +392,7 @@ io.on("connection", function (socket) {
     toColumnId: string,
     cardId: string,
     sessionId: string,
-  }) {
+  }) => {
     console.log("card move request");
     const session = getSession(boardId, sessionId);
 
@@ -397,39 +455,69 @@ io.on("connection", function (socket) {
     }
   }
 
-  socket.on("card:created", function(data: { boardId: string, columnId: string, cardId: string, text: string, sessionId: string }) {
+  socket.on("card:created", ({
+    boardId,
+    columnId,
+    cardId,
+    text,
+    sessionId,
+  }: {
+    boardId: string,
+    columnId: string,
+    cardId: string,
+    text: string,
+    sessionId: string,
+  }) => {
     console.log("card create request")
-    const session = getSession(data.boardId, data.sessionId);
+    const session = getSession(boardId, sessionId);
 
     if (session === null) { return; }
 
-    addNewCardToColumn(data);
-  });
-
-  socket.on("card:updated", function (data: { boardId: string, columnId: string, cardId: string, text: string, sessionId: string }) {
-    console.log("card update request");
-    const session = getSession(data.boardId, data.sessionId);
-
-    if (session === null) { return; }
-
-    boards[data.boardId].cards[data.cardId].text = data.text;
-
-    socket.broadcast.emit(`card:updated:${data.cardId}`, {
-      text: data.text,
+    addNewCardToColumn({
+      cardId,
+      sessionId,
+      text,
+      columnId,
+      boardId,
     });
   });
 
-  socket.on("card:deleted", function ({
+  socket.on("card:updated", ({
+    boardId,
+    columnId,
+    cardId,
+    text,
+    sessionId,
+  }: {
+    boardId: string,
+    columnId: string,
+    cardId: string,
+    text: string,
+    sessionId: string,
+  }) => {
+    console.log("card update request");
+    const session = getSession(boardId, sessionId);
+
+    if (session === null) { return; }
+
+    boards[boardId].cards[cardId].text = text;
+
+    socket.broadcast.emit(`card:updated:${cardId}`, {
+      text,
+    });
+  });
+
+  socket.on("card:deleted", ({
     boardId,
     columnId,
     cardId,
     sessionId,
-  }:{
+  }: {
     boardId: string,
     columnId: string,
     cardId: string,
     sessionId: string,
-  }) {
+  }) => {
     console.log("card delete request");
     const session = getSession(boardId, sessionId);
     if (session === null) { return; }
@@ -454,7 +542,18 @@ io.on("connection", function (socket) {
     }
   });
 
-  socket.on("card:starred", function ({ id, star, boardId, sessionId }: { id: string, star: number, boardId: string, columnId: string, sessionId: string }) {
+  socket.on("card:starred", ({
+    id,
+    star,
+    boardId,
+    sessionId,
+  }: {
+    id: string,
+    star: number,
+    boardId: string,
+    columnId: string,
+    sessionId: string,
+  }) => {
     const session = getSession(boardId, sessionId);
 
     if (session === null) { return; }
