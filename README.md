@@ -1,5 +1,7 @@
 # Retro
 
+[![CI](https://github.com/joekrump/retro-board/actions/workflows/main.yml/badge.svg)](https://github.com/joekrump/retro-board/actions/workflows/main.yml)
+
 A tool for running retros.
 
 ![App Screenshot](https://user-images.githubusercontent.com/3317231/107178416-f57cd600-6988-11eb-884e-fff71f8c9e79.png)
