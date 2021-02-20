@@ -40,34 +40,35 @@ export const App = () => {
   }
 
   useEffect(function onMount() {
-    socket.on(`board:loaded:${boardId}`, (
-      data: {
-        board: IBoard,
-        sessionId: string,
-        remainingStars: number,
-        showResults: boolean,
-      },
-    ) => {
-      updateMode(data.showResults ? AppMode.review : AppMode.vote);
+    socket.on(`board:loaded:${boardId}`, ({
+      board,
+      sessionId,
+      remainingStars,
+    }: {
+      board: IBoard,
+      sessionId: string,
+      remainingStars: number,
+    }) => {
+      updateMode(board.showResults ? AppMode.review : AppMode.vote);
       updateTimer({
-        remainingMS: data.board.timerRemainingMS,
-        status: data.board.timerStatus,
+        remainingMS: board.timerRemainingMS,
+        status: board.timerStatus,
       });
-      const initialColumns = data.board.columns.map((column: IColumn) => ({
+      const initialColumns = board.columns.map((column: IColumn) => ({
         ...column,
         isEditing: false
       }));
       updateBoard({
         id: boardId,
-        title: data.board.title,
-        starsPerUser: data.board.starsPerUser,
+        title: board.title,
+        starsPerUser: board.starsPerUser,
       });
-      updateRemainingStars(data.remainingStars);
-      sessionStorage.setItem("retroSessionId", data.sessionId);
-      updateSessionId(data.sessionId);
+      updateRemainingStars(remainingStars);
+      sessionStorage.setItem("retroSessionId", sessionId);
+      updateSessionId(sessionId);
       setBoardState({
         columns: initialColumns,
-        cards: data.board.cards,
+        cards: board.cards,
       });
     });
 

@@ -83,17 +83,8 @@ function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
   console.log(`board loaded: ${boardId}`);
   socket.emit(`board:loaded:${boardId}`, {
-    board: {
-      timerRemainingMS: boards[boardId].timerRemainingMS,
-      timerDurationMS: boards[boardId].timerDurationMS,
-      timerStatus: boards[boardId].timerStatus,
-      title: boards[boardId].title,
-      cards: boards[boardId].cards,
-      columns: boards[boardId].columns,
-      starsPerUser: boards[boardId].starsPerUser,
-    },
+    board: boards[boardId],
     sessionId,
-    showResults: boards[boardId].showResults,
     remainingStars: sessionStore[boardId][sessionId].remainingStars,
   });
 }
