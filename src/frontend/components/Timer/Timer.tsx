@@ -28,36 +28,32 @@ function getFormattedRemainingTimerTime(timerClockMS: number): string {
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
-  socket: SocketIOClient.Socket,
-  boardId: string,
-  remainingTimeMS: number,
-  state: "running" | "paused" | "stopped",
-}) => {
+export const Timer = ({ socket }: { socket: SocketIOClient.Socket }) => {
   let minutesInputRef = useRef<HTMLInputElement>(null);
   let secondsInputRef = useRef<HTMLInputElement>(null);
-  let { state: { sessionId } } = useOvermind();
+  let { state: { sessionId, board, timer } } = useOvermind();
   const specialInitialTimerMS = -1;
 
   function stopTimer(e: MouseEvent) {
     e.preventDefault();
-    socket.emit(`board:timer-stop`, { boardId, sessionId });
+    socket.emit(`board:timer-stop`, { boardId: board.id, sessionId });
   }
 
   function toggleTimerRunning(e: FormEvent) {
     e.preventDefault();
-
-    if (state === "running") {
-      socket.emit(`board:timer-pause`, { boardId, sessionId });
-    } else if (state === "paused") {
+    console.log(board.id)
+    if (timer.status === "running") {
+      socket.emit(`board:timer-pause`, { boardId: board.id, sessionId });
+    } else if (timer.status === "paused") {
       socket.emit(`board:timer-start`, {
-        boardId,
+        boardId: board.id,
         sessionId,
-        durationMS: remainingTimeMS,
+        durationMS: timer.remainingMS,
       });
     } else {
+      console.log("START NEW TIMER")
       socket.emit(`board:timer-start`, {
-        boardId,
+        boardId: board.id,
         sessionId,
         durationMS: calculateTimeDurationInMilliseconds(
           parseInt(minutesInputRef?.current?.value ?? "1"),
@@ -69,16 +65,16 @@ export const Timer = ({ socket, boardId, remainingTimeMS, state }: {
     return false;
   }
 
-  if (remainingTimeMS === specialInitialTimerMS) {
+  if (timer.remainingMS === specialInitialTimerMS) {
     return null;
-  } else if (state === "running" || state === "paused") {
+  } else if (timer.status === "running" || timer.status === "paused") {
     return (
       <div className="timer-display">
         <span className="gg-timer"></span>
-        <h4 className="digits">{ getFormattedRemainingTimerTime(remainingTimeMS) }</h4>
+        <h4 className="digits">{ getFormattedRemainingTimerTime(timer.remainingMS) }</h4>
         <form className="timer-control" onSubmit={toggleTimerRunning}>
           <button type="submit">
-            <span className={`gg-play-${state === "running" ? "pause" : "button"}`}></span>
+            <span className={`gg-play-${timer.status === "running" ? "pause" : "button"}`}></span>
           </button>
           <button type="button" onClick={stopTimer}>
             <span className="gg-play-stop"></span>

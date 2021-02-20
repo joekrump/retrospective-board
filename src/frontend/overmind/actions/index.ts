@@ -1,15 +1,22 @@
-import { AppMode } from "../state";
+import { AppMode, State } from "../state";
 import { Action, mutate } from "overmind";
-import { BoardColumn, Card, Board } from "../../../@types";
+import { BoardColumn, Card } from "../../../@types";
 
 export const updateMode: Action<AppMode> = ({ state }, mode: AppMode) => {
   state.mode = mode;
 };
 
-export const updateBoard: Action<{ title: string, id: string }> = ({ state }, board: { title: string, id: string }) => {
+export const updateBoard: Action<Partial<State["board"]>> = ({ state }, board: Partial<State["board"]>) => {
   state.board = {
     ...state.board,
     ...board,
+  };
+};
+
+export const updateTimer: Action<Partial<State["timer"]>> = ({ state }, timer: Partial<State["timer"]>) => {
+  state.timer = {
+    ...state.timer,
+    ...timer,
   };
 };
 

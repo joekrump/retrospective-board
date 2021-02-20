@@ -14,9 +14,7 @@ const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
 
 export const App = () => {
-  const { state: { sessionId }, actions: { updateMode, updateSessionId, setBoardState, updateBoard, updateRemainingStars } } = useOvermind();
-  let [timerClockRemainingMS, updateTimeClockRemainingMS] = useState(-1);
-  let [timerState, updateTimerState]: ["running" | "paused" | "stopped", Function] = useState("stopped");
+  const { state: { sessionId }, actions: { updateMode, updateSessionId, setBoardState, updateBoard, updateRemainingStars, updateTimer } } = useOvermind();
   let serverURL = window.location.origin;
   let boardId = window.location.pathname.split("/").pop() ?? uuidV4();
 
@@ -43,10 +41,6 @@ export const App = () => {
     setHideStarLimitAlertTimeout();
   }
 
-  function updateTimerClock(timeMS: number) {
-    updateTimeClockRemainingMS(timeMS);
-  }
-
   useEffect(function onMount() {
     socket.on(`board:loaded:${boardId}`, (
       data: {
@@ -57,8 +51,10 @@ export const App = () => {
       },
     ) => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
-      updateTimerState(data.board.timerState);
-      updateTimeClockRemainingMS(data.board.timerRemainingMS);
+      updateTimer({
+        remainingMS: data.board.timerRemainingMS,
+        status: data.board.timerState,
+      });
       const initialColumns = data.board.columns.map((column: IColumn) => ({
         ...column,
         isEditing: false
@@ -88,8 +84,10 @@ export const App = () => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
     });
     socket.on(`board:timer-tick:${boardId}`, ({ remainingTimeMS, state }: { remainingTimeMS: number, state: "running" | "paused" | "stopped" }) => {
-      updateTimerClock(remainingTimeMS);
-      updateTimerState(state);
+      updateTimer({
+        status: state,
+        remainingMS: remainingTimeMS,
+      });
     });
 
     socket.emit("board:loaded", {
@@ -103,7 +101,7 @@ export const App = () => {
       socket.removeListener(`board:timer-tick:${boardId}`);
       socket.close();
     };
-  }, []);
+  }, [boardId]);
 
   function renderLoading() {
     return <div>Loading...</div>
@@ -111,15 +109,8 @@ export const App = () => {
 
   return (
     <Suspense fallback={renderLoading()}>
-      <Header
-        socket={socket}
-        boardId={boardId}
-        timerClockMS={timerClockRemainingMS}
-        timerState={timerState}
-      />
-      <Board
-        socket={socket}
-      />
+      <Header socket={socket} />
+      <Board socket={socket} />
       <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
         Your voting limit of {maxStars} has been reached. Undo previous stars if you want some back.
       </div>

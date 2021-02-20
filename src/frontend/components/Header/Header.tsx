@@ -9,19 +9,16 @@ import { AppMode } from "../../overmind/state";
 import { Timer } from "../Timer/Timer";
 interface HeaderProps {
   socket: SocketIOClient.Socket;
-  boardId: string;
-  timerClockMS: number;
-  timerState: "running" | "paused" | "stopped";
 }
 
 const Header = (props: HeaderProps) => {
-  let { state: { sessionId, mode } } = useOvermind();
+  let { state: { sessionId, mode, board } } = useOvermind();
 
   function toggleShowResults(e: React.ChangeEvent) {
     e.preventDefault();
     // emit an event to show results.
     props.socket.emit(`board:show-results`, {
-      boardId: props.boardId,
+      boardId: board.id,
       sessionId,
     });
   }
@@ -37,7 +34,7 @@ const Header = (props: HeaderProps) => {
         <h2>Retro</h2>
       </div>
       <div className="header-middle">
-        <Timer remainingTimeMS={props.timerClockMS} state={props.timerState} socket={props.socket} boardId={props.boardId} />
+        <Timer socket={props.socket} />
       </div>
       <div id="app-controls">
         <h4>View Results</h4>
