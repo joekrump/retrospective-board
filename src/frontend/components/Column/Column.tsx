@@ -118,16 +118,19 @@ export const Column = (props: ColumnProps) => {
   function deleteCard(event: React.MouseEvent, cardId: string) {
     event.preventDefault();
     const cardToDelete = cards[cardId];
-    removeCard(cardId);
 
-    if (cardToDelete.ownerId !== undefined) {
-      props.socket.emit("card:deleted", {
-        boardId: props.boardId,
-        columnId: props.id,
-        cardId,
-        sessionId,
-      });
-    }
+    removeCard(cardId).then(() => {
+      if (cardToDelete.ownerId !== undefined) {
+        props.socket.emit("card:deleted", {
+          boardId: props.boardId,
+          columnId: props.id,
+          cardId,
+          sessionId,
+        });
+      }
+    }).catch(() => {
+      throw new Error("failed to delete card from store");
+    });
   }
 
   function toggleIsEditing(event?: React.MouseEvent) {

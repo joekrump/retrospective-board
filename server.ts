@@ -137,6 +137,9 @@ function emitUpdateRemainingStars(
   socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
     remainingStars,
   });
+  socket.broadcast.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
+    remainingStars,
+  });
 }
 
 io.on("connection", function (socket) {
