@@ -90,6 +90,7 @@ function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: st
       title: boards[boardId].title,
       cards: boards[boardId].cards,
       columns: boards[boardId].columns,
+      starsPerUser: boards[boardId].starsPerUser,
     },
     sessionId,
     showResults: boards[boardId].showResults,
