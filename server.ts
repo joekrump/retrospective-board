@@ -81,7 +81,7 @@ function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
 }
 
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
-  console.log("load board");
+  console.log(`board loaded: ${boardId}`);
   socket.emit(`board:loaded:${boardId}`, {
     board: {
       timerRemainingMS: boards[boardId].timerRemainingMS,
