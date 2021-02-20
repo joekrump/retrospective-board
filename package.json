@@ -36,7 +36,8 @@
     "dev:client": "webpack-dev-server --mode development --open --config ./config/webpack.config.js",
     "dev:server": "ts-node-dev --respawn --transpile-only server.ts",
     "test:headless": "cypress run",
-    "test": "cypress open"
+    "test": "cypress open",
+    "test:ci": "concurrently \"npm start\" \"npm run test:headless\""
   },
   "devDependencies": {
     "@arkweid/lefthook": "^0.7.2",
@@ -48,7 +49,7 @@
     "@types/uuid": "^3.4.9",
     "concurrently": "^5.2.0",
     "css-loader": "^3.6.0",
-    "cypress": "^6.3.0",
+    "cypress": "^6.5.0",
     "html-webpack-plugin": "^3.2.0",
     "source-map-loader": "^0.2.4",
     "style-loader": "^1.2.1",
