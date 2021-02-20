@@ -103,7 +103,7 @@ export const Column = (props: ColumnProps) => {
     if (card === undefined) {
       card = {
         id: `card-${uuid.v4()}`,
-        ownerId: "",
+        ownerId: null,
         stars: {},
         columnId: props.id,
         text: "",

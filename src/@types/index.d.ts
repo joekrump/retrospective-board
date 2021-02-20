@@ -6,7 +6,7 @@ export interface Card {
   };
   columnId: string;
   starsCount: number;
-  ownerId: string;
+  ownerId: string | null;
   isEditing: boolean;
 }
 
