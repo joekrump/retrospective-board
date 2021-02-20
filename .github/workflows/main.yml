@@ -20,7 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: cypress-io/github-action@v2.8.2
-      - run: npm install
+
+      - name: Start the application
+      - run: npm star
       
       - name: Cypress.io
         run: npm run test:headless
