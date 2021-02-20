@@ -94,10 +94,10 @@ function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: st
 }
 
 function updateRemainingStars(
+  boardId: string,
+  card: Card,
   session: Session,
   socket: SocketIO.Socket,
-  card: Card,
-  boardId: string,
   star: number,
 ) {
   if (card.stars[session.id] === undefined) {
@@ -124,9 +124,9 @@ function canStar(remainingStars: number) {
 }
 
 function emitUpdateRemainingStars(
-  socket: SocketIO.Socket,
   boardId: string,
   sessionId: string,
+  socket: SocketIO.Socket,
 ) {
   socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
     remainingStars: sessionStore[boardId][sessionId].remainingStars
@@ -188,13 +188,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("board:updated", ({
-    title,
     boardId,
-    sessionId
+    sessionId,
+    title,
   }: {
     boardId: string,
-    title: string,
     sessionId: string,
+    title: string,
   }) => {
     if (!hasSession(boardId, sessionId)) { return; }
 
@@ -332,8 +332,8 @@ io.on("connection", (socket) => {
 
   socket.on("column:deleted", ({
     boardId,
-    sessionId,
     id,
+    sessionId,
   }: {
     boardId: string,
     id: string,
@@ -351,7 +351,7 @@ io.on("connection", (socket) => {
         delete boards[boardId].cards[cardId];
       });
 
-      emitUpdateRemainingStars(socket, boardId, sessionId);
+      emitUpdateRemainingStars(boardId, sessionId, socket);
 
       boards[boardId]?.columns.splice(columnIndex, 1);
       socket.broadcast.emit(`column:deleted:${boardId}`, { id });
@@ -375,16 +375,16 @@ io.on("connection", (socket) => {
 
   socket.on("card:moved", ({
     boardId,
-    fromColumnId,
-    toColumnId,
     cardId,
+    fromColumnId,
     sessionId,
+    toColumnId,
   }: {
     boardId: string,
-    fromColumnId: string,
-    toColumnId: string,
     cardId: string,
+    fromColumnId: string,
     sessionId: string,
+    toColumnId: string,
   }) => {
     console.log("card move request");
     if (!hasSession(boardId, sessionId)) { return; }
@@ -412,17 +412,17 @@ io.on("connection", (socket) => {
   });
 
   function addNewCardToColumn({
+    boardId,
     cardId,
+    columnId,
     sessionId,
     text,
-    columnId,
-    boardId,
   }: {
+    boardId: string,
     cardId: string,
+    columnId: string,
     sessionId: string,
     text: string,
-    columnId: string,
-    boardId: string,
   }) {
     const column = boards[boardId].columns.find((column) => column.id === columnId);
 
@@ -448,39 +448,39 @@ io.on("connection", (socket) => {
 
   socket.on("card:created", ({
     boardId,
-    columnId,
     cardId,
-    text,
+    columnId,
     sessionId,
+    text,
   }: {
     boardId: string,
-    columnId: string,
     cardId: string,
-    text: string,
+    columnId: string,
     sessionId: string,
+    text: string,
   }) => {
     console.log("card create request")
     if (!hasSession(boardId, sessionId)) { return; }
 
     addNewCardToColumn({
+      boardId,
       cardId,
+      columnId,
       sessionId,
       text,
-      columnId,
-      boardId,
     });
   });
 
   socket.on("card:updated", ({
     boardId,
     cardId,
-    text,
     sessionId,
+    text,
   }: {
     boardId: string,
     cardId: string,
-    text: string,
     sessionId: string,
+    text: string,
   }) => {
     console.log("card update request");
     if (!hasSession(boardId, sessionId)) { return; }
@@ -494,13 +494,13 @@ io.on("connection", (socket) => {
 
   socket.on("card:deleted", ({
     boardId,
-    columnId,
     cardId,
+    columnId,
     sessionId,
   }: {
     boardId: string,
-    columnId: string,
     cardId: string,
+    columnId: string,
     sessionId: string,
   }) => {
     console.log("card delete request");
@@ -517,7 +517,7 @@ io.on("connection", (socket) => {
         column.cardIds.splice(index, 1);
 
         reclaimStarsFromDeleteCard(card, boardId);
-        emitUpdateRemainingStars(socket, boardId, sessionId);
+        emitUpdateRemainingStars(boardId, sessionId, socket);
 
         socket.broadcast.emit(`card:deleted:${boardId}`, {
           cardId,
@@ -527,23 +527,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("card:starred", ({
-    id,
-    star,
     boardId,
+    id,
     sessionId,
+    star,
   }: {
-    id: string,
-    star: number,
     boardId: string,
     columnId: string,
+    id: string,
     sessionId: string,
+    star: number,
   }) => {
     const session = getSession(boardId, sessionId);
     if (!hasSession(boardId, sessionId)) { return; }
     const card = boards[boardId].cards[id];
 
     if (card && canStar(session.remainingStars)) {
-      updateRemainingStars(session, socket, card, boardId, star);
+      updateRemainingStars(boardId, card, session, socket, star);
       const userStars = card.stars[session.id];
       const { starsCount } = card;
 
