@@ -62,7 +62,7 @@ export const BoardControls = (props: BoardControlsProps) => {
       </div>
       {
         mode === AppMode.review ?
-          <button className="button button__sort" onClick={props.sortColumnCardsByStars}>
+          <button className="button button__sort" data-cy="sort-columns-button" onClick={props.sortColumnCardsByStars}>
             ⭐️ { props.sortDirection === SortDirection.asc ? <span className="gg-sort-za" /> : <span className="gg-sort-az" /> }
           </button>
         :

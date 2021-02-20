@@ -11,6 +11,7 @@ const Switch = ({ id, handleChange, isOn }: SwitchProps) => {
   return (
     <>
       <input
+        data-cy="review-switch-checkbox"
         className="switch--checkbox"
         id={id}
         checked={isOn}
