@@ -12,13 +12,13 @@ let sessionStore: {
 
 const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
 const NEW_BOARD: Board = {
-  title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`,
+  title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`,
   showResults: false,
-  maxStars: MAX_VOTES_USER_VOTE_PER_BOARD,
+  starsPerUser: MAX_VOTES_USER_VOTE_PER_BOARD,
   cards: {},
   timerRemainingMS: 0,
   timerDurationMS: 0,
-  timerState: "stopped",
+  timerStatus: "stopped",
   columns: [
     {
       id: uuid.v4(),
@@ -81,15 +81,16 @@ function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
 }
 
 function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
-  console.log("load board");
+  console.log(`board loaded: ${boardId}`);
   socket.emit(`board:loaded:${boardId}`, {
     board: {
       timerRemainingMS: boards[boardId].timerRemainingMS,
       timerDurationMS: boards[boardId].timerDurationMS,
-      timerState: boards[boardId].timerState,
+      timerStatus: boards[boardId].timerStatus,
       title: boards[boardId].title,
       cards: boards[boardId].cards,
       columns: boards[boardId].columns,
+      starsPerUser: boards[boardId].starsPerUser,
     },
     sessionId,
     showResults: boards[boardId].showResults,
@@ -136,11 +137,14 @@ function emitUpdateRemainingStars(
   socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
     remainingStars,
   });
+  socket.broadcast.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
+    remainingStars,
+  });
 }
 
-io.on('connection', function (socket) {
+io.on("connection", function (socket) {
 
-  socket.on('board:show-results', function(data: { boardId: string, sessionId: string }) {
+  socket.on("board:show-results", function(data: { boardId: string, sessionId: string }) {
     if (!!boards[data.boardId]) {
       boards[data.boardId].showResults = !boards[data.boardId].showResults;
 
@@ -154,8 +158,8 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on("board:loaded", function (data: { boardId: string, sessionId?: string }) {
-    const sessionId = data.sessionId ?? uuid.v4();
+  socket.on("board:loaded", function (data: { boardId: string, sessionId: string }) {
+    const sessionId = data.sessionId === "" ? uuid.v4() : data.sessionId;
     const boardId = data.boardId ?? uuid.v4();
 
     const newSession = {
@@ -198,10 +202,10 @@ io.on('connection', function (socket) {
     boards[boardId].stepsIntervalId = undefined;
     boards[boardId].timerRemainingMS = 0;
     boards[boardId].timerDurationMS = 0;
-    boards[boardId].timerState = "stopped";
+    boards[boardId].timerStatus = "stopped";
 
-    socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0, state: "stopped" });
-    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: 0, state: "stopped" });
+    socket.emit(`board:timer-tick:${boardId}`, { remainingMS: 0, status: "stopped" });
+    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingMS: 0, status: "stopped" });
   }));
 
   socket.on("board:timer-pause", (({ boardId, sessionId }: { boardId: string, sessionId: string }) => {
@@ -210,9 +214,9 @@ io.on('connection', function (socket) {
 
     if (session === null) { return; }
 
-    boards[boardId].timerState = "paused";
-    socket.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: boards[boardId].timerRemainingMS, state: "paused" });
-    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingTimeMS: boards[boardId].timerRemainingMS, state: "paused" });
+    boards[boardId].timerStatus = "paused";
+    socket.emit(`board:timer-tick:${boardId}`, { remainingMS: boards[boardId].timerRemainingMS, status: "paused" });
+    socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingMS: boards[boardId].timerRemainingMS, status: "paused" });
   }));
 
   socket.on("board:timer-start", ({
@@ -230,16 +234,16 @@ io.on('connection', function (socket) {
     if (session === null) { return; }
     const intervalFrequencyMS = 1000;
 
-    boards[boardId].timerState = "running";
+    boards[boardId].timerStatus = "running";
     boards[boardId].timerDurationMS = durationMS;
     boards[boardId].timerRemainingMS = durationMS;
 
     if (!boards[boardId]?.stepsIntervalId) {
       boards[boardId].stepsIntervalId = setInterval(() => {
-        if (boards[boardId].timerState === "paused") { return; }
+        if (boards[boardId].timerStatus === "paused") { return; }
         if (boards[boardId].timerRemainingMS === 0) {
           clearInterval(boards[boardId].stepsIntervalId);
-          boards[boardId].timerState = "stopped";
+          boards[boardId].timerStatus = "stopped";
           boards[boardId].stepsIntervalId = undefined;
           return;
         }
@@ -247,40 +251,14 @@ io.on('connection', function (socket) {
         boards[boardId].timerRemainingMS = boards[boardId].timerRemainingMS - intervalFrequencyMS;
 
         socket.emit(`board:timer-tick:${boardId}`, {
-          remainingTimeMS: boards[boardId].timerRemainingMS,
-          state: "running"
+          remainingMS: boards[boardId].timerRemainingMS,
+          status: "running"
         });
         socket.broadcast.emit(`board:timer-tick:${boardId}`, {
-          remainingTimeMS: boards[boardId].timerRemainingMS,
-          state: "running",
+          remainingMS: boards[boardId].timerRemainingMS,
+          status: "running",
         });
       }, intervalFrequencyMS);
-    }
-  });
-
-  socket.on("column:loaded", function(data: { boardId: string, id: string, sessionId: string }) {
-    console.log("column load request");
-    const session = getSession(data.boardId, data.sessionId);
-
-    if (session === null) { return; }
-
-    const board = boards[data.boardId];
-    const column = board?.columns.find((column) => column.id === data.id);
-
-    if (column) {
-      let card: Card;
-      socket.emit(`column:loaded:${data.id}`, {
-        cards: column.cardIds.map((cardId) => {
-          card = board?.cards[cardId];
-          // Remove all stars other than the current users.
-          return {
-            ...card,
-            stars: {
-              [data.sessionId]: card.stars[data.sessionId]
-            },
-          };
-        }),
-      });
     }
   });
 
@@ -366,7 +344,7 @@ io.on('connection', function (socket) {
     cardId: string,
     sessionId: string,
   }) {
-    console.log("card move request")
+    console.log("card move request");
     const session = getSession(boardId, sessionId);
 
     if (session === null) { return; }
@@ -501,12 +479,15 @@ io.on('connection', function (socket) {
       socket.broadcast.emit(`card:starred:${id}`, {
         starsCount,
       });
+
       socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
         remainingStars: session.remainingStars,
       });
+      socket.broadcast.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
+        remainingStars: session.remainingStars,
+      });
     } else {
-      console.log("cannot star")
-      console.log("card", card)
+      console.error("cannot star card: ", card.id, card.columnId);
     }
   });
 });

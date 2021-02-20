@@ -7,17 +7,33 @@ export enum AppMode {
 
 export type State = {
   mode: AppMode;
+  board: {
+    title: string;
+    id: string;
+    starsPerUser: number;
+  };
+  sessionId: string;
   columns: BoardColumn[];
   cards: { [ id: string ]: Card }
   cardBeingDragged: any;
   timer: {
     remainingMS: number;
     status: "running" | "paused" | "stopped";
-  }
+  },
+  remainingStars: number;
 };
+
+const initialSessionId = sessionStorage.getItem("retroSessionId") ?? "";
 
 export const state: State = {
   mode: AppMode.vote,
+  sessionId: initialSessionId,
+  remainingStars: 0,
+  board: {
+    title: "",
+    id: "",
+    starsPerUser: 0,
+  },
   timer: {
     remainingMS: 0,
     status: "stopped",

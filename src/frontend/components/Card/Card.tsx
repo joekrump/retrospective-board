@@ -16,18 +16,17 @@ interface CardProps {
   text: string;
   starsCount: number;
   userStars: number;
-  ownerId?: string;
+  ownerId: string | null;
   isEditing: boolean;
 }
 
 export const Card = (props: CardProps) => {
-  const sessionId = sessionStorage.getItem("retroSessionId") ?? "";
-  const [isEditing, updateIsEditing] = useState(props.isEditing && (props.ownerId === "" || sessionId === props.ownerId));
   const [text, updateText] = useState(props.text);
-  const [ownerId, updateOwnerId] = useState(props.ownerId ?? null);
   const [userStars, updateUserStars] = useState(props.userStars);
   const [starsCount, updateStarsCount] = useState(props.starsCount);
-  const { state: { mode }, actions: { updateCardBeingDragged, updateCard } } = useOvermind();
+  const { state: { mode, sessionId }, actions: { updateCardBeingDragged, updateCard } } = useOvermind();
+  const [ownerId, updateOwnerId] = useState(props.ownerId);
+  const [isEditing, updateIsEditing] = useState(props.isEditing && (sessionId === props.ownerId || props.ownerId === null));
   const innerRef: RefObject<HTMLDivElement> = useRef(null);
   let cardContents;
 
