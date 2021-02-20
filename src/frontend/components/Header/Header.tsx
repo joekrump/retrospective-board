@@ -12,14 +12,13 @@ interface HeaderProps {
 }
 
 const Header = (props: HeaderProps) => {
-  let { state: { sessionId, mode, board } } = useOvermind();
+  let { state: { mode, board } } = useOvermind();
 
   function toggleShowResults(e: React.ChangeEvent) {
     e.preventDefault();
-    // emit an event to show results.
+
     props.socket.emit(`board:show-results`, {
       boardId: board.id,
-      sessionId,
     });
   }
 

@@ -23,8 +23,8 @@ const Board = (props: BoardProps) => {
   const [sortDirection, updateSortDirection] = useState(SortDirection.desc);
 
   useEffect(function onMount() {
-    props.socket.on(`board:updated:${board.id}`, (data: any) => {
-      actions.updateBoard(data.title);
+    props.socket.on(`board:updated:${board.id}`, ({ title }: { title: string }) => {
+      actions.updateBoard({ title });
     });
 
     props.socket.on(`column:created:${board.id}`, (data: any) => {
