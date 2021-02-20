@@ -19,13 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: cypress-io/github-action@v2.8.2
 
       - name: Start the application
         run: npm start
       
       - name: Cypress.io
-        run: npm run test:headless
+        uses: cypress-io/github-action@v2.8.2
 
   # This workflow contains a single job called "build"
   build:
