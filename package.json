@@ -35,7 +35,7 @@
     "start": "npm run dev",
     "dev:client": "webpack-dev-server --mode development --open --config ./config/webpack.config.js",
     "dev:server": "ts-node-dev --respawn --transpile-only server.ts",
-    "test:run": "cypress run",
+    "test:headless": "cypress run",
     "test": "cypress open"
   },
   "devDependencies": {
