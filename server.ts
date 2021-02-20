@@ -127,13 +127,12 @@ function emitUpdateRemainingStars(
   socket: SocketIO.Socket,
   boardId: string,
   sessionId: string,
-  remainingStars: number,
 ) {
   socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
-    remainingStars,
+    remainingStars: sessionStore[boardId][sessionId].remainingStars
   });
   socket.broadcast.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
-    remainingStars,
+    remainingStars: sessionStore[boardId][sessionId].remainingStars
   });
 }
 
@@ -342,7 +341,6 @@ io.on("connection", (socket) => {
   }) => {
     console.log("column delete request");
     if (!hasSession(boardId, sessionId)) { return; }
-
     let columnIndex = boards[boardId]?.columns.findIndex((column) => column.id === id);
 
     if (columnIndex !== -1) {
@@ -353,7 +351,7 @@ io.on("connection", (socket) => {
         delete boards[boardId].cards[cardId];
       });
 
-      emitUpdateRemainingStars(socket, boardId, sessionId, session.remainingStars);
+      emitUpdateRemainingStars(socket, boardId, sessionId);
 
       boards[boardId]?.columns.splice(columnIndex, 1);
       socket.broadcast.emit(`column:deleted:${boardId}`, { id });
@@ -519,7 +517,7 @@ io.on("connection", (socket) => {
         column.cardIds.splice(index, 1);
 
         reclaimStarsFromDeleteCard(card, boardId);
-        emitUpdateRemainingStars(socket, boardId, sessionId, session.remainingStars);
+        emitUpdateRemainingStars(socket, boardId, sessionId);
 
         socket.broadcast.emit(`card:deleted:${boardId}`, {
           cardId,
