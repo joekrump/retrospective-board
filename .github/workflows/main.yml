@@ -20,13 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Start the application
-        run: |
-          npm i
-          npm start
-      
       - name: Cypress.io
         uses: cypress-io/github-action@v2.8.2
+        with:
+          record: false
+          start: npm start &
 
   # This workflow contains a single job called "build"
   build:
