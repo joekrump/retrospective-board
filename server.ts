@@ -54,16 +54,16 @@ function createNewBoard(boardId: string) {
   boards[boardId] = NEW_BOARD;
 }
 
-function getSession(boardId, sessionId: string): Session | null {
+function getSession(boardId: string, sessionId: string): Session | null {
   let session;
   if (sessionId !== undefined) {
     try {
       session = sessionStore[boardId][sessionId]
     } catch {
-      session =  null;
+      session = null;
     }
   } else {
-    session =  null;
+    session = null;
   }
 
   if (session === null || session === undefined) {
@@ -72,6 +72,10 @@ function getSession(boardId, sessionId: string): Session | null {
   } else {
     return session;
   }
+}
+
+function hasSession(boardId: string, sessionId: string) {
+  return getSession(boardId, sessionId) !== null;
 }
 
 function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
@@ -187,11 +191,14 @@ io.on("connection", (socket) => {
   socket.on("board:updated", ({
     title,
     boardId,
+    sessionId
   }: {
     boardId: string,
     title: string,
     sessionId: string,
   }) => {
+    if (!hasSession(boardId, sessionId)) { return; }
+
     if (title !== undefined) {
       boards[boardId].title = title;
     }
@@ -209,9 +216,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     console.log("timer stop request");
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
 
     clearInterval(boards[boardId].stepsIntervalId);
     boards[boardId].stepsIntervalId = undefined;
@@ -231,9 +236,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     console.log("timer pause request");
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
 
     boards[boardId].timerStatus = "paused";
     socket.emit(`board:timer-tick:${boardId}`, { remainingMS: boards[boardId].timerRemainingMS, status: "paused" });
@@ -250,9 +253,7 @@ io.on("connection", (socket) => {
     sessionId: string
   }) => {
     console.log("timer start request");
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
     const intervalFrequencyMS = 1000;
 
     boards[boardId].timerStatus = "running";
@@ -295,9 +296,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     console.log("column create request");
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
 
     const newColumn = {
       id,
@@ -321,9 +320,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     console.log("column update request");
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
 
     const column = boards[boardId].columns.find((column) => column.id === id);
     if (column) {
@@ -344,9 +341,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     console.log("column delete request");
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
 
     let columnIndex = boards[boardId]?.columns.findIndex((column) => column.id === id);
 
@@ -394,9 +389,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     console.log("card move request");
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
 
     const toColumn = boards[boardId].columns.find((column) => column.id === toColumnId);
     const fromColumn = boards[boardId].columns.find((column) => column.id === fromColumnId);
@@ -434,8 +427,8 @@ io.on("connection", (socket) => {
     boardId: string,
   }) {
     const column = boards[boardId].columns.find((column) => column.id === columnId);
-    if (column) {
 
+    if (column) {
       const newCard: Card = {
         id: cardId,
         text,
@@ -469,9 +462,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     console.log("card create request")
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
 
     addNewCardToColumn({
       cardId,
@@ -484,21 +475,17 @@ io.on("connection", (socket) => {
 
   socket.on("card:updated", ({
     boardId,
-    columnId,
     cardId,
     text,
     sessionId,
   }: {
     boardId: string,
-    columnId: string,
     cardId: string,
     text: string,
     sessionId: string,
   }) => {
     console.log("card update request");
-    const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
+    if (!hasSession(boardId, sessionId)) { return; }
 
     boards[boardId].cards[cardId].text = text;
 
@@ -519,10 +506,9 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     console.log("card delete request");
-    const session = getSession(boardId, sessionId);
-    if (session === null) { return; }
-
+    if (!hasSession(boardId, sessionId)) { return; }
     const column = boards[boardId].columns.find((column) => column.id === columnId);
+
     if (column) {
       const card = boards[boardId].cards[cardId];
 
@@ -555,9 +541,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     const session = getSession(boardId, sessionId);
-
-    if (session === null) { return; }
-
+    if (!hasSession(boardId, sessionId)) { return; }
     const card = boards[boardId].cards[id];
 
     if (card && canStar(session.remainingStars)) {
