@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Column } from "../Column/Column";
 import * as uuid from "uuid";
 import { BoardControls } from "../BoardControls/BoardControls";
@@ -20,7 +20,7 @@ export enum SortDirection {
 
 const Board = (props: BoardProps) => {
   const { state: { cards, columns, mode, board, sessionId, }, actions } = useOvermind();
-  const [sortDirection, updateSortDirection] = React.useState(SortDirection.desc);
+  const [sortDirection, updateSortDirection] = useState(SortDirection.desc);
 
   useEffect(function onMount() {
     props.socket.on(`board:updated:${board.id}`, (data: any) => {
