@@ -1,5 +1,5 @@
 import express from "express";
-import SocketIO from "socket.io";
+import SocketIO, { Socket } from "socket.io";
 import uuid from "uuid";
 import { Board, Card, Session } from "./src/@types";
 
@@ -149,7 +149,7 @@ function emitUpdateRemainingStars(
   });
 }
 
-function addNewCardToColumn({
+function addNewCardToColumn(socket: SocketIO.Socket, {
   boardId,
   cardId,
   columnId,
@@ -461,13 +461,16 @@ io.on("connection", (socket) => {
     console.log("card create request")
     if (!hasSession(boardId, sessionId)) { return; }
 
-    addNewCardToColumn({
-      boardId,
-      cardId,
-      columnId,
-      sessionId,
-      text,
-    });
+    addNewCardToColumn(
+      socket,
+      {
+        boardId,
+        cardId,
+        columnId,
+        sessionId,
+        text,
+      },
+    );
   };
 
   const handleCardUpdated = ({
