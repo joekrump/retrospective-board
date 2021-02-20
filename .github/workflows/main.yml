@@ -24,7 +24,9 @@ jobs:
         uses: cypress-io/github-action@v2.8.2
         with:
           record: false
-          start: npm start &
+          start: |
+            npm run dev:server &
+            npm run dev:client
 
   # This workflow contains a single job called "build"
   build:
