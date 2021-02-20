@@ -119,6 +119,19 @@ function updateRemainingStars(
   }
 }
 
+function removeCardFromColumn(column, cardId) {
+  const index = column.cardIds.indexOf(cardId);
+  column.cardIds.splice(index, 1);
+}
+
+function moveCardToColumn(board, column, cardId) {
+  // TODO: A refinement could be for this event to receive an index where the card should be slotted in.
+  // This would require the order of cards in a column to be kept track of on the client as well.
+  // Keeping track of the order of cards would bring the added benefit of being able to re-order cards in a column
+  board.cards[cardId].columnId = column.id;
+  column.cardIds.push(cardId);
+}
+
 function canStar(remainingStars: number) {
   return remainingStars >= 0;
 }
@@ -136,9 +149,43 @@ function emitUpdateRemainingStars(
   });
 }
 
-io.on("connection", (socket) => {
+function addNewCardToColumn({
+  boardId,
+  cardId,
+  columnId,
+  sessionId,
+  text,
+}: {
+  boardId: string,
+  cardId: string,
+  columnId: string,
+  sessionId: string,
+  text: string,
+}) {
+  const column = boards[boardId].columns.find((column) => column.id === columnId);
 
-  socket.on("board:show-results", ({
+  if (column) {
+    const newCard: Card = {
+      id: cardId,
+      text,
+      stars: {},
+      ownerId: sessionId,
+      starsCount: 0,
+      columnId,
+      isEditing: false,
+    };
+
+    boards[boardId].cards[cardId] = newCard;
+    column.cardIds.push(cardId);
+
+    socket.broadcast.emit(`card:created:${boardId}`, {
+      card: newCard,
+    });
+  }
+}
+
+io.on("connection", (socket) => {
+  const handleShowBoardResults = ({
     boardId,
   }: {
     boardId: string,
@@ -158,9 +205,9 @@ io.on("connection", (socket) => {
         showResults: boards[boardId].showResults,
       });
     }
-  });
+  };
 
-  socket.on("board:loaded", ({
+  const handleBoardLoaded = ({
     sessionId,
     boardId,
   }: {
@@ -185,9 +232,9 @@ io.on("connection", (socket) => {
     }
 
     emitBoardLoaded(socket, boardId, sessionId);
-  });
+  };
 
-  socket.on("board:updated", ({
+  const handleBoardUpdated = ({
     boardId,
     sessionId,
     title,
@@ -205,9 +252,9 @@ io.on("connection", (socket) => {
     socket.broadcast.emit(`board:updated:${boardId}`, {
       title: boards[boardId].title,
     });
-  });
+  };
 
-  socket.on("board:timer-stop", (({
+  const handleBoardTimerStop = ({
     boardId,
     sessionId,
   }: {
@@ -225,9 +272,9 @@ io.on("connection", (socket) => {
 
     socket.emit(`board:timer-tick:${boardId}`, { remainingMS: 0, status: "stopped" });
     socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingMS: 0, status: "stopped" });
-  }));
+  };
 
-  socket.on("board:timer-pause", (({
+  const handleBoardTimerPause = ({
     boardId,
     sessionId,
   }: {
@@ -240,9 +287,9 @@ io.on("connection", (socket) => {
     boards[boardId].timerStatus = "paused";
     socket.emit(`board:timer-tick:${boardId}`, { remainingMS: boards[boardId].timerRemainingMS, status: "paused" });
     socket.broadcast.emit(`board:timer-tick:${boardId}`, { remainingMS: boards[boardId].timerRemainingMS, status: "paused" });
-  }));
+  };
 
-  socket.on("board:timer-start", ({
+  const handleBoardTimerStart = ({
     boardId,
     durationMS,
     sessionId,
@@ -281,9 +328,9 @@ io.on("connection", (socket) => {
         });
       }, intervalFrequencyMS);
     }
-  });
+  };
 
-  socket.on("column:created", ({
+  const handleColumnCreated = ({
     boardId,
     id,
     name,
@@ -305,9 +352,9 @@ io.on("connection", (socket) => {
 
     boards[boardId].columns.push(newColumn);
     socket.broadcast.emit(`column:created:${boardId}`, newColumn);
-  });
+  };
 
-  socket.on("column:updated", ({
+  const handleColumnUpdated = ({
     boardId,
     id,
     name,
@@ -328,9 +375,9 @@ io.on("connection", (socket) => {
         name,
       });
     }
-  });
+  };
 
-  socket.on("column:deleted", ({
+  const handleColumnDeleted = ({
     boardId,
     id,
     sessionId,
@@ -358,22 +405,9 @@ io.on("connection", (socket) => {
     } else  {
       console.error("No column found");
     }
-  });
+  };
 
-  function removeCardFromColumn(column, cardId) {
-    const index = column.cardIds.indexOf(cardId);
-    column.cardIds.splice(index, 1);
-  }
-
-  function moveCardToColumn(board, column, cardId) {
-    // TODO: A refinement could be for this event to receive an index where the card should be slotted in.
-    // This would require the order of cards in a column to be kept track of on the client as well.
-    // Keeping track of the order of cards would bring the added benefit of being able to re-order cards in a column
-    board.cards[cardId].columnId = column.id;
-    column.cardIds.push(cardId);
-  }
-
-  socket.on("card:moved", ({
+  const handleCardMoved = ({
     boardId,
     cardId,
     fromColumnId,
@@ -409,44 +443,9 @@ io.on("connection", (socket) => {
       cardId,
       toColumnId,
     });
-  });
+  };
 
-  function addNewCardToColumn({
-    boardId,
-    cardId,
-    columnId,
-    sessionId,
-    text,
-  }: {
-    boardId: string,
-    cardId: string,
-    columnId: string,
-    sessionId: string,
-    text: string,
-  }) {
-    const column = boards[boardId].columns.find((column) => column.id === columnId);
-
-    if (column) {
-      const newCard: Card = {
-        id: cardId,
-        text,
-        stars: {},
-        ownerId: sessionId,
-        starsCount: 0,
-        columnId,
-        isEditing: false,
-      };
-
-      boards[boardId].cards[cardId] = newCard;
-      column.cardIds.push(cardId);
-
-      socket.broadcast.emit(`card:created:${boardId}`, {
-        card: newCard,
-      });
-    }
-  }
-
-  socket.on("card:created", ({
+  const handleCardCreated = ({
     boardId,
     cardId,
     columnId,
@@ -469,9 +468,9 @@ io.on("connection", (socket) => {
       sessionId,
       text,
     });
-  });
+  };
 
-  socket.on("card:updated", ({
+  const handleCardUpdated = ({
     boardId,
     cardId,
     sessionId,
@@ -490,9 +489,9 @@ io.on("connection", (socket) => {
     socket.broadcast.emit(`card:updated:${cardId}`, {
       text,
     });
-  });
+  };
 
-  socket.on("card:deleted", ({
+  const handleCardDeleted = ({
     boardId,
     cardId,
     columnId,
@@ -524,9 +523,9 @@ io.on("connection", (socket) => {
         });
       }
     }
-  });
+  };
 
-  socket.on("card:starred", ({
+  const handleCardStarred = ({
     boardId,
     id,
     sessionId,
@@ -561,6 +560,23 @@ io.on("connection", (socket) => {
     } else {
       console.error("cannot star card: ", card.id, card.columnId);
     }
-  });
+  };
+
+  socket.on("board:show-results", handleShowBoardResults);
+  socket.on("board:loaded", handleBoardLoaded);
+  socket.on("board:updated", handleBoardUpdated);
+  socket.on("board:timer-stop", handleBoardTimerStop);
+  socket.on("board:timer-pause", handleBoardTimerPause);
+  socket.on("board:timer-start", handleBoardTimerStart);
+
+  socket.on("column:created", handleColumnCreated);
+  socket.on("column:updated", handleColumnUpdated);
+  socket.on("column:deleted", handleColumnDeleted);
+
+  socket.on("card:moved", handleCardMoved);
+  socket.on("card:created", handleCardCreated);
+  socket.on("card:updated", handleCardUpdated);
+  socket.on("card:deleted", handleCardDeleted);
+  socket.on("card:starred", handleCardStarred);
 });
 
