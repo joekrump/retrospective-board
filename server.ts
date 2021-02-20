@@ -562,21 +562,21 @@ io.on("connection", (socket) => {
     }
   };
 
-  socket.on("board:show-results", handleShowBoardResults);
   socket.on("board:loaded", handleBoardLoaded);
-  socket.on("board:updated", handleBoardUpdated);
-  socket.on("board:timer-stop", handleBoardTimerStop);
+  socket.on("board:show-results", handleShowBoardResults);
   socket.on("board:timer-pause", handleBoardTimerPause);
   socket.on("board:timer-start", handleBoardTimerStart);
+  socket.on("board:timer-stop", handleBoardTimerStop);
+  socket.on("board:updated", handleBoardUpdated);
 
   socket.on("column:created", handleColumnCreated);
-  socket.on("column:updated", handleColumnUpdated);
   socket.on("column:deleted", handleColumnDeleted);
+  socket.on("column:updated", handleColumnUpdated);
 
-  socket.on("card:moved", handleCardMoved);
   socket.on("card:created", handleCardCreated);
-  socket.on("card:updated", handleCardUpdated);
   socket.on("card:deleted", handleCardDeleted);
+  socket.on("card:moved", handleCardMoved);
   socket.on("card:starred", handleCardStarred);
+  socket.on("card:updated", handleCardUpdated);
 });
 
