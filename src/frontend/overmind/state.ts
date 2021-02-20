@@ -10,6 +10,7 @@ export type State = {
   board: {
     title: string;
     id: string;
+    starsPerUser: number;
   };
   sessionId: string;
   columns: BoardColumn[];
@@ -31,6 +32,7 @@ export const state: State = {
   board: {
     title: "",
     id: "",
+    starsPerUser: 0,
   },
   timer: {
     remainingMS: 0,

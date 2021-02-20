@@ -14,7 +14,7 @@ const LOCAL_DEV_SERVER_PORT = "4000";
 const SERVER_PORT = "8000";
 
 export const App = () => {
-  const { state: { sessionId }, actions: { updateMode, updateSessionId, setBoardState, updateBoard, updateRemainingStars, updateTimer } } = useOvermind();
+  const { state: { sessionId, board }, actions: { updateMode, updateSessionId, setBoardState, updateBoard, updateRemainingStars, updateTimer } } = useOvermind();
   let serverURL = window.location.origin;
   let boardId = window.location.pathname.split("/").pop() ?? uuidV4();
 
@@ -26,7 +26,6 @@ export const App = () => {
   }
 
   const socket = socketConnect(serverURL);
-  const [maxStars, setMaxStars] = useState(null as unknown as number);
   const [showStarLimitAlert, updateShowStarLimitAlert] = useState(false);
 
   function setHideStarLimitAlertTimeout(timeoutMS = 3000) {
@@ -35,8 +34,7 @@ export const App = () => {
     }, timeoutMS);
   }
 
-  function displayStarLimitAlert(maxStars: number) {
-    setMaxStars(maxStars);
+  function displayStarLimitAlert() {
     updateShowStarLimitAlert(true);
     setHideStarLimitAlertTimeout();
   }
@@ -53,7 +51,7 @@ export const App = () => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
       updateTimer({
         remainingMS: data.board.timerRemainingMS,
-        status: data.board.timerState,
+        status: data.board.timerStatus,
       });
       const initialColumns = data.board.columns.map((column: IColumn) => ({
         ...column,
@@ -62,6 +60,7 @@ export const App = () => {
       updateBoard({
         id: boardId,
         title: data.board.title,
+        starsPerUser: data.board.starsPerUser,
       });
       updateRemainingStars(data.remainingStars);
       sessionStorage.setItem("retroSessionId", data.sessionId);
@@ -77,16 +76,16 @@ export const App = () => {
     });
 
     socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {
-      displayStarLimitAlert(data.maxStars);
+      displayStarLimitAlert();
     });
 
     socket.on(`board:show-results:${boardId}`, (data: { showResults: boolean }) => {
       updateMode(data.showResults ? AppMode.review : AppMode.vote);
     });
-    socket.on(`board:timer-tick:${boardId}`, ({ remainingTimeMS, state }: { remainingTimeMS: number, state: "running" | "paused" | "stopped" }) => {
+    socket.on(`board:timer-tick:${boardId}`, ({ remainingMS, status }: { remainingMS: number, status: "running" | "paused" | "stopped" }) => {
       updateTimer({
-        status: state,
-        remainingMS: remainingTimeMS,
+        status,
+        remainingMS,
       });
     });
 
@@ -112,7 +111,7 @@ export const App = () => {
       <Header socket={socket} />
       <Board socket={socket} />
       <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
-        Your voting limit of {maxStars} has been reached. Undo previous stars if you want some back.
+        Your voting limit of {board.starsPerUser} has been reached. Undo previous stars if you want some back.
       </div>
     </Suspense>
   );
