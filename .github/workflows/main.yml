@@ -22,7 +22,7 @@ jobs:
       - uses: cypress-io/github-action@v2.8.2
 
       - name: Start the application
-      - run: npm star
+        run: npm star
       
       - name: Cypress.io
         run: npm run test:headless
