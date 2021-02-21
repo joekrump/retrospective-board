@@ -2,6 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import { connect as socketConnect } from "socket.io-client";
 import { v4 as uuidV4} from "uuid";
 import { useOvermind } from "../../overmind";
+import { AppErrorBoundary } from "../ErrorBoundaries/AppErrorBoundary";
 
 import "./app.css";
 
@@ -108,12 +109,14 @@ export const App = () => {
   }
 
   return (
-    <Suspense fallback={renderLoading()}>
-      <Header socket={socket} />
-      <Board socket={socket} />
-      <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
-        Your voting limit of {board.starsPerUser} has been reached. Undo previous stars if you want some back.
-      </div>
-    </Suspense>
+    <AppErrorBoundary>
+      <Suspense fallback={renderLoading()}>
+        <Header socket={socket} />
+        <Board socket={socket} />
+        <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
+          Your voting limit of {board.starsPerUser} has been reached. Undo previous stars if you want some back.
+        </div>
+      </Suspense>
+    </AppErrorBoundary>
   );
 }
