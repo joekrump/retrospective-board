@@ -50,7 +50,7 @@ export const App = () => {
       sessionId: string,
       remainingStars: number,
     }) => {
-      updateMode(board.showResults ? AppMode.review : AppMode.vote);
+      updateMode(board.showResults ? AppMode.review : AppMode.active);
       updateTimer({
         remainingMS: board.timerRemainingMS,
         status: board.timerStatus,
@@ -62,7 +62,7 @@ export const App = () => {
       updateBoard({
         id: boardId,
         title: board.title,
-        starsPerUser: board.starsPerUser,
+        maxStarsPerUser: board.maxStarsPerUser,
       });
       updateRemainingStars(remainingStars);
       sessionStorage.setItem("retroSessionId", sessionId);
@@ -78,7 +78,7 @@ export const App = () => {
     });
 
     socket.on(`board:show-results:${boardId}`, (data: { showResults: boolean }) => {
-      updateMode(data.showResults ? AppMode.review : AppMode.vote);
+      updateMode(data.showResults ? AppMode.review : AppMode.active);
     });
     socket.on(`board:timer-tick:${boardId}`, ({ remainingMS, status }: { remainingMS: number, status: "running" | "paused" | "stopped" }) => {
       updateTimer({
@@ -120,7 +120,7 @@ export const App = () => {
         <Header socket={socket} />
         <Board socket={socket} />
         <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
-          Your voting limit of {board.starsPerUser} has been reached. Undo previous stars if you want some back.
+          Your ⭐️ limit of {board.maxStarsPerUser} has been reached. Undo previous stars if you want some back.
         </div>
       </Suspense>
     </AppErrorBoundary>

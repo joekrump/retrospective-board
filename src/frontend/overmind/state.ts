@@ -1,7 +1,7 @@
 import { BoardColumn, Card } from "../../@types";
 
 export enum AppMode {
-  "vote",
+  "active",
   "review",
 };
 
@@ -10,7 +10,7 @@ export type State = {
   board: {
     title: string;
     id: string;
-    starsPerUser: number;
+    maxStarsPerUser: number;
   };
   sessionId: string;
   columns: BoardColumn[];
@@ -26,13 +26,13 @@ export type State = {
 const initialSessionId = sessionStorage.getItem("retroSessionId") ?? "";
 
 export const state: State = {
-  mode: AppMode.vote,
+  mode: AppMode.active,
   sessionId: initialSessionId,
   remainingStars: 0,
   board: {
     title: "",
     id: "",
-    starsPerUser: 0,
+    maxStarsPerUser: 0,
   },
   timer: {
     remainingMS: 0,

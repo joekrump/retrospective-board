@@ -17,7 +17,7 @@ export interface Column {
 }
 
 export interface Board {
-  starsPerUser: number;
+  maxStarsPerUser: number;
   title: string;
   showResults: boolean;
   columns: Column[];

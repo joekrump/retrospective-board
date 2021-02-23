@@ -9,7 +9,7 @@ A tool for helping run [a retrospective meeting](https://www.softwaretestinghelp
 1. Drag and drop cards between columns.
 2. **Anonymity**
    - Each user has a session but no personal identifying information is required.
-   - You only see your ⭐️s that you've given to cards while in voting mode.
+   - You only see your ⭐️s that you've given to cards while in "active" mode.
 3. **Review mode**
    - See the total number of ⭐️ values given to each card
    - Quickly identify the cards with the most ⭐️s using sorting.
