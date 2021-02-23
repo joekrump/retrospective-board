@@ -193,11 +193,6 @@ io.on("connection", (socket) => {
     if (!!boards[boardId]) {
       boards[boardId].showResults = !boards[boardId].showResults;
 
-      boards[boardId].columns.forEach((column) => {
-        socket.emit(`column:loaded:${column.id}`, column);
-        socket.broadcast.emit(`column:loaded:${column.id}`, column);
-      });
-
       socket.emit(`board:show-results:${boardId}`, {
         showResults: boards[boardId].showResults,
       });
