@@ -10,11 +10,11 @@ let sessionStore: {
   };
 } = {};
 
-const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
+const BOARD_MAX_STARS_PER_USER = 10;
 const NEW_BOARD: Board = {
   title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`,
   showResults: false,
-  maxStarsPerUser: MAX_VOTES_USER_VOTE_PER_BOARD,
+  maxStarsPerUser: BOARD_MAX_STARS_PER_USER,
   cards: {},
   timerRemainingMS: 0,
   timerDurationMS: 0,
@@ -115,7 +115,7 @@ function updateRemainingStars(
     card.stars[session.id]++;
   } else {
     console.log("No more stars left");
-    socket.emit(`board:star-limit-reached:${boardId}`, { maxStars: MAX_VOTES_USER_VOTE_PER_BOARD });
+    socket.emit(`board:star-limit-reached:${boardId}`, { maxStars: BOARD_MAX_STARS_PER_USER });
   }
 }
 
@@ -214,7 +214,7 @@ io.on("connection", (socket) => {
 
     const newSession = {
       id: sessionId,
-      remainingStars: MAX_VOTES_USER_VOTE_PER_BOARD,
+      remainingStars: BOARD_MAX_STARS_PER_USER,
     };
 
     if(!sessionStore[boardId]) {
