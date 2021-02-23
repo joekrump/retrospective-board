@@ -73,10 +73,6 @@ export const App = () => {
       });
     });
 
-    socket.on(`board:update-remaining-stars:${boardId}:${sessionId}`, (data: any) => {
-      updateRemainingStars(data.remainingStars);
-    });
-
     socket.on(`board:star-limit-reached:${boardId}`, (data: { maxStars: number }) => {
       displayStarLimitAlert();
     });
@@ -102,7 +98,17 @@ export const App = () => {
       socket.removeListener(`board:timer-tick:${boardId}`);
       socket.close();
     };
-  }, [boardId, sessionId]);
+  }, []);
+
+  useEffect(() => {
+    socket.on(`board:update-remaining-stars:${boardId}:${sessionId}`, (data: any) => {
+      updateRemainingStars(data.remainingStars);
+    });
+
+    return () => {
+      socket.removeListener(`board:update-remaining-stars:${boardId}:${sessionId}`);
+    };
+  }, [sessionId]);
 
   function renderLoading() {
     return <div>Loading...</div>
