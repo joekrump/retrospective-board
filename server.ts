@@ -14,7 +14,7 @@ const MAX_VOTES_USER_VOTE_PER_BOARD = 10;
 const NEW_BOARD: Board = {
   title: `Retro - ${(new Date()).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`,
   showResults: false,
-  starsPerUser: MAX_VOTES_USER_VOTE_PER_BOARD,
+  maxStarsPerUser: MAX_VOTES_USER_VOTE_PER_BOARD,
   cards: {},
   timerRemainingMS: 0,
   timerDurationMS: 0,

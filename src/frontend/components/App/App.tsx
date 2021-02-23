@@ -62,7 +62,7 @@ export const App = () => {
       updateBoard({
         id: boardId,
         title: board.title,
-        starsPerUser: board.starsPerUser,
+        maxStarsPerUser: board.maxStarsPerUser,
       });
       updateRemainingStars(remainingStars);
       sessionStorage.setItem("retroSessionId", sessionId);
@@ -120,7 +120,7 @@ export const App = () => {
         <Header socket={socket} />
         <Board socket={socket} />
         <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
-          Your voting limit of {board.starsPerUser} has been reached. Undo previous stars if you want some back.
+          Your voting limit of {board.maxStarsPerUser} has been reached. Undo previous stars if you want some back.
         </div>
       </Suspense>
     </AppErrorBoundary>
