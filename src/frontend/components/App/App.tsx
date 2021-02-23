@@ -120,7 +120,7 @@ export const App = () => {
         <Header socket={socket} />
         <Board socket={socket} />
         <div className={`alert alert-star-limit ${showStarLimitAlert ? "alert--show" : ""}`}>
-          Your voting limit of {board.maxStarsPerUser} has been reached. Undo previous stars if you want some back.
+          Your ⭐️ limit of {board.maxStarsPerUser} has been reached. Undo previous stars if you want some back.
         </div>
       </Suspense>
     </AppErrorBoundary>
