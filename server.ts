@@ -193,6 +193,9 @@ io.on("connection", (socket) => {
     if (!!boards[boardId]) {
       boards[boardId].showResults = !boards[boardId].showResults;
 
+      socket.emit(`board:show-results:${boardId}`, {
+        showResults: boards[boardId].showResults,
+      });
       socket.broadcast.emit(`board:show-results:${boardId}`, {
         showResults: boards[boardId].showResults,
       });
