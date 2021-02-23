@@ -1,7 +1,7 @@
 import { BoardColumn, Card } from "../../@types";
 
 export enum AppMode {
-  "vote",
+  "active",
   "review",
 };
 
@@ -26,7 +26,7 @@ export type State = {
 const initialSessionId = sessionStorage.getItem("retroSessionId") ?? "";
 
 export const state: State = {
-  mode: AppMode.vote,
+  mode: AppMode.active,
   sessionId: initialSessionId,
   remainingStars: 0,
   board: {

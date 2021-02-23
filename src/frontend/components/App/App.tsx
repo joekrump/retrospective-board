@@ -50,7 +50,7 @@ export const App = () => {
       sessionId: string,
       remainingStars: number,
     }) => {
-      updateMode(board.showResults ? AppMode.review : AppMode.vote);
+      updateMode(board.showResults ? AppMode.review : AppMode.active);
       updateTimer({
         remainingMS: board.timerRemainingMS,
         status: board.timerStatus,
@@ -78,7 +78,7 @@ export const App = () => {
     });
 
     socket.on(`board:show-results:${boardId}`, (data: { showResults: boolean }) => {
-      updateMode(data.showResults ? AppMode.review : AppMode.vote);
+      updateMode(data.showResults ? AppMode.review : AppMode.active);
     });
     socket.on(`board:timer-tick:${boardId}`, ({ remainingMS, status }: { remainingMS: number, status: "running" | "paused" | "stopped" }) => {
       updateTimer({

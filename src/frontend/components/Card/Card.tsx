@@ -162,7 +162,7 @@ export const Card = (props: CardProps) => {
   }
 
   function isEditable() {
-    return ownerId === sessionId && mode === AppMode.vote;
+    return ownerId === sessionId && mode === AppMode.active;
   }
 
   function renderUserStars() {
@@ -248,8 +248,8 @@ export const Card = (props: CardProps) => {
                 ⭐️
               </button>
             }
-            { mode === AppMode.vote ? renderUserStars() : renderResults() }
-            { mode === AppMode.vote && userStars > 0 ? renderUndoButton() : null }
+            { mode === AppMode.active ? renderUserStars() : renderResults() }
+            { mode === AppMode.active && userStars > 0 ? renderUndoButton() : null }
           </div>
           { editLink }
         </div>
