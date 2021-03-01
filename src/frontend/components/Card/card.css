@@ -20,7 +20,7 @@
 }
 
 .card-container[draggable="true"] {
-  cursor: move;
+  cursor: grab;
 }
 
 .card-container--editing {
