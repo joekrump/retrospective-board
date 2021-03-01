@@ -6,12 +6,14 @@
   display: flex;
   height: 2rem;
   align-items: center;
+  font-weight: 700;
 }
 .timer-control input {
   width: fit-content;
   color: var(--timer-light-color);
   outline: none;
   border: none;
+  font-weight: 700;
 }
 
 /* Hide number input arrows */
