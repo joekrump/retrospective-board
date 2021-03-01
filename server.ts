@@ -210,7 +210,7 @@ io.on("connection", (socket) => {
     sessionId: string,
   }) => {
     sessionId = sessionId === "" ? uuid.v4() : sessionId;
-    boardId = boardId ?? uuid.v4();
+    boardId = boardId === "" ? uuid.v4() : boardId;
 
     const newSession = {
       id: sessionId,

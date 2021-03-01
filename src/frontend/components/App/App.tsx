@@ -17,12 +17,13 @@ const SERVER_PORT = "8000";
 export const App = () => {
   const { state: { sessionId, board }, actions: { updateMode, updateSessionId, setBoardState, updateBoard, updateRemainingStars, updateTimer } } = useOvermind();
   let serverURL = window.location.origin;
-  let boardId = window.location.pathname.split("/").pop() ?? uuidV4();
+  let boardId = window.location.pathname.split("/").pop()
 
   if (window.location.port === LOCAL_DEV_SERVER_PORT) {
     serverURL = window.location.origin.replace(window.location.port, SERVER_PORT);
     boardId = "dev-board";
-  } else {
+  } else if (!boardId) {
+    boardId = uuidV4();
     window.location.assign(`/board/${boardId}`);
   }
 
