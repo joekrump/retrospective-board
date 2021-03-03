@@ -38,8 +38,7 @@ export const Column = (props: ColumnProps) => {
 
   function handleDrop(e: DragEvent) {
     e.stopPropagation(); // stops the browser from redirecting.
-    if (innerRef.current !== null && e?.dataTransfer?.dropEffect) {
-      e.dataTransfer.dropEffect = "move";
+    if (innerRef.current !== null) {
       const droppedCard = cardBeingDragged;
       innerRef.current?.classList.remove("over");
       if (droppedCard === null || droppedCard.columnId === props.id) {
