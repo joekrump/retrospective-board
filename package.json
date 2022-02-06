@@ -28,16 +28,16 @@
     "uuid": "^3.4.0"
   },
   "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev": "concurrently \"yarn run dev:server\" \"yarn run dev:client\"",
     "prod": "NODE_ENV=production concurrently --kill-others \"ts-node-dev --respawn --transpile-only server.ts\" \"ts-node-dev --transpile-only --respawn ngrok.ts\"",
-    "preprod": "npm run build",
+    "preprod": "yarn run build",
     "build": "webpack --mode production --config ./config/webpack.config.js",
-    "start": "npm run dev",
+    "start": "yarn run dev",
     "dev:client": "webpack-dev-server --mode development --open --config ./config/webpack.config.js",
     "dev:server": "ts-node-dev --respawn --transpile-only server.ts",
     "ci:client": "webpack-dev-server --mode development --config ./config/webpack.config.js",
     "ci:server": "ts-node-dev --transpile-only server.ts",
-    "ci:start": "concurrently \"npm run ci:server\" \"npm run ci:client\"",
+    "ci:start": "concurrently \"yarn run ci:server\" \"yarn run ci:client\"",
     "test:headless": "cypress run",
     "test": "cypress open",
     "test:ci": "start-server-and-test ci:start http://localhost:4000 test:headless"
