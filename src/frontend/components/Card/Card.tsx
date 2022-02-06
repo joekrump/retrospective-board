@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, RefObject } from "react";
 import { ButtonDelete } from "../ButtonDelete/ButtonDelete";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
-import ReactMarkdown from "react-markdown";
+import Markdown from "react-markdown";
 
 import "./card.css";
 
@@ -222,22 +222,19 @@ export const Card = (props: CardProps) => {
 
     cardContents = (
       <>
-        <ReactMarkdown
+        <Markdown
+          children={text}
           className="card--content"
-          source={text}
-          allowedTypes={[
-            "paragraph",
-            "text",
-            "root",
-            "emphasis",
+          allowedElements={[
+            "p",
+            "em",
             "strong",
-            "image",
-            "link",
-            "inlineCode",
+            "img",
+            "a",
+            "pre",
             "code",
           ]}
-        >
-        </ReactMarkdown>
+        />
         <div className="card--footer">
           <div className="starring">
             {
