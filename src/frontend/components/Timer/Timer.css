@@ -8,6 +8,7 @@
   align-items: center;
   font-weight: 700;
 }
+
 .timer-control input {
   width: fit-content;
   color: var(--timer-light-color);
@@ -51,6 +52,7 @@
 }
 
 .timer-display .digits {
+  font-variant-numeric: tabular-nums;
   text-align: right;
   margin-right: 0.6rem;
   width: 80px;
@@ -62,6 +64,6 @@
   width: 1.6rem;
 }
 
-.timer-display input + button {
+.timer-display input+button {
   margin-left: 1rem;
 }
