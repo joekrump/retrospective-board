@@ -3,3 +3,5 @@ public
 .env
 .vscode
 cypress
+.yarn/cache
+.yarn/install-state.gz
