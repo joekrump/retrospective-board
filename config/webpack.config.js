@@ -53,10 +53,8 @@ module.exports = {
   ],
   devServer: {
     compress: true,
-    contentBase: path.join(__dirname, 'src/frontend'),
     hot: true,
-    inline: true,
     port: 4000,
-    watchContentBase: true,
+    watchFiles: path.join(__dirname, 'src/frontend'),
   }
 };
