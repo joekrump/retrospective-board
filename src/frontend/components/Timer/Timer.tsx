@@ -1,4 +1,5 @@
 import React, { FormEvent, MouseEvent, useRef } from "react";
+import type { Socket } from "socket.io-client";
 import { useOvermind } from "../../overmind";
 
 import "./Timer.css";
@@ -28,7 +29,7 @@ function getFormattedRemainingTimerTime(timerClockMS: number): string {
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export const Timer = ({ socket }: { socket: SocketIOClient.Socket }) => {
+export const Timer = ({ socket }: { socket: Socket }) => {
   let minutesInputRef = useRef<HTMLInputElement>(null);
   let secondsInputRef = useRef<HTMLInputElement>(null);
   let { state: { sessionId, board, timer } } = useOvermind();

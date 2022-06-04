@@ -7,8 +7,10 @@ import { AppLogo } from "../AppLogo/AppLogo";
 import "./header.css";
 import { AppMode } from "../../overmind/state";
 import { Timer } from "../Timer/Timer";
+import type { Socket } from "socket.io-client";
+
 interface HeaderProps {
-  socket: SocketIOClient.Socket;
+  socket: Socket;
 }
 
 const Header = (props: HeaderProps) => {
