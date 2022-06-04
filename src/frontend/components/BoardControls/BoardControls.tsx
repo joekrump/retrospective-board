@@ -4,8 +4,10 @@ import "./board-controls.css";
 import { SortDirection } from "../Board/Board";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
+import type { Socket } from "socket.io-client";
+
 interface BoardControlsProps {
-  socket: SocketIOClient.Socket;
+  socket: Socket;
   boardId: string;
   sortDirection: SortDirection;
   sortColumnCardsByStars: (e: React.MouseEvent) => void;

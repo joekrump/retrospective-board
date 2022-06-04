@@ -7,13 +7,14 @@ import { SortDirection } from "../Board/Board";
 import { useOvermind } from "../../overmind";
 import { AppMode } from "../../overmind/state";
 import { Card as ICard } from "../../../@types";
+import type { Socket } from "socket.io-client";
 
 interface ColumnProps {
   key: string;
   id: string;
   name: string;
   deleteColumn: (event: React.MouseEvent, id: string) => void;
-  socket: SocketIOClient.Socket;
+  socket: Socket;
   boardId: string;
   maxWidthPercentage: number;
   isEditing?: boolean;

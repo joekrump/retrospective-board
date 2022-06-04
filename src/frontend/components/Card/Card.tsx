@@ -5,12 +5,13 @@ import { AppMode } from "../../overmind/state";
 import Markdown from "react-markdown";
 
 import "./card.css";
+import type { Socket } from "socket.io-client";
 
 interface CardProps {
   key: string;
   id: string;
   deleteCard: (event: React.MouseEvent, id: string) => void;
-  socket: SocketIOClient.Socket;
+  socket: Socket;
   columnId: string;
   boardId: string;
   text: string;

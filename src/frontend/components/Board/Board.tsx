@@ -7,9 +7,10 @@ import { useOvermind } from "../../overmind";
 import "./board.css";
 import { AppMode } from "../../overmind/state";
 import { BoardColumn, Card } from "../../../@types";
+import type { Socket } from "socket.io-client";
 
 interface BoardProps {
-  socket: SocketIOClient.Socket;
+  socket: Socket;
 }
 
 export enum SortDirection {

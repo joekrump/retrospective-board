@@ -1,5 +1,5 @@
 import express from "express";
-import SocketIO, { Socket } from "socket.io";
+import type { Socket } from "socket.io";
 import uuid from "uuid";
 import { Board, Card, Session } from "./src/@types";
 
@@ -40,8 +40,10 @@ const NEW_BOARD: Board = {
 
 let app = express();
 let server = require("http").Server(app);
-let io = SocketIO(server, {
-  origins: process.env.NODE_ENV !== "production" ? ["http://localhost:4000"] : [],
+var io = require("socket.io")(server, {
+  cors: {
+    origin: process.env.NODE_ENV !== "production" ? "http://localhost:4000" : "*:*"
+  }
 });
 server.listen(8000);
 app.use(express.static("public"));
@@ -84,7 +86,7 @@ function reclaimStarsFromDeleteCard(card: Card, boardId: string) {
   });
 }
 
-function emitBoardLoaded(socket: SocketIO.Socket, boardId: string, sessionId: string) {
+function emitBoardLoaded(socket: Socket, boardId: string, sessionId: string) {
   console.log(`board loaded: ${boardId}`);
   socket.emit(`board:loaded:${boardId}`, {
     board: boards[boardId],
@@ -97,7 +99,7 @@ function updateRemainingStars(
   boardId: string,
   card: Card,
   session: Session,
-  socket: SocketIO.Socket,
+  socket: Socket,
   star: number,
 ) {
   if (card.stars[session.id] === undefined) {
@@ -139,7 +141,7 @@ function canStar(remainingStars: number) {
 function emitUpdateRemainingStars(
   boardId: string,
   sessionId: string,
-  socket: SocketIO.Socket,
+  socket: Socket,
 ) {
   socket.emit(`board:update-remaining-stars:${boardId}:${sessionId}`, {
     remainingStars: sessionStore[boardId][sessionId].remainingStars
@@ -149,7 +151,7 @@ function emitUpdateRemainingStars(
   });
 }
 
-function addNewCardToColumn(socket: SocketIO.Socket, {
+function addNewCardToColumn(socket: Socket, {
   boardId,
   cardId,
   columnId,
